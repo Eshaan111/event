@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>StudioArch Events | Live Operations Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-container": "#dde4df",
+                      "on-primary-fixed-variant": "#3d6357",
+                      "outline-variant": "#a9b4b3",
+                      "on-tertiary-fixed": "#364f46",
+                      "surface-container-high": "#e1eae9",
+                      "on-surface-variant": "#576160",
+                      "primary-fixed-dim": "#b4ddce",
+                      "primary-fixed": "#c2ebdc",
+                      "on-background": "#2a3434",
+                      "surface-container": "#e9efee",
+                      "on-primary": "#defff2",
+                      "on-tertiary-fixed-variant": "#526b62",
+                      "tertiary-fixed-dim": "#d0ece0",
+                      "error-dim": "#4e0309",
+                      "surface-dim": "#cfdddb",
+                      "surface-container-low": "#f0f4f3",
+                      "background": "#f8faf9",
+                      "primary-container": "#c2ebdc",
+                      "surface": "#f8faf9",
+                      "secondary-fixed-dim": "#cfd6d1",
+                      "on-primary-container": "#33594d",
+                      "secondary": "#59615d",
+                      "primary": "#40665a",
+                      "surface-variant": "#dae5e3",
+                      "inverse-surface": "#0b0f0f",
+                      "on-error": "#fff7f6",
+                      "on-error-container": "#752121",
+                      "tertiary": "#4b645b",
+                      "inverse-primary": "#d0faea",
+                      "surface-container-highest": "#dae5e3",
+                      "outline": "#727d7c",
+                      "tertiary-fixed": "#defaee",
+                      "error-container": "#fe8983",
+                      "secondary-dim": "#4d5551",
+                      "tertiary-container": "#defaee",
+                      "on-secondary-fixed": "#3a413e",
+                      "primary-dim": "#345a4e",
+                      "on-surface": "#2a3434",
+                      "error": "#9f403d",
+                      "inverse-on-surface": "#9b9d9d",
+                      "tertiary-dim": "#40584f",
+                      "on-secondary-fixed-variant": "#565d5a",
+                      "on-secondary-container": "#4c5350",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-fixed": "#dde4df",
+                      "surface-tint": "#40665a",
+                      "on-tertiary": "#e4fff3",
+                      "on-tertiary-container": "#486158",
+                      "surface-bright": "#f8faf9",
+                      "on-primary-fixed": "#20463b",
+                      "on-secondary": "#f4fbf6"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Space Grotesk"],
+                      "body": ["Manrope"],
+                      "label": ["Space Grotesk"]
+              }
+            },
+          },
+        }
+      </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .font-headline { font-family: 'Space Grotesk', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .arch-grid {
+            background-image: 
+                linear-gradient(to right, rgba(64, 102, 90, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(64, 102, 90, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .dust-layer {
+            background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 1%);
+            background-size: 100px 100px;
+        }
+        .ghost-border { border: 1px solid rgba(169, 180, 179, 0.2); }
+      </style>
+</head>
+<body class="bg-background text-on-background min-h-screen relative overflow-x-hidden">
+<!-- Background Layering -->
+<div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+<div class="absolute inset-0 arch-grid"></div>
+<div class="absolute inset-0 dust-layer opacity-40"></div>
+<div class="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px]"></div>
+<div class="absolute bottom-[10%] left-[-5%] w-[400px] h-[400px] bg-secondary/5 rounded-full blur-[100px]"></div>
+<div class="absolute inset-0 opacity-[0.03] grayscale pointer-events-none mix-blend-multiply" data-alt="Technical blueprint of a modern glass pavilion with architectural lines and drafting notations in a subtle gray wash." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCTWNYvzmUFvO7c7cK86X_3SHNZOyB-wHmKJjjZak_BIhShymgoX0-d7wI0JkGX4Sn2V2EjYI4N2suUseK86LhQFwQlyHCiiIWemSLrB2eU6K2IinrSfzenBfrD3dUVBjIPQa4e3RGsAt4qQTqU-IkygUDgvoNlhRBI1Hy_s4W3o5N6AGSaTJMTp1Ze-JMcp3g0Yo4YwOW_yjt1CkQaAV8waiqKgabxUEhsTzJxAz2qsvp9I_AinstV3WML90Vkc1SmsracBuo_bg'); background-size: cover; background-position: center;"></div>
+</div>
+<div class="flex">
+<!-- SideNavBar (Shared Component) -->
+<aside class="hidden md:flex bg-emerald-50 dark:bg-stone-950 h-screen w-64 border-r border-emerald-900/10 dark:border-emerald-100/10 flex-col h-full py-8 gap-4 fixed left-0 top-0 z-50">
+<div class="px-6 mb-8">
+<div class="text-lg font-black text-emerald-900 dark:text-emerald-50 font-headline uppercase tracking-tighter">Project Studio</div>
+<div class="font-['Space_Grotesk'] uppercase tracking-widest text-[10px] text-emerald-800/50 dark:text-stone-500 mt-1">Event Management</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center px-6 py-3 text-emerald-950 dark:text-emerald-400 font-bold border-r-2 border-emerald-800 dark:border-emerald-500 font-['Space_Grotesk'] uppercase tracking-widest text-[10px] bg-emerald-100/30 dark:bg-stone-900/30 transition-transform active:translate-x-1" href="#">
+<span class="material-symbols-outlined mr-3 text-lg" data-icon="architecture">architecture</span>
+                    Projects
+                </a>
+<a class="flex items-center px-6 py-3 text-emerald-800/50 dark:text-stone-500 font-['Space_Grotesk'] uppercase tracking-widest text-[10px] hover:text-emerald-900 dark:hover:text-emerald-300 hover:bg-emerald-100/20 transition-transform" href="#">
+<span class="material-symbols-outlined mr-3 text-lg" data-icon="description">description</span>
+                    Proposals
+                </a>
+<a class="flex items-center px-6 py-3 text-emerald-800/50 dark:text-stone-500 font-['Space_Grotesk'] uppercase tracking-widest text-[10px] hover:text-emerald-900 dark:hover:text-emerald-300 hover:bg-emerald-100/20 transition-transform" href="#">
+<span class="material-symbols-outlined mr-3 text-lg" data-icon="calendar_today">calendar_today</span>
+                    Calendar
+                </a>
+<a class="flex items-center px-6 py-3 text-emerald-800/50 dark:text-stone-500 font-['Space_Grotesk'] uppercase tracking-widest text-[10px] hover:text-emerald-900 dark:hover:text-emerald-300 hover:bg-emerald-100/20 transition-transform" href="#">
+<span class="material-symbols-outlined mr-3 text-lg" data-icon="groups">groups</span>
+                    Meetings
+                </a>
+</nav>
+<div class="px-6 pt-8 mt-auto border-t border-emerald-900/10 dark:border-emerald-100/10 space-y-2">
+<a class="flex items-center py-2 text-emerald-800/50 dark:text-stone-500 font-['Space_Grotesk'] uppercase tracking-widest text-[10px] hover:text-emerald-900" href="#">
+<span class="material-symbols-outlined mr-3 text-lg" data-icon="settings">settings</span>
+                    Settings
+                </a>
+<a class="flex items-center py-2 text-emerald-800/50 dark:text-stone-500 font-['Space_Grotesk'] uppercase tracking-widest text-[10px] hover:text-emerald-900" href="#">
+<span class="material-symbols-outlined mr-3 text-lg" data-icon="help_outline">help_outline</span>
+                    Support
+                </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 min-h-screen">
+<!-- TopAppBar (Shared Component) -->
+<header class="fixed top-0 right-0 left-0 md:left-64 bg-emerald-50/80 dark:bg-stone-900/80 backdrop-blur-xl border-b border-emerald-900/10 dark:border-emerald-100/10 h-16 px-6 flex justify-between items-center z-40">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-emerald-950 dark:text-emerald-50 font-headline">StudioArch Events</span>
+<div class="hidden lg:flex items-center bg-emerald-100/50 dark:bg-stone-800/50 rounded-lg px-4 py-1.5 ghost-border">
+<span class="material-symbols-outlined text-emerald-900/40 mr-2 text-xl" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48 text-emerald-900" placeholder="Search archive..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-emerald-100/50 dark:hover:bg-stone-800/50 rounded-full transition-colors">
+<span class="material-symbols-outlined text-emerald-900" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 hover:bg-emerald-100/50 dark:hover:bg-stone-800/50 rounded-full transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-emerald-900" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<div class="pt-24 px-8 pb-12 max-w-7xl mx-auto space-y-10">
+<!-- Section 1: Top Metrics Row -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Proposal Card -->
+<div class="bg-surface-container-lowest ghost-border rounded-xl p-6 transition-all hover:bg-surface-container-high group">
+<div class="flex justify-between items-start mb-4">
+<div class="space-y-1">
+<span class="font-headline text-[10px] uppercase tracking-[0.2em] text-secondary">Total Proposals</span>
+<h3 class="text-3xl font-headline font-bold text-primary">52</h3>
+</div>
+<div class="w-16 h-8 flex items-end gap-0.5">
+<div class="w-1.5 h-[20%] bg-primary/20 rounded-t-sm"></div>
+<div class="w-1.5 h-[40%] bg-primary/20 rounded-t-sm"></div>
+<div class="w-1.5 h-[30%] bg-primary/20 rounded-t-sm"></div>
+<div class="w-1.5 h-[60%] bg-primary/40 rounded-t-sm"></div>
+<div class="w-1.5 h-[90%] bg-primary rounded-t-sm"></div>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-2 pt-4 border-t border-outline-variant/10">
+<div>
+<p class="text-[10px] font-headline text-outline uppercase">Drafts</p>
+<p class="text-sm font-bold text-on-surface">32</p>
+</div>
+<div class="border-x border-outline-variant/10 px-2">
+<p class="text-[10px] font-headline text-error uppercase">Flagged</p>
+<p class="text-sm font-bold text-on-surface">12</p>
+</div>
+<div class="pl-2">
+<p class="text-[10px] font-headline text-outline uppercase">Review</p>
+<p class="text-sm font-bold text-on-surface">8</p>
+</div>
+</div>
+</div>
+<!-- Client Conversion -->
+<div class="bg-surface-container-lowest ghost-border rounded-xl p-6 transition-all hover:bg-surface-container-high">
+<div class="flex justify-between items-start mb-4">
+<div class="space-y-1">
+<span class="font-headline text-[10px] uppercase tracking-[0.2em] text-secondary">Engagement Rate</span>
+<h3 class="text-3xl font-headline font-bold text-primary">84%</h3>
+</div>
+<span class="material-symbols-outlined text-primary p-2 bg-primary/10 rounded-lg" data-icon="trending_up">trending_up</span>
+</div>
+<div class="h-1 bg-surface-variant rounded-full mt-8 relative overflow-hidden">
+<div class="absolute inset-0 bg-primary w-[84%] rounded-full"></div>
+</div>
+<p class="text-[11px] text-on-surface-variant mt-2 font-headline uppercase tracking-wide">+4.2% from last quarter</p>
+</div>
+<!-- Studio Load -->
+<div class="bg-surface-container-lowest ghost-border rounded-xl p-6 transition-all hover:bg-surface-container-high">
+<div class="flex justify-between items-start mb-4">
+<div class="space-y-1">
+<span class="font-headline text-[10px] uppercase tracking-[0.2em] text-secondary">Studio Capacity</span>
+<h3 class="text-3xl font-headline font-bold text-primary">92%</h3>
+</div>
+<span class="material-symbols-outlined text-secondary p-2 bg-secondary/10 rounded-lg" data-icon="bolt">bolt</span>
+</div>
+<div class="flex gap-1 mt-8">
+<div class="flex-1 h-3 bg-primary rounded-sm"></div>
+<div class="flex-1 h-3 bg-primary rounded-sm"></div>
+<div class="flex-1 h-3 bg-primary rounded-sm"></div>
+<div class="flex-1 h-3 bg-primary/20 rounded-sm"></div>
+</div>
+<p class="text-[11px] text-on-surface-variant mt-2 font-headline uppercase tracking-wide">Critical load threshold</p>
+</div>
+</section>
+<!-- Section 2: Main Operational Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Live Projects Feed (2/3 width) -->
+<div class="lg:col-span-2 space-y-6">
+<div class="flex justify-between items-end">
+<div>
+<h2 class="text-2xl font-headline font-bold text-on-background tracking-tighter">Live Projects</h2>
+<p class="text-sm text-on-surface-variant">Active execution pipelines</p>
+</div>
+<button class="text-[10px] font-headline font-bold uppercase tracking-widest text-primary border-b border-primary/20 pb-1 hover:text-primary-dim transition-colors">View All Archive</button>
+</div>
+<div class="space-y-4">
+<!-- Project 1 -->
+<div class="bg-surface-container-lowest ghost-border rounded-xl p-5 group flex flex-col sm:flex-row gap-6 items-center transition-all hover:translate-x-1">
+<div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Modern architectural gala interior with dramatic violet lighting and grand staircase silhouettes." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXoXAcQbwsxIzR_tpcYG32k3LKdHZJbWX7d331_i4E8jsr-nYKYhbtOR7fzuBqiuKkV5oybow0TqsRbM_NbJTNCzv5IBSC92oAIAh_YONKB4PnGPBHiKllhDLWY4N7vA9NcAiSZ7A9147OG7a-sbB4dROHx-A5dkGNgtE42ygwCSB2Fb-ipAgpqphN_gAbG2SUm8saS0_t4q2UWfj2D3-2QfFc4tmIv-j2mobDj-wL0nUZRTGNI4MGKmzelw96IiKa5rUOXyA2Ag"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 bg-primary/5 text-primary text-[9px] font-headline font-bold uppercase rounded border border-primary/10">Active</span>
+<h4 class="text-lg font-headline font-bold text-on-background truncate">Met Gala 2026: Neo-Baroque</h4>
+</div>
+<div class="flex items-center gap-4 text-xs text-on-surface-variant mb-4">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" data-icon="person">person</span> Julian Vane</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" data-icon="schedule">schedule</span> 14 Days Remaining</span>
+</div>
+<div class="w-full bg-surface-container h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[72%]"></div>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-2 bg-surface-container-high rounded-md text-[10px] font-headline font-bold uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-all">Preview</button>
+<button class="p-2 bg-surface-container-high rounded-md hover:bg-primary-container transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="edit">edit</span>
+</button>
+</div>
+</div>
+<!-- Project 2 -->
+<div class="bg-surface-container-lowest ghost-border rounded-xl p-5 group flex flex-col sm:flex-row gap-6 items-center transition-all hover:translate-x-1">
+<div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Futuristic summit stage with holographic displays and sleek minimalist furniture in a glass dome." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9zoqkR7hDlOGE1fP7QzdbTzPkFwsCy316AyUGelhNSolyVJsO86t77e8m_Fk276qyYpUsEI8kpQkDjHcXmYAXmxwu7760z_4TO9RTjddjP0h9BsqThbkw3yO4u2FohIEQQgdxrMNusLjMyBMsq1FeWF1fL-R2K8e32d63-YlhUBrk3zc4T5kl3qhSHL2aVQxyixKSyc5z4jL4SXkeiki-yei63pR_jQPHB2hLKR3ZALviJU-yeCM3E8HX3RnMIyYJJNEUTEcwbQ"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 bg-secondary/5 text-secondary text-[9px] font-headline font-bold uppercase rounded border border-secondary/10">Discussion</span>
+<h4 class="text-lg font-headline font-bold text-on-background truncate">Aetheric Summit 2.0</h4>
+</div>
+<div class="flex items-center gap-4 text-xs text-on-surface-variant mb-4">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" data-icon="person">person</span> Elena Thorne</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" data-icon="schedule">schedule</span> 2 Month Lead</span>
+</div>
+<div class="w-full bg-surface-container h-1 rounded-full overflow-hidden">
+<div class="bg-secondary h-full w-[15%]"></div>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-2 bg-surface-container-high rounded-md text-[10px] font-headline font-bold uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-all">Preview</button>
+<button class="p-2 bg-surface-container-high rounded-md hover:bg-primary-container transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="edit">edit</span>
+</button>
+</div>
+</div>
+<!-- Project 3 -->
+<div class="bg-surface-container-lowest ghost-border rounded-xl p-5 group flex flex-col sm:flex-row gap-6 items-center transition-all hover:translate-x-1">
+<div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Elegant outdoor garden party at twilight with warm string lights and structured floral installations." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRJkDWkZyxapCgCqiR_pf4aDnH2TkMqgxQZAI9Fk7OV-y7px_qAgL5PEK-ivwFthIue0O6RP-0UpOYHiz_nY2TaYMyas5vc2CqStnwgSnvbQESAEd4OxfRdKLS4-9IAqVnJo0wUaUIXOfUazvCJRz5PyVMOD-WlZWHi-TxqXh49RRZef-JggQiSgs3pb7NMPgRRG8Cmay2bHXvdfEZLrWEBmEeJX3V59bzyOu2Qfoyq6EyCDaI3h7Iftpc1WVIw8iOpMuo4xUZOg"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 bg-error/5 text-error text-[9px] font-headline font-bold uppercase rounded border border-error/10">Action Required</span>
+<h4 class="text-lg font-headline font-bold text-on-background truncate">Verdant Estate Wedding</h4>
+</div>
+<div class="flex items-center gap-4 text-xs text-on-surface-variant mb-4">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" data-icon="person">person</span> Marcus Wei</span>
+<span class="flex items-center gap-1 text-error font-bold"><span class="material-symbols-outlined text-sm" data-icon="priority_high">priority_high</span> Budget Overrun</span>
+</div>
+<div class="w-full bg-surface-container h-1 rounded-full overflow-hidden">
+<div class="bg-error h-full w-[95%]"></div>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-2 bg-surface-container-high rounded-md text-[10px] font-headline font-bold uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-all">Preview</button>
+<button class="p-2 bg-error/10 rounded-md hover:bg-error hover:text-on-error transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="warning">warning</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Sidebar Widgets -->
+<div class="space-y-8">
+<!-- Meeting Hub -->
+<div class="bg-surface-container-low ghost-border rounded-2xl p-6 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4">
+<span class="flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-error"></span>
+</span>
+</div>
+<h3 class="font-headline font-bold text-lg mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="videocam">videocam</span> Meeting Hub
+                            </h3>
+<div class="space-y-4">
+<div class="p-4 bg-surface-container-lowest rounded-xl ghost-border border-l-4 border-l-primary transition-all hover:scale-[1.02]">
+<div class="flex justify-between items-start mb-3">
+<div>
+<p class="text-[9px] font-headline font-bold text-primary uppercase tracking-[0.1em]">Live Now</p>
+<h4 class="text-sm font-bold mt-1">Creative Sync: Neo-Baroque</h4>
+</div>
+</div>
+<div class="flex items-center -space-x-2 mb-4">
+<img alt="Avatar" class="w-8 h-8 rounded-full border-2 border-surface-container-lowest" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARZmOYz3WaFomORHoYGJ2j7cfNQMWxIe2o8zfTCmkd9-VjpjdGYueG6VieHhC9-t0qNSZABRMxv8XDm79OXZjxDSy7mUH8_rLayQQJ9ietfXzbmsHiJlSwlk054tmDEvrVsNuxky9b5ZYMC920uFCSNkewSRN1MlCASfJQbqa7_vkZi0N_bc76VBR6bpv8nW8RlkExCHATjXwPyLg-W2VC7dc04Jy9sblLcGfjHx5BUu4OK4LGH_DOU7MwryrS6bCwd8lB8XtaBw"/>
+<img alt="Avatar" class="w-8 h-8 rounded-full border-2 border-surface-container-lowest" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtL4YCU7vFyqUCDwoRDybMMfgn4mIKhueE6Qt4DsZr3XvLWbDlU1FMSkBa4McI_i36nq2z5QVKxfnZAZ-attGhzE1tNdZyW8xifdCJmcMKZxdRd8anGMmZsxJk-y_x7LGgICPSY3ws9Heodw7ZfONbkx9jzxsh-lHO5lQraIscyuVf6nFvvXG1FQUGP3iR-LmLwjsrlPKlAH_JBNSOhHw6DrSMx-a1Jxf7mhXlB11-78FqFvoAfpBHKe52z3FFFIaggvCYxMv3zA"/>
+<img alt="Avatar" class="w-8 h-8 rounded-full border-2 border-surface-container-lowest" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhFeDiZW8CL9e5V37uiAIbKQ7lX1p-Uhx98CXsL2cNNbXdLmnBUbsE8u8Wbn5YgMMHJnRHhL-V9MtQgG7vR7uv7Cv-HOo6R1fNBlNrf9yelZtSv_ktCS2lKRGLT-PagOnHmPCLj2yrQcpN5eD61M3jO5tW2pBlulzUpEIj-Vb83wysjW0k1JDBSKc_2eNf8vkqn1H5BegNSJ7CyCqP-SqUmTvmCyp_nUlWPBaPGT1IQIjoyRF-e3_339rN156lm8b8lxPQffnDug"/>
+<div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-[10px] font-bold text-emerald-900 border-2 border-surface-container-lowest">+2</div>
+</div>
+<button class="w-full py-2 bg-primary text-on-primary rounded-lg text-xs font-headline font-bold uppercase tracking-widest hover:bg-primary-dim transition-colors">Join Now</button>
+</div>
+<div class="p-4 bg-surface-container-lowest/50 rounded-xl ghost-border opacity-60">
+<p class="text-[9px] font-headline font-bold text-secondary uppercase tracking-[0.1em]">In 45 Min</p>
+<h4 class="text-sm font-bold mt-1">Technical Feasibility Brief</h4>
+<div class="flex items-center gap-2 mt-2 text-[10px] text-on-surface-variant font-headline uppercase">
+<span class="material-symbols-outlined text-xs" data-icon="groups">groups</span> 8 Participants
+                                    </div>
+</div>
+</div>
+</div>
+<!-- Studio Insight Widget -->
+<div class="bg-primary-container/30 ghost-border rounded-2xl p-6">
+<h3 class="font-headline font-bold text-lg mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="analytics">analytics</span> Studio Insight
+                            </h3>
+<div class="space-y-5">
+<div class="space-y-2">
+<div class="flex justify-between text-[10px] font-headline font-bold uppercase text-on-primary-container">
+<span>3D Rendering Load</span>
+<span>94%</span>
+</div>
+<div class="h-1.5 w-full bg-on-primary-fixed/10 rounded-full">
+<div class="h-full bg-primary-dim rounded-full" style="width: 94%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-[10px] font-headline font-bold uppercase text-on-primary-container">
+<span>Curation Bandwidth</span>
+<span>42%</span>
+</div>
+<div class="h-1.5 w-full bg-on-primary-fixed/10 rounded-full">
+<div class="h-full bg-primary-dim rounded-full" style="width: 42%"></div>
+</div>
+</div>
+<div class="pt-4 border-t border-primary/10">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-surface-container-lowest rounded-lg">
+<span class="material-symbols-outlined text-primary" data-icon="lightbulb">lightbulb</span>
+</div>
+<p class="text-[11px] leading-relaxed text-on-primary-container">Recommend moving 2 junior curators to <b>Neo-Baroque</b> stream to balance load.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Metadata Bar (Signature Component) -->
+<footer class="bg-surface-dim/40 ghost-border rounded-xl p-4 flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="flex items-center gap-6">
+<div class="flex flex-col">
+<span class="text-[8px] font-headline font-bold text-outline uppercase tracking-widest">Instance ID</span>
+<span class="text-[10px] font-mono text-secondary">ARCH-OS-2024-X9</span>
+</div>
+<div class="w-px h-6 bg-outline-variant/20 hidden md:block"></div>
+<div class="flex flex-col">
+<span class="text-[8px] font-headline font-bold text-outline uppercase tracking-widest">Global Status</span>
+<span class="text-[10px] text-primary flex items-center gap-1 font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> NOMINAL
+                            </span>
+</div>
+</div>
+<div class="text-[10px] font-headline text-secondary flex items-center gap-4">
+<span>LAST UPDATED: 12:43:02 GMT</span>
+<div class="w-px h-6 bg-outline-variant/20"></div>
+<span>SYNCED TO CLOUD CLUSTER [BERLIN]</span>
+</div>
+</footer>
+</div>
+</main>
+</div>
+<!-- Mobile BottomNavBar (Shared Component) -->
+<nav class="md:hidden fixed bottom-0 w-full bg-emerald-50/90 backdrop-blur-xl border-t border-emerald-900/10 z-50 h-16 flex items-center justify-around px-4">
+<a class="flex flex-col items-center text-emerald-900" href="#">
+<span class="material-symbols-outlined" data-icon="architecture" style="font-variation-settings: 'FILL' 1;">architecture</span>
+<span class="text-[9px] font-headline font-bold uppercase mt-1">Projects</span>
+</a>
+<a class="flex flex-col items-center text-emerald-800/40" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="text-[9px] font-headline font-bold uppercase mt-1">Files</span>
+</a>
+<a class="flex flex-col items-center text-emerald-800/40" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="text-[9px] font-headline font-bold uppercase mt-1">Dates</span>
+</a>
+<a class="flex flex-col items-center text-emerald-800/40" href="#">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span class="text-[9px] font-headline font-bold uppercase mt-1">Hub</span>
+</a>
+</nav>
+</body></html>

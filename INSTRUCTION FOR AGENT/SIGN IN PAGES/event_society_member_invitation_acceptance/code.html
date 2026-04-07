@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Accept Invitation | THE MONOGRAPH</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Work+Sans:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f4f3f2",
+                        "secondary": "#5f5e5e",
+                        "on-surface-variant": "#474747",
+                        "surface-container": "#eeeeed",
+                        "secondary-container": "#d6d4d3",
+                        "outline": "#777777",
+                        "on-tertiary-fixed": "#ffffff",
+                        "on-tertiary": "#e8e2d8",
+                        "background": "#faf9f8",
+                        "primary-fixed": "#5e5e5e",
+                        "tertiary-fixed-dim": "#4a463f",
+                        "surface": "#faf9f8",
+                        "primary-fixed-dim": "#474747",
+                        "on-tertiary-container": "#ffffff",
+                        "on-secondary-fixed-variant": "#3b3b3b",
+                        "primary-container": "#3b3b3b",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#faf9f8",
+                        "on-tertiary-fixed-variant": "#e8e2d8",
+                        "on-error-container": "#410002",
+                        "inverse-primary": "#c6c6c6",
+                        "surface-container-high": "#e9e8e7",
+                        "inverse-surface": "#2f3130",
+                        "tertiary": "#3e3b34",
+                        "error": "#ba1a1a",
+                        "on-background": "#1a1c1c",
+                        "on-primary-fixed": "#ffffff",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "tertiary-container": "#79746c",
+                        "tertiary-fixed": "#625e56",
+                        "on-surface": "#1a1c1c",
+                        "on-secondary": "#ffffff",
+                        "surface-dim": "#dadad9",
+                        "surface-container-highest": "#e3e2e1",
+                        "surface-variant": "#e3e2e1",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "on-primary-container": "#ffffff",
+                        "surface-tint": "#5e5e5e",
+                        "secondary-fixed-dim": "#acabaa",
+                        "on-primary": "#e2e2e2",
+                        "primary": "#000000",
+                        "secondary-fixed": "#c8c6c5",
+                        "inverse-on-surface": "#f1f0f0",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-container": "#1b1c1c",
+                        "outline-variant": "#c6c6c6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Newsreader"],
+                        "body": ["Work Sans"],
+                        "label": ["Work Sans"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Work Sans', sans-serif; }
+        .font-serif { font-family: 'Newsreader', serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .editorial-glaze {
+            pointer-events: none;
+            user-select: none;
+            z-index: 0;
+            line-height: 0.8;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col selection:bg-primary selection:text-on-primary">
+<!-- The Shell Visibility Rule: Navigation is suppressed for Task-Focused Onboarding -->
+<main class="flex-grow flex items-center justify-center relative overflow-hidden px-6 py-20">
+<!-- Editorial Glazing Background -->
+<div class="absolute inset-0 editorial-glaze flex flex-col justify-center items-center overflow-hidden">
+<span class="text-[30vw] font-serif italic text-on-surface opacity-[0.03] leading-none -ml-[20%]">SOCIETY</span>
+<span class="text-[25vw] font-serif text-on-surface opacity-[0.02] leading-none ml-[30%] -mt-[5%]">INVITATION</span>
+</div>
+<div class="w-full max-w-xl relative z-10">
+<!-- Content & Identity: Brand Anchors Hierarchy -->
+<div class="mb-12 text-center md:text-left">
+<h1 class="text-2xl font-serif italic tracking-tighter text-primary mb-2">THE MONOGRAPH</h1>
+<p class="text-[10px] uppercase tracking-[0.3em] font-medium text-secondary">New Member Affiliation</p>
+</div>
+<!-- Main UI: High-Contrast White Card -->
+<div class="bg-surface-container-lowest p-8 md:p-16 shadow-[0px_40px_60px_rgba(26,28,28,0.06)] border border-black/5">
+<header class="mb-12">
+<h2 class="text-4xl md:text-5xl font-serif font-light leading-tight mb-6">
+                        You have been invited to <span class="italic">The Avant-Garde Collective</span>
+</h2>
+<p class="text-on-surface-variant font-body text-sm leading-relaxed max-w-md">
+                        Join an elite circle of cultural curators and visionaries. Your seat at the table is prepared.
+                    </p>
+</header>
+<form class="space-y-10">
+<div class="grid grid-cols-1 gap-10">
+<!-- Full Name -->
+<div class="relative group">
+<label class="block text-[10px] uppercase tracking-widest font-semibold text-secondary mb-3" for="full_name">Full Name</label>
+<input class="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-3 text-lg font-serif transition-colors duration-300 placeholder:text-outline-variant/50" id="full_name" name="full_name" placeholder="Elias Thorne" type="text"/>
+</div>
+<!-- Set Password -->
+<div class="relative group">
+<label class="block text-[10px] uppercase tracking-widest font-semibold text-secondary mb-3" for="password">Set Password</label>
+<input class="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-3 text-lg font-serif transition-colors duration-300 placeholder:text-outline-variant/50" id="password" name="password" placeholder="••••••••••••" type="password"/>
+</div>
+<!-- Role (Read-only Tag) -->
+<div class="flex items-center justify-between py-6 border-b border-outline-variant/30">
+<div>
+<span class="block text-[10px] uppercase tracking-widest font-semibold text-secondary mb-1">Assigned Role</span>
+<span class="text-sm font-medium">Your permissions have been pre-configured.</span>
+</div>
+<span class="bg-surface-container-low px-4 py-1.5 text-[10px] uppercase tracking-widest font-bold border border-black/5">
+                                Curator
+                            </span>
+</div>
+</div>
+<div class="pt-6">
+<button class="w-full bg-primary text-on-primary py-5 px-8 text-sm uppercase tracking-[0.2em] font-semibold hover:bg-primary-container transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-3" type="submit">
+                            Join the Society
+                            <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</form>
+<footer class="mt-12 text-center">
+<p class="text-[10px] text-secondary/60 uppercase tracking-tighter">
+                        By joining, you agree to the <a class="text-primary hover:underline underline-offset-4" href="#">Code of Conduct</a>.
+                    </p>
+</footer>
+</div>
+<!-- Asymmetric Support Text -->
+<div class="mt-16 md:ml-12 grid grid-cols-1 md:grid-cols-2 gap-12">
+<div class="border-l border-primary/10 pl-6">
+<h3 class="font-serif italic text-xl mb-3">The Collective Mandate</h3>
+<p class="text-xs text-on-surface-variant leading-relaxed font-light">
+                        Every member contributes to the living archive. Your role as a Curator empowers you to shape the narrative of upcoming society exhibitions and governance polls.
+                    </p>
+</div>
+<div class="relative h-32 overflow-hidden bg-surface-container-low group">
+<img alt="Abstract marble texture" class="w-full h-full object-cover opacity-50 mix-blend-multiply group-hover:scale-105 transition-transform duration-700" data-alt="Macro photography of white Carrara marble with subtle grey veining and elegant crystalline texture in soft daylight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDT1eyFwuoJgB2sSsN58mRmXstB-ak09wuof4yZFthwnYi6IktOgMnSk_EQ128KsqiwsmygmKSc060vz7jbvIt8RHgYPVS7fH5K3jsczZvXvUzLzeVD3Zujzbq3jGOrOMrwBekkhs3FyYZSGa8n1te85BKCjKuuTEQrgPMPBFS9V6b05QdNfEC7yMflURWPBzfCCS6--Jx2uzYuj_EuX29jdckS4rQuhN4JxmwFWpQoOprLPCjufrPdDy3EsXSv6KP6NUuUohnTiw"/>
+<div class="absolute inset-0 flex items-center justify-center p-4">
+<span class="text-[10px] uppercase tracking-[0.4em] font-bold text-primary bg-surface/80 backdrop-blur-sm px-4 py-2">Established 1894</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer: Shared Component Execution -->
+<footer class="bg-surface border-t border-black/5 dark:border-white/5">
+<div class="flex flex-col md:flex-row justify-between items-center w-full px-12 py-12 gap-8">
+<div class="text-[10px] uppercase tracking-[0.2em] font-medium text-gray-400">
+                © 2024 THE MONOGRAPH SOCIETY. ALL RIGHTS RESERVED.
+            </div>
+<div class="flex gap-10">
+<a class="text-[10px] uppercase tracking-[0.2em] font-medium text-gray-400 hover:text-black hover:underline underline-offset-4 transition-opacity opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="text-[10px] uppercase tracking-[0.2em] font-medium text-gray-400 hover:text-black hover:underline underline-offset-4 transition-opacity opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="text-[10px] uppercase tracking-[0.2em] font-medium text-gray-400 hover:text-black hover:underline underline-offset-4 transition-opacity opacity-80 hover:opacity-100" href="#">Code of Conduct</a>
+</div>
+</div>
+</footer>
+</body></html>

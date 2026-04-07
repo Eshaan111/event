@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Founder Registration | ORGANIZATION</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Work+Sans:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-primary-fixed": "#ffffff",
+                "surface-variant": "#e3e2e1",
+                "on-tertiary-fixed-variant": "#e8e2d8",
+                "primary-fixed": "#5e5e5e",
+                "on-surface": "#1a1c1c",
+                "on-secondary-container": "#1b1c1c",
+                "on-background": "#1a1c1c",
+                "surface-container-low": "#f4f3f2",
+                "on-tertiary-fixed": "#ffffff",
+                "surface-container-high": "#e9e8e7",
+                "outline": "#777777",
+                "inverse-on-surface": "#f1f0f0",
+                "surface": "#faf9f8",
+                "surface-container-lowest": "#ffffff",
+                "primary-container": "#3b3b3b",
+                "tertiary": "#3e3b34",
+                "surface-tint": "#5e5e5e",
+                "on-surface-variant": "#474747",
+                "inverse-surface": "#2f3130",
+                "tertiary-fixed": "#625e56",
+                "primary-fixed-dim": "#474747",
+                "surface-dim": "#dadad9",
+                "on-primary-container": "#ffffff",
+                "secondary-container": "#d6d4d3",
+                "surface-container-highest": "#e3e2e1",
+                "on-secondary-fixed": "#1b1c1c",
+                "background": "#faf9f8",
+                "error": "#ba1a1a",
+                "on-error": "#ffffff",
+                "on-tertiary-container": "#ffffff",
+                "secondary": "#5f5e5e",
+                "primary": "#000000",
+                "on-primary-fixed-variant": "#e2e2e2",
+                "on-secondary": "#ffffff",
+                "outline-variant": "#c6c6c6",
+                "surface-bright": "#faf9f8",
+                "secondary-fixed-dim": "#acabaa",
+                "on-secondary-fixed-variant": "#3b3b3b",
+                "on-error-container": "#410002",
+                "error-container": "#ffdad6",
+                "tertiary-container": "#79746c",
+                "on-primary": "#e2e2e2",
+                "tertiary-fixed-dim": "#4a463f",
+                "surface-container": "#eeeeed",
+                "on-tertiary": "#e8e2d8",
+                "secondary-fixed": "#c8c6c5",
+                "inverse-primary": "#c6c6c6"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+            },
+            "fontFamily": {
+                "headline": ["Newsreader", "serif"],
+                "body": ["Work Sans", "sans-serif"],
+                "label": ["Work Sans", "sans-serif"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glazing-text {
+            user-select: none;
+            pointer-events: none;
+            line-height: 0.8;
+        }
+        .tonal-transition {
+            transition: background-color 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<!-- Glazing Background Layer -->
+<div class="fixed inset-0 overflow-hidden z-0">
+<div class="glazing-text absolute -top-10 -left-20 text-[25rem] font-headline font-black text-on-surface opacity-[0.03] italic tracking-tighter">
+            Society
+        </div>
+<div class="glazing-text absolute -bottom-20 -right-20 text-[20rem] font-headline font-black text-on-surface opacity-[0.03] tracking-tighter">
+            Legacy
+        </div>
+</div>
+<!-- TopNavBar (Suppressed for focused registration flow as per Rule) -->
+<!-- Navigation is suppressed for "Sign-up" transactional screens -->
+<main class="relative z-10 min-h-screen flex flex-col md:flex-row items-center justify-center px-6 py-12 md:px-24">
+<!-- Left Editorial Section -->
+<div class="w-full md:w-1/2 flex flex-col gap-8 mb-16 md:mb-0 md:pr-24">
+<header>
+<span class="font-label text-xs tracking-[0.3em] uppercase text-outline mb-4 block">Introduction</span>
+<h1 class="font-headline text-6xl md:text-8xl font-medium tracking-tight leading-none text-primary italic">
+                    The Modern <br/>Monograph.
+                </h1>
+</header>
+<div class="max-w-md flex flex-col gap-6">
+<p class="font-headline text-2xl leading-relaxed text-on-surface-variant">
+                    We believe that institutional success is an art form. ORGANIZATION provides the architectural foundation for visionary founders to build lasting structures of influence.
+                </p>
+<p class="font-body text-base leading-loose text-on-surface-variant/80">
+                    Our society serves as an editorial frame for your operations. By stripping away the digital noise of traditional enterprise software, we allow your mission to breathe, providing a pristine space where strategy meets execution with quiet authority.
+                </p>
+<div class="flex items-center gap-4 mt-4">
+<div class="h-[1px] w-12 bg-outline-variant"></div>
+<span class="font-label text-sm italic">Est. MMXXIV</span>
+</div>
+</div>
+</div>
+<!-- Registration Card Container -->
+<div class="w-full md:w-[480px] flex flex-col gap-8">
+<div class="bg-surface-container-lowest p-10 md:p-14 rounded-lg shadow-[0_40px_80px_-20px_rgba(26,28,28,0.08)] border-none">
+<div class="mb-10">
+<h2 class="font-headline text-3xl font-bold mb-2">Create Account</h2>
+<p class="font-body text-sm text-on-surface-variant">Begin your journey into the curated workspace.</p>
+</div>
+<!-- OAuth Selection -->
+<div class="flex flex-col gap-3 mb-10">
+<button class="w-full flex items-center justify-center gap-3 py-2.5 px-4 border border-outline-variant/30 rounded-md hover:bg-surface-container-low transition-colors duration-300 group">
+<img alt="" class="w-5 h-5 opacity-80 group-hover:opacity-100" data-alt="Official Google logo icon with clean vibrant colors on white background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-nF-hm84kn_OjGvrLnqQnHKBEt69e4d11CWvB9XfOHFhMZ1v95OLoOkGUTCogLgzzF2gmkZrYWRaZM47PZMspyhsUQ2tZsQTE2vpr2OPluIEulieGTQ3yNGzIcrjPXQtgS9oh89y0nOQkz342zY9lRqPrz3ru_r1HURePVNPP0NS3s3xEWbqOJu-VDlGcF9oRLFy2OsDy5z7hya0wGw-nFtQk5IqUZ6EllE-I8YzAWiTk6gJZkHzXkfxS__7o7_EMemkVVGDwJQ"/>
+<span class="font-label text-sm font-medium">Continue with Google</span>
+</button>
+<div class="grid grid-cols-2 gap-3">
+<button class="flex items-center justify-center gap-3 py-2.5 px-4 border border-outline-variant/30 rounded-md hover:bg-surface-container-low transition-colors duration-300">
+<span class="material-symbols-outlined text-[20px]" data-icon="terminal">terminal</span>
+<span class="font-label text-sm font-medium">GitHub</span>
+</button>
+<button class="flex items-center justify-center gap-3 py-2.5 px-4 border border-outline-variant/30 rounded-md hover:bg-surface-container-low transition-colors duration-300">
+<span class="material-symbols-outlined text-[20px]" data-icon="work">work</span>
+<span class="font-label text-sm font-medium">LinkedIn</span>
+</button>
+</div>
+</div>
+<div class="relative flex items-center mb-10">
+<div class="flex-grow border-t border-outline-variant/20"></div>
+<span class="flex-shrink mx-4 font-label text-[10px] uppercase tracking-widest text-outline">Or register manually</span>
+<div class="flex-grow border-t border-outline-variant/20"></div>
+</div>
+<!-- Registration Form -->
+<form class="space-y-6" onsubmit="return false;"><div class="relative group">
+<label class="block font-label text-[10px] uppercase tracking-widest text-outline mb-1 group-focus-within:text-primary transition-colors" for="name">Full Name</label>
+<input class="w-full px-0 py-1 bg-transparent border-0 border-b border-outline-variant/40 focus:ring-0 focus:border-primary placeholder:text-surface-variant/50 font-body text-base transition-all" id="name" name="name" placeholder="E.g. Alexander Hamilton" type="text"/>
+</div>
+<div class="relative group">
+<label class="block font-label text-[10px] uppercase tracking-widest text-outline mb-1 group-focus-within:text-primary transition-colors" for="email">Email Address</label>
+<input class="w-full px-0 py-1 bg-transparent border-0 border-b border-outline-variant/40 focus:ring-0 focus:border-primary placeholder:text-surface-variant/50 font-body text-base transition-all" id="email" name="email" placeholder="name@organization.com" type="email"/>
+</div>
+<div class="relative group">
+<label class="block font-label text-[10px] uppercase tracking-widest text-outline mb-1 group-focus-within:text-primary transition-colors" for="phone">Phone Number</label>
+<input class="w-full px-0 py-1 bg-transparent border-0 border-b border-outline-variant/40 focus:ring-0 focus:border-primary placeholder:text-surface-variant/50 font-body text-base transition-all" id="phone" name="phone" placeholder="+1 (555) 000-0000" type="tel"/>
+</div>
+<div class="relative group">
+<label class="block font-label text-[10px] uppercase tracking-widest text-outline mb-1 group-focus-within:text-primary transition-colors" for="company">Company Name</label>
+<input class="w-full px-0 py-1 bg-transparent border-0 border-b border-outline-variant/40 focus:ring-0 focus:border-primary placeholder:text-surface-variant/50 font-body text-base transition-all" id="company" name="company" placeholder="The Monograph Agency" type="text"/>
+</div>
+<div class="relative group">
+<label class="block font-label text-[10px] uppercase tracking-widest text-outline mb-1 group-focus-within:text-primary transition-colors" for="size">Company Size</label>
+<input class="w-full px-0 py-1 bg-transparent border-0 border-b border-outline-variant/40 focus:ring-0 focus:border-primary placeholder:text-surface-variant/50 font-body text-base transition-all" id="size" name="size" placeholder="E.g. 11-50 employees" type="text"/>
+</div>
+<div class="pt-4">
+<button class="w-full bg-primary text-on-primary py-4 rounded-md font-label text-sm font-bold tracking-widest uppercase hover:bg-primary/90 transition-all shadow-lg shadow-primary/10" type="submit">
+                            Apply for Access
+                        </button>
+</div></form>
+<p class="mt-8 text-center font-body text-xs text-outline leading-relaxed">
+                    By proceeding, you agree to the <a class="underline hover:text-primary transition-colors" href="#">Charter of Conduct</a> and our <a class="underline hover:text-primary transition-colors" href="#">Privacy Governance</a>.
+                </p>
+</div>
+<!-- Contextual Footer Links -->
+<div class="flex justify-between items-center px-4">
+<a class="font-label text-xs text-outline hover:text-primary transition-colors flex items-center gap-2" href="#">
+<span class="material-symbols-outlined text-[16px]" data-icon="arrow_back">arrow_back</span>
+                    Return to Lobby
+                </a>
+<span class="font-label text-xs text-outline/50">Version 2.0.4 - Alpha</span>
+</div>
+</div>
+</main>
+<!-- Side Decoration (Editorial Quote) -->
+<aside class="fixed bottom-12 left-12 hidden xl:block max-w-xs pointer-events-none">
+<blockquote class="font-headline italic text-on-surface-variant/40 text-lg leading-snug">
+            "Design is not just what it looks like and feels like. Design is how it works."
+        </blockquote>
+</aside>
+<!-- Background Pattern Decoration -->
+<div class="fixed top-0 right-0 w-1/3 h-screen bg-surface-container-low -z-10 opacity-50"></div>
+<div class="fixed top-1/4 right-12 w-[1px] h-32 bg-outline-variant/20 -z-10"></div>
+</body></html>

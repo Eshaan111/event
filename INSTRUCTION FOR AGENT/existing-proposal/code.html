@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Proposal Review | Event Society</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#b4ddce",
+                        "surface-variant": "#dae5e3",
+                        "inverse-primary": "#d0faea",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface-variant": "#576160",
+                        "secondary-container": "#dde4df",
+                        "on-surface": "#2a3434",
+                        "primary-dim": "#345a4e",
+                        "tertiary-fixed-dim": "#d0ece0",
+                        "on-tertiary-fixed": "#364f46",
+                        "tertiary": "#4b645b",
+                        "secondary-fixed": "#dde4df",
+                        "surface-container-high": "#e1eae9",
+                        "on-primary": "#defff2",
+                        "on-background": "#2a3434",
+                        "secondary-fixed-dim": "#cfd6d1",
+                        "inverse-on-surface": "#9b9d9d",
+                        "on-primary-container": "#33594d",
+                        "primary": "#40665a",
+                        "on-tertiary-container": "#486158",
+                        "surface-container-low": "#f0f4f3",
+                        "surface-container-highest": "#dae5e3",
+                        "surface-tint": "#40665a",
+                        "outline-variant": "#a9b4b3",
+                        "on-tertiary": "#e4fff3",
+                        "on-secondary": "#f4fbf6",
+                        "surface-bright": "#f8faf9",
+                        "primary-fixed": "#c2ebdc",
+                        "error-container": "#fe8983",
+                        "inverse-surface": "#0b0f0f",
+                        "on-tertiary-fixed-variant": "#526b62",
+                        "on-error": "#fff7f6",
+                        "surface": "#f8faf9",
+                        "surface-dim": "#cfdddb",
+                        "on-primary-fixed": "#20463b",
+                        "background": "#f8faf9",
+                        "tertiary-container": "#defaee",
+                        "outline": "#727d7c",
+                        "on-primary-fixed-variant": "#3d6357",
+                        "on-error-container": "#752121",
+                        "on-secondary-container": "#4c5350",
+                        "tertiary-dim": "#40584f",
+                        "secondary": "#59615d",
+                        "tertiary-fixed": "#defaee",
+                        "on-secondary-fixed": "#3a413e",
+                        "on-secondary-fixed-variant": "#565d5a",
+                        "primary-container": "#c2ebdc",
+                        "error": "#9f403d",
+                        "surface-container": "#e9efee",
+                        "secondary-dim": "#4d5551",
+                        "error-dim": "#4e0309"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Manrope"],
+                        "label": ["Space Grotesk"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-glazing {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+        /* Custom scrollbar for Submission Data */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(64, 102, 90, 0.1);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(64, 102, 90, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface">
+<!-- TopNavBar -->
+<nav class="bg-[#f8faf9]/80 backdrop-blur-xl border-b border-[#a9b4b3]/20 flex justify-between items-center w-full px-8 h-20 docked full-width top-0 sticky z-50">
+<div class="flex items-center gap-12">
+<span class="text-xl font-bold tracking-tighter text-[#40665a] font-['Space_Grotesk']">Event Society</span>
+<div class="hidden md:flex gap-8">
+<a class="text-[#2a3434]/60 font-['Space_Grotesk'] tracking-tight hover:text-[#40665a] transition-colors duration-300" href="#">Dashboard</a>
+<a class="text-[#40665a] font-['Space_Grotesk'] tracking-tight border-b-2 border-[#40665a] pb-1" href="#">Proposals</a>
+<a class="text-[#2a3434]/60 font-['Space_Grotesk'] tracking-tight hover:text-[#40665a] transition-colors duration-300" href="#">Archives</a>
+<a class="text-[#2a3434]/60 font-['Space_Grotesk'] tracking-tight hover:text-[#40665a] transition-colors duration-300" href="#">Calendar</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-[#40665a] cursor-pointer">notifications</span>
+<span class="material-symbols-outlined text-[#40665a] cursor-pointer">settings</span>
+<img alt="Reviewer Profile" class="w-10 h-10 rounded-xl border border-outline-variant/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCY6X7wCgSEOlj0G7yCFQxqR9eS2dqlyGQWyhMjtZVVQIx0bxUCYs376NPK1L-wfqCnnIssz6FMrqtOhX6sNlfTIyR71d3HYQRYiFqL1lWmnbD7NhwEhOaz797gjGL99w0UvxMb33AIwgPrRE6_fVaz92WUmD_YBHrr2Uz6LLXhsPXaUlEfhRiBxh4vtJEzii_kAcuj3THUXucu4EdJrOrsDjnn8jDHZMgqWi-4FCT1xky-h0E-6lMAdR3oWxYihUi5DIuS8tOICA"/>
+</div>
+</nav>
+<div class="flex min-h-[calc(100vh-5rem)]">
+<!-- SideNavBar -->
+<aside class="hidden lg:flex flex-col p-6 gap-8 bg-[#f0f4f3] w-64 border-r border-[#a9b4b3]/20 shrink-0">
+<div class="flex items-center gap-3">
+<img alt="Organization Logo" class="w-8 h-8" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDE3eXpVIbf4CDTilvKfoTw-IqmMRy4pxNniumNT8Vp2EtDSzK0tKTr6XXjtZCToT5BANgy6SpYOJXj5YfoXlYr12QoRz7gAHTBwbEgXJhlGLmtzk23jrlQ3fkTSgFa9ZgP4C_hblFrN-DiOMgkTrQ2AYP2deInZQxAmHEYFWyCAlPS9FAqXrlSrFgp7ta3V9CTwLWhOnkjT4Q0MLgNI1XRo0M4ESo1JyV975VXb4Y2GJknbVgLd0jKxVHwD02BDS33VWXIgn3ZAg"/>
+<div>
+<h2 class="text-lg font-bold text-[#2a3434] font-['Space_Grotesk'] leading-none">Proposal Suite</h2>
+<p class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[10px] text-[#2a3434]/70">Event Society Admin</p>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary py-3 rounded-lg font-label text-[10px] uppercase tracking-widest font-bold">
+                New Review
+            </button>
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-3 p-3 bg-[#ffffff] text-[#40665a] rounded-lg">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">pending_actions</span>
+<span class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[10px]">Current Reviews</span>
+</div>
+<div class="flex items-center gap-3 p-3 text-[#2a3434]/70 hover:bg-[#e9efee] transition-all rounded-lg cursor-pointer">
+<span class="material-symbols-outlined">group</span>
+<span class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[10px]">Team Queue</span>
+</div>
+<div class="flex items-center gap-3 p-3 text-[#2a3434]/70 hover:bg-[#e9efee] transition-all rounded-lg cursor-pointer">
+<span class="material-symbols-outlined">person_search</span>
+<span class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[10px]">Assigned to Me</span>
+</div>
+<div class="flex items-center gap-3 p-3 text-[#2a3434]/70 hover:bg-[#e9efee] transition-all rounded-lg cursor-pointer">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[10px]">History</span>
+</div>
+<div class="flex items-center gap-3 p-3 text-[#2a3434]/70 hover:bg-[#e9efee] transition-all rounded-lg cursor-pointer">
+<span class="material-symbols-outlined">description</span>
+<span class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[10px]">Templates</span>
+</div>
+</div>
+<div class="mt-auto border-t border-outline-variant/10 pt-6 flex flex-col gap-2">
+<div class="flex items-center gap-3 p-3 text-[#2a3434]/70 hover:bg-[#e9efee] transition-all rounded-lg cursor-pointer">
+<span class="material-symbols-outlined">help_outline</span>
+<span class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[10px]">Help Center</span>
+</div>
+<div class="flex items-center gap-3 p-3 text-[#2a3434]/70 hover:bg-[#e9efee] transition-all rounded-lg cursor-pointer">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[10px]">Logout</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-grow p-8 overflow-y-auto">
+<!-- Header Bar -->
+<div class="flex justify-between items-center mb-12 p-4 bg-surface-container-low border border-outline-variant/10 rounded-xl">
+<div class="flex items-center gap-4">
+<h3 class="font-headline font-bold text-lg text-primary">PR-2024-0812</h3>
+<div class="h-8 w-[1px] bg-outline-variant/20"></div>
+<span class="font-label text-xs uppercase tracking-widest font-medium text-on-surface-variant">Metropolis Gala Night</span>
+</div>
+<!-- Avatar Stack with Hover Popover -->
+<div class="relative group">
+<div class="flex items-center -space-x-3 cursor-pointer">
+<img alt="Reviewer 1" class="w-10 h-10 rounded-full border-2 border-surface-container-low ring-2 ring-primary-fixed-dim" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNJLuhowatezOpW3fN7SGDN_C2pjswNQatMFmDaYLslJ_b9E3wzgf8MNbCewnek7d65ePHcIchWxkKGG-ev9IezwL7ftq-MjvcR0l6zGKo-BNjRve3t0zK_DjmOoCJqOgDqSv9Z6kkcQr1ti7rW5J7iKWPkd7xRRQoFG_hKFnSZPaBouIxlKgsv3ZxydTU24M_Yl90D5nkutP5GCgtio_IDyHkXcIX_dKVHQUpxIdzPDBLhAy2nn3SwfQbKKo_66wzbPwR1JL3uw"/>
+<img alt="Reviewer 2" class="w-10 h-10 rounded-full border-2 border-surface-container-low ring-2 ring-primary-fixed-dim" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCh0Bpn93_46fXrj91p42vaFegoXb9Mavd1M5_14_pG-HfLvstoQNq8y6jMLrHWo0RMWBWwuAx7W7M4318TiKJT5zXlxsf8OLi6u6q1hSaDLdlSZRF-3_WmbDRg2CLRnCEAxMz0NPZxD-94JgNz3kjZtMKdy-fHHvrxsoOI68BusVqK_BgUy4RYdVKDKH-rwcpKWANPXm-v5DSG32skipbCvjZS5cgyX7wegiu-KIKunmpCgP758raTv2LPmCpW-2CzeAzfOzLIdA"/>
+<div class="w-10 h-10 rounded-full border-2 border-surface-container-low bg-surface-container-high flex items-center justify-center text-[10px] font-bold text-on-surface-variant ring-2 ring-outline-variant/10">
+                            +2
+                        </div>
+</div>
+<!-- Popover Timeline -->
+<div class="absolute right-0 top-12 w-72 bg-surface-container-lowest border border-outline-variant/20 rounded-2xl shadow-2xl p-6 z-[60] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right group-hover:translate-y-0 translate-y-2">
+<h4 class="font-label text-[10px] uppercase tracking-widest font-bold text-primary mb-6">Approval Timeline</h4>
+<div class="space-y-6 relative before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-[1px] before:bg-outline-variant/20">
+<div class="flex gap-4 relative">
+<div class="w-10 h-10 rounded-full border-2 border-primary bg-primary-container z-10 overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNJLuhowatezOpW3fN7SGDN_C2pjswNQatMFmDaYLslJ_b9E3wzgf8MNbCewnek7d65ePHcIchWxkKGG-ev9IezwL7ftq-MjvcR0l6zGKo-BNjRve3t0zK_DjmOoCJqOgDqSv9Z6kkcQr1ti7rW5J7iKWPkd7xRRQoFG_hKFnSZPaBouIxlKgsv3ZxydTU24M_Yl90D5nkutP5GCgtio_IDyHkXcIX_dKVHQUpxIdzPDBLhAy2nn3SwfQbKKo_66wzbPwR1JL3uw"/>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-on-surface">Alex Rivera</span>
+<span class="text-[10px] text-on-surface-variant font-medium">Initial Draft • Aug 12</span>
+<span class="text-[10px] text-primary font-bold uppercase mt-1">Approved</span>
+</div>
+</div>
+<div class="flex gap-4 relative">
+<div class="w-10 h-10 rounded-full border-2 border-primary bg-primary-container z-10 overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCh0Bpn93_46fXrj91p42vaFegoXb9Mavd1M5_14_pG-HfLvstoQNq8y6jMLrHWo0RMWBWwuAx7W7M4318TiKJT5zXlxsf8OLi6u6q1hSaDLdlSZRF-3_WmbDRg2CLRnCEAxMz0NPZxD-94JgNz3kjZtMKdy-fHHvrxsoOI68BusVqK_BgUy4RYdVKDKH-rwcpKWANPXm-v5DSG32skipbCvjZS5cgyX7wegiu-KIKunmpCgP758raTv2LPmCpW-2CzeAzfOzLIdA"/>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-on-surface">Sarah Chen</span>
+<span class="text-[10px] text-on-surface-variant font-medium">Technical Lead • Aug 14</span>
+<span class="text-[10px] text-primary font-bold uppercase mt-1">Approved</span>
+</div>
+</div>
+<div class="flex gap-4 relative">
+<div class="w-10 h-10 rounded-full border-2 border-outline-variant/30 bg-surface-container-high z-10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-sm text-outline-variant">pending</span>
+</div>
+<div class="flex flex-col opacity-60">
+<span class="text-xs font-bold text-on-surface">Fin. Controller</span>
+<span class="text-[10px] text-on-surface-variant font-medium">Financial Review</span>
+<span class="text-[10px] text-on-surface-variant font-bold uppercase mt-1">Pending</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Central Layout: Bento Style -->
+<div class="grid grid-cols-12 gap-8 relative">
+<!-- Background Glazing Text -->
+<div class="absolute -right-12 top-0 opacity-[0.03] select-none pointer-events-none">
+<h1 class="text-[12rem] font-headline font-extrabold leading-none bg-glazing tracking-tighter">ETHICS</h1>
+</div>
+<!-- Left Column: PPT + Comments -->
+<div class="col-span-12 xl:col-span-8 flex flex-col gap-8">
+<!-- PPT/PDF Viewer -->
+<div class="group relative">
+<div class="bg-surface-container-highest rounded-2xl overflow-hidden relative border border-outline-variant/10 shadow-sm aspect-video">
+<img class="w-full h-full object-cover transition-transform duration-500" data-alt="architectural blueprint of a modern event hall with clean geometric lines and soft ambient lighting rendering" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5gmE8RC7lHpWGb5so2MGjGf-KVLUckaLtZEvp1sqUbInmTI2bz50EqpJ1AdNIYB4gqlR3I-6BJUktheQjpstfZ4DSst54mzuwLnwbzv2mhxpW6O0DY_7PFku8kOzGsO5ViLByAx2PiNwOyfH62N-vjEi4RKnTJAevG7yNbgO6o12ZSEUeXlZ_9jLgx86fYehX7p9wg04MMDuBjBAowOxl9XkACIAY_xrp6moYNzfOjqnC5iYAuum9xilE2JS-0VsjH6IcJcEacQ"/>
+<!-- Top Right Overlay Controls (Visible on Hover) -->
+<div class="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-40">
+<button class="flex items-center gap-2 px-4 py-2 bg-on-surface/90 text-surface border border-white/20 rounded-lg hover:bg-on-surface transition-all shadow-xl">
+<span class="material-symbols-outlined text-sm">download</span>
+<span class="font-['Space_Grotesk'] font-bold text-[10px] uppercase tracking-widest">Download</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 bg-on-surface/90 text-surface border border-white/20 rounded-lg hover:bg-on-surface transition-all shadow-xl">
+<span class="material-symbols-outlined text-sm">upload</span>
+<span class="font-['Space_Grotesk'] font-bold text-[10px] uppercase tracking-widest">Upload</span>
+</button>
+</div>
+<!-- Bottom Right Always Visible Navigation -->
+<div class="absolute bottom-4 right-4 flex items-center gap-2 z-40">
+<div class="px-4 py-2 bg-on-surface/90 backdrop-blur-sm rounded-lg">
+<p class="font-label text-[10px] text-surface-container-lowest uppercase tracking-[0.2em] whitespace-nowrap">Slide 04 / 12</p>
+</div>
+<div class="flex gap-1">
+<button class="bg-on-surface/90 backdrop-blur-sm p-2 rounded-lg text-surface hover:bg-primary transition-all">
+<span class="material-symbols-outlined text-base">chevron_left</span>
+</button>
+<button class="bg-on-surface/90 backdrop-blur-sm p-2 rounded-lg text-surface hover:bg-primary transition-all">
+<span class="material-symbols-outlined text-base">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Peer Discussion (Repositioned) -->
+<div class="bg-surface-container-low rounded-2xl border border-outline-variant/10 overflow-hidden flex flex-col">
+<div class="px-6 py-4 border-b border-outline-variant/10 flex justify-between items-center bg-surface-bright/50">
+<h4 class="font-headline font-bold text-sm text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">forum</span> PEER DISCUSSION
+                            </h4>
+<span class="font-label text-[10px] bg-surface-container-high px-2 py-1 rounded-md text-on-surface-variant font-bold uppercase">4 ACTIVE</span>
+</div>
+<div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Comment Card -->
+<div class="flex items-start gap-3">
+<img alt="Reviewer" class="w-8 h-8 rounded-lg bg-surface-dim shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhpTeNICcBvIjO3qICGZ1Wt2VSAkX17b862JjpliqnOfK5O2tVSKKwjUscgaq7_lfqzwawAEahaHYs95Pw50WLEN0nREunVEptNvonChla1g-k9zNFSO9HF9HbvYdmTYEs6_14qX8O5qrmEzq_q9UP1izrnmOCatjxrGe0JdMdQxGAAoyoHsrYQheQY--PSHaJJOWhwiUWRUiyDLPwk81spn7dZZuZWRqHejA9De4Zk2mZWGsH4jy_DR_dK588E8O3V0UacVmRuw"/>
+<div class="min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h5 class="font-headline font-bold text-[10px] uppercase tracking-tight truncate">Marcus Thorne</h5>
+</div>
+<div class="bg-surface-container-lowest p-3 rounded-xl rounded-tl-none border border-outline-variant/10">
+<p class="text-[11px] font-body text-on-surface leading-relaxed">The load-bearing calculations for the stage cantilever seem aggressive. Request stress test on slide 04.</p>
+</div>
+</div>
+</div>
+<!-- Comment Card -->
+<div class="flex items-start gap-3">
+<img alt="Reviewer" class="w-8 h-8 rounded-lg bg-surface-dim shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1g5SLW10AZLdaXovq2dg_ZGhchLrw6Q61JtOZKureVqb5LwFi1_eH5NhZmmZAC5yKBqTj9OchmsuqnfjciwXMt7TCE1fDzXjCzPDPFWIa5OaPBLe3M-Y3CSN_aFOC0nRPvdC2ZyViFfQxy6qsrv9YqIPwhL_oGjjWDzgn8vO0Klyu9b-OfEXhFS4TFefiaIgZ_KAH8mp5fHQLkYdWrbhnMrdDDz8C8xdQyzQfFR-RbuaXo0b7CQI-LojQRkLXFXzhTaq4qPdvQQ"/>
+<div class="min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h5 class="font-headline font-bold text-[10px] uppercase tracking-tight truncate">Elena Vance</h5>
+</div>
+<div class="bg-surface-container-lowest p-3 rounded-xl rounded-tl-none border border-outline-variant/10">
+<p class="text-[11px] font-body text-on-surface leading-relaxed">Budget for lighting is $45k higher. Is obsidian finish on trussing really necessary?</p>
+</div>
+</div>
+</div>
+<!-- New Comment Input -->
+<div class="bg-surface-container-high/40 rounded-xl p-4 border border-dashed border-outline-variant/40 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-outline-variant text-base mb-1">add_comment</span>
+<p class="font-label text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">New Comment</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Metadata + Actions -->
+<div class="col-span-12 xl:col-span-4 flex flex-col gap-6">
+<div class="bg-surface-container-low rounded-2xl border border-outline-variant/10 flex flex-col max-h-[600px]">
+<div class="p-6 pb-4 shrink-0 border-b border-outline-variant/10">
+<h4 class="font-headline font-bold text-sm text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">info</span> SUBMISSION DATA
+                            </h4>
+</div>
+<div class="p-6 pt-4 overflow-y-auto custom-scrollbar flex-grow space-y-8">
+<div class="space-y-6">
+<div>
+<label class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant mb-1.5 block">Project Name</label>
+<p class="font-body font-medium text-on-surface text-base">Metropolis Gala: Obsidian Edition</p>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant mb-1.5 block">Scheduled Date</label>
+<p class="font-body font-medium text-on-surface">Oct 24, 2024</p>
+</div>
+<div>
+<label class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant mb-1.5 block">Expected Flux</label>
+<p class="font-body font-medium text-on-surface">1,200 PAX</p>
+</div>
+</div>
+<div>
+<label class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant mb-1.5 block">Primary Location</label>
+<div class="flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-base text-primary">location_on</span>
+<p class="font-body font-medium">The Glass Pavillion, Oslo</p>
+</div>
+</div>
+<div>
+<label class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant mb-1.5 block">Target Audience</label>
+<p class="font-body font-medium text-on-surface">High-Net-Worth Individuals, Tech Executives</p>
+</div>
+<div>
+<label class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant mb-1.5 block">Potential Sponsors</label>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-surface-container-highest text-[10px] font-bold uppercase tracking-tight rounded text-primary">NORD-Bank</span>
+<span class="px-2 py-1 bg-surface-container-highest text-[10px] font-bold uppercase tracking-tight rounded text-primary">Aetheric Tech</span>
+</div>
+</div>
+<div class="pt-6 border-t border-outline-variant/10">
+<label class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant mb-2 block">Allocated Budget</label>
+<div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/10">
+<p class="text-3xl font-headline font-bold text-primary tracking-tight">$420,000.00</p>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mt-1 inline-block">Global Event Fund</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/20 shadow-sm">
+<h4 class="font-label text-[10px] uppercase tracking-widest font-bold mb-4">Actions</h4>
+<div class="grid grid-cols-2 gap-3">
+<button class="flex items-center justify-center gap-2 py-3 bg-primary text-on-primary rounded-lg text-xs font-label uppercase font-bold hover:bg-primary-dim transition-all">
+<span class="material-symbols-outlined text-sm">check_circle</span> Approve
+                            </button>
+<button class="flex items-center justify-center gap-2 py-3 border border-outline text-on-surface rounded-lg text-xs font-label uppercase font-bold hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined text-sm">edit</span> Revise
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Metadata Floating Anchor -->
+<div class="fixed bottom-8 right-8 flex flex-col gap-2 pointer-events-none">
+<div class="bg-surface-container-lowest/80 backdrop-blur-md px-4 py-2 border border-outline-variant/20 rounded-lg shadow-sm flex items-center gap-4">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">System Status</span>
+<div class="w-2 h-2 rounded-full bg-[#40665a]"></div>
+<span class="font-label text-[10px] font-bold text-primary">LIVE EDITING</span>
+</div>
+</div>
+</body></html>

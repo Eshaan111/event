@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f0f4f3",
+                        "background": "#f8faf9",
+                        "surface-dim": "#cfdddb",
+                        "tertiary-fixed-dim": "#d0ece0",
+                        "error-dim": "#4e0309",
+                        "on-background": "#2a3434",
+                        "on-tertiary-fixed-variant": "#526b62",
+                        "on-primary": "#defff2",
+                        "surface-container": "#e9efee",
+                        "primary-fixed": "#c2ebdc",
+                        "primary-fixed-dim": "#b4ddce",
+                        "on-surface-variant": "#576160",
+                        "on-tertiary-fixed": "#364f46",
+                        "surface-container-high": "#e1eae9",
+                        "secondary-container": "#dde4df",
+                        "outline-variant": "#a9b4b3",
+                        "on-primary-fixed-variant": "#3d6357",
+                        "on-error": "#fff7f6",
+                        "inverse-surface": "#0b0f0f",
+                        "surface-variant": "#dae5e3",
+                        "primary": "#40665a",
+                        "secondary": "#59615d",
+                        "secondary-fixed-dim": "#cfd6d1",
+                        "on-primary-container": "#33594d",
+                        "surface": "#f8faf9",
+                        "primary-container": "#c2ebdc",
+                        "tertiary-container": "#defaee",
+                        "outline": "#727d7c",
+                        "secondary-dim": "#4d5551",
+                        "error-container": "#fe8983",
+                        "tertiary-fixed": "#defaee",
+                        "surface-container-highest": "#dae5e3",
+                        "inverse-primary": "#d0faea",
+                        "tertiary": "#4b645b",
+                        "on-error-container": "#752121",
+                        "on-secondary": "#f4fbf6",
+                        "on-primary-fixed": "#20463b",
+                        "surface-bright": "#f8faf9",
+                        "on-tertiary-container": "#486158",
+                        "secondary-fixed": "#dde4df",
+                        "surface-tint": "#40665a",
+                        "on-tertiary": "#e4fff3",
+                        "on-secondary-container": "#4c5350",
+                        "on-secondary-fixed-variant": "#565d5a",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-dim": "#40584f",
+                        "error": "#9f403d",
+                        "inverse-on-surface": "#9b9d9d",
+                        "on-secondary-fixed": "#3a413e",
+                        "primary-dim": "#345a4e",
+                        "on-surface": "#2a3434"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Manrope"],
+                        "label": ["Space Grotesk"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .font-headline { font-family: 'Space Grotesk', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .matte-surface {
+            background-color: #f8faf9;
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 1px 3px rgba(42, 52, 52, 0.05);
+        }
+        .ghost-border { border: 1px solid rgba(169, 180, 179, 0.2); }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased overflow-x-hidden">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-screen w-72 bg-zinc-50 border-r-2 border-emerald-900/5 flex flex-col gap-6 p-6">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined">architecture</span>
+</div>
+<div>
+<h2 class="font-headline font-bold text-emerald-900 leading-none">Project Desk</h2>
+<p class="text-[10px] font-headline tracking-widest text-zinc-500 uppercase mt-1">V0.4.2 Structure</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-500 hover:bg-emerald-900/5 transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">edit_note</span>
+<span class="font-headline text-sm">Drafts</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-emerald-900 font-bold bg-emerald-900/5 rounded-lg translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-headline text-sm">Proposals</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-500 hover:bg-emerald-900/5 transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">inventory_2</span>
+<span class="font-headline text-sm">Archive</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-500 hover:bg-emerald-900/5 transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">settings</span>
+<span class="font-headline text-sm">Settings</span>
+</a>
+</nav>
+<div class="mt-auto">
+<button class="w-full bg-primary text-on-primary py-3 rounded-lg font-headline font-medium hover:bg-primary-dim transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span>
+                New Draft
+            </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-72 min-h-screen pb-12">
+<!-- Top Nav Bar Shell -->
+<header class="sticky top-4 z-40 mx-auto w-[95%] max-w-7xl h-16 flex justify-between items-center px-8 bg-emerald-50/80 backdrop-blur-xl rounded-2xl border border-emerald-900/10 shadow-2xl shadow-emerald-900/5">
+<div class="flex items-center gap-2">
+<span class="font-headline text-xl font-bold tracking-tighter text-emerald-950">Aetheric Studio</span>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="font-headline text-[11px] tracking-widest uppercase text-emerald-900/60 hover:text-emerald-700 transition-colors" href="#">Portfolio</a>
+<a class="font-headline text-[11px] tracking-widest uppercase text-emerald-900/60 hover:text-emerald-700 transition-colors" href="#">Process</a>
+<a class="font-headline text-[11px] tracking-widest uppercase text-emerald-700 border-b-2 border-emerald-700 pb-1" href="#">Inquiry</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="text-emerald-900/60 hover:text-emerald-700 transition-colors">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="text-emerald-900/60 hover:text-emerald-700 transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<img alt="Studio Principal Profile" class="w-8 h-8 rounded-full border border-emerald-900/10" data-alt="professional headshot of a creative director in a minimalist studio environment with soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCeaGTtlaihb944PKIFFZUGtugqICztGCcKzx6OHHoq5tMJZapgvRXFK2UDIfSd0Da70IwdUFOuIPJLH_-E2lJQ2OlG8-VQrHbRhvEX0qQsHDFVGRH9WVYm4W4uP0oedXv53DXY_ycQuqOHItTxO7yTt5yw7nkaIlV_2k04HXnebIEIvzXTg0XbGYVl8y2BXExCjPUJ8eEkXo3js_CHS_kz2WlU9ceggNzrYAeMVg-dKHhQB_e58ErXIYBQask9GRmjutmkcjIfw"/>
+</div>
+</header>
+<section class="max-w-7xl mx-auto px-8 mt-12">
+<!-- Hero Header -->
+<div class="mb-12">
+<p class="font-headline text-sm tracking-[0.2em] text-primary mb-2 uppercase">Operational Narrative</p>
+<h1 class="font-headline text-5xl font-bold text-on-background tracking-tighter max-w-2xl">
+                    Dashboard Overview
+                </h1>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Main Flux Chart Container -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-lowest rounded-3xl ghost-border p-8 matte-surface">
+<div class="flex justify-between items-end mb-10">
+<div>
+<h3 class="font-headline text-xl font-bold">Overview Flux</h3>
+<p class="text-sm text-on-surface-variant font-body">Structural output vs. kinetic engagement</p>
+</div>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-surface-container rounded text-[10px] font-headline uppercase tracking-widest text-outline">24H</span>
+<span class="px-3 py-1 bg-primary text-on-primary rounded text-[10px] font-headline uppercase tracking-widest">7D</span>
+<span class="px-3 py-1 bg-surface-container rounded text-[10px] font-headline uppercase tracking-widest text-outline">30D</span>
+</div>
+</div>
+<!-- SVG Chart (Fine Lines Drafting Style) -->
+<div class="h-64 w-full relative">
+<svg class="w-full h-full overflow-visible" viewbox="0 0 800 200">
+<!-- Grid Lines -->
+<line stroke="rgba(169, 180, 179, 0.1)" stroke-width="1" x1="0" x2="800" y1="0" y2="0"></line>
+<line stroke="rgba(169, 180, 179, 0.1)" stroke-width="1" x1="0" x2="800" y1="50" y2="50"></line>
+<line stroke="rgba(169, 180, 179, 0.1)" stroke-width="1" x1="0" x2="800" y1="100" y2="100"></line>
+<line stroke="rgba(169, 180, 179, 0.1)" stroke-width="1" x1="0" x2="800" y1="150" y2="150"></line>
+<line stroke="rgba(169, 180, 179, 0.1)" stroke-width="1" x1="0" x2="800" y1="200" y2="200"></line>
+<!-- Main Data Line -->
+<path d="M0,150 C100,140 150,180 200,120 C250,60 300,100 400,80 C500,60 600,20 700,50 L800,40" fill="none" stroke="#40665a" stroke-dasharray="0" stroke-width="1.5"></path>
+<!-- Interaction Dots -->
+<circle cx="200" cy="120" fill="#40665a" r="3"></circle>
+<circle cx="400" cy="80" fill="#40665a" r="3"></circle>
+<circle cx="700" cy="50" fill="#40665a" r="3"></circle>
+</svg>
+<div class="absolute inset-0 flex justify-between items-end pointer-events-none px-1">
+<span class="text-[10px] font-headline text-outline uppercase tracking-tighter">Mon</span>
+<span class="text-[10px] font-headline text-outline uppercase tracking-tighter">Tue</span>
+<span class="text-[10px] font-headline text-outline uppercase tracking-tighter">Wed</span>
+<span class="text-[10px] font-headline text-outline uppercase tracking-tighter">Thu</span>
+<span class="text-[10px] font-headline text-outline uppercase tracking-tighter">Fri</span>
+<span class="text-[10px] font-headline text-outline uppercase tracking-tighter">Sat</span>
+<span class="text-[10px] font-headline text-outline uppercase tracking-tighter">Sun</span>
+</div>
+</div>
+</div>
+<!-- Right Column Metric Cards -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-6">
+<!-- Metric Card 1 -->
+<div class="bg-surface-container-lowest p-6 rounded-3xl ghost-border matte-surface flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<span class="font-headline text-[10px] tracking-widest uppercase text-outline">Active Builds</span>
+<span class="material-symbols-outlined text-primary text-sm">precision_manufacturing</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-4xl font-headline font-bold">14</span>
+<span class="text-xs font-headline text-primary font-medium">+2 this week</span>
+</div>
+</div>
+<!-- Metric Card 2 -->
+<div class="bg-surface-container-lowest p-6 rounded-3xl ghost-border matte-surface flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<span class="font-headline text-[10px] tracking-widest uppercase text-outline">Revenue</span>
+<span class="material-symbols-outlined text-primary text-sm">payments</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-4xl font-headline font-bold">$124.8k</span>
+<span class="text-xs font-headline text-primary font-medium">12% Growth</span>
+</div>
+</div>
+<!-- Metric Card 3 -->
+<div class="bg-surface-container-lowest p-6 rounded-3xl ghost-border matte-surface flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<span class="font-headline text-[10px] tracking-widest uppercase text-outline">Global Impact</span>
+<span class="material-symbols-outlined text-primary text-sm">language</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-4xl font-headline font-bold">42</span>
+<span class="text-xs font-headline text-primary font-medium">Active Regions</span>
+</div>
+</div>
+</div>
+<!-- Recent Shifts Ledger -->
+<div class="col-span-12 bg-surface-container rounded-3xl p-8 border border-white/40">
+<div class="flex items-center justify-between mb-8">
+<h3 class="font-headline text-xl font-bold">Recent Shifts</h3>
+<button class="text-[10px] font-headline tracking-widest uppercase text-primary border-b border-primary/30">Review All Entries</button>
+</div>
+<div class="flex flex-col">
+<!-- Ledger Item -->
+<div class="flex items-center py-5 border-b border-outline-variant/10">
+<div class="w-12 h-12 bg-surface-container-lowest rounded-xl ghost-border flex items-center justify-center mr-6">
+<span class="material-symbols-outlined text-primary">architecture</span>
+</div>
+<div class="flex-1">
+<p class="font-headline text-sm font-bold text-on-surface">Brutalist Pavilion V2.1</p>
+<p class="text-xs text-on-surface-variant">System-wide geometry optimization applied</p>
+</div>
+<div class="text-right">
+<p class="font-headline text-xs text-outline uppercase tracking-widest">14:02 PM</p>
+<p class="text-[10px] text-primary font-medium">Synced</p>
+</div>
+</div>
+<!-- Ledger Item -->
+<div class="flex items-center py-5 border-b border-outline-variant/10">
+<div class="w-12 h-12 bg-surface-container-lowest rounded-xl ghost-border flex items-center justify-center mr-6">
+<span class="material-symbols-outlined text-primary">diversity_3</span>
+</div>
+<div class="flex-1">
+<p class="font-headline text-sm font-bold text-on-surface">Nexus Integration</p>
+<p class="text-xs text-on-surface-variant">New client onboarding initiated</p>
+</div>
+<div class="text-right">
+<p class="font-headline text-xs text-outline uppercase tracking-widest">11:45 AM</p>
+<p class="text-[10px] text-primary font-medium">Active</p>
+</div>
+</div>
+<!-- Ledger Item -->
+<div class="flex items-center py-5">
+<div class="w-12 h-12 bg-surface-container-lowest rounded-xl ghost-border flex items-center justify-center mr-6">
+<span class="material-symbols-outlined text-primary">inventory_2</span>
+</div>
+<div class="flex-1">
+<p class="font-headline text-sm font-bold text-on-surface">Archive Migration</p>
+<p class="text-xs text-on-surface-variant">Legacy structures moved to deep-cold storage</p>
+</div>
+<div class="text-right">
+<p class="font-headline text-xs text-outline uppercase tracking-widest">Yesterday</p>
+<p class="text-[10px] text-secondary font-medium">Completed</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Feature Spotlight Section -->
+<div class="col-span-12 lg:col-span-4 bg-primary text-on-primary p-8 rounded-3xl flex flex-col justify-between relative overflow-hidden h-72">
+<div class="relative z-10">
+<span class="text-[10px] font-headline tracking-widest uppercase opacity-70">Focus Zone</span>
+<h4 class="font-headline text-2xl font-bold mt-2 leading-tight">Elevated Drafting Tools</h4>
+<p class="text-sm opacity-80 mt-4 max-w-xs font-body">Access the new structural synthesis engine for automated blueprint optimization.</p>
+</div>
+<button class="relative z-10 self-start px-6 py-2 bg-on-primary text-primary rounded-lg text-xs font-headline font-bold uppercase tracking-wider">Launch Engine</button>
+<!-- Decorative Graphic -->
+<div class="absolute -right-12 -bottom-12 w-48 h-48 border border-white/10 rounded-full"></div>
+<div class="absolute -right-6 -bottom-6 w-32 h-32 border border-white/10 rounded-full"></div>
+</div>
+<!-- Secondary Spotlight -->
+<div class="col-span-12 lg:col-span-8 bg-surface-dim p-8 rounded-3xl relative overflow-hidden h-72 flex gap-8">
+<div class="flex-1 flex flex-col justify-between relative z-10">
+<div>
+<span class="text-[10px] font-headline tracking-widest uppercase text-on-surface-variant">Environment State</span>
+<h4 class="font-headline text-2xl font-bold text-on-surface mt-2">Aetheric Ambient Monitoring</h4>
+<p class="text-sm text-on-surface-variant mt-4 font-body">Real-time analysis of studio-wide digital flow and creative density patterns across all active nodes.</p>
+</div>
+<div class="flex gap-4">
+<div class="flex items-center gap-2 bg-surface-container-lowest/50 px-3 py-1.5 rounded-full border border-white/20">
+<span class="w-2 h-2 bg-primary rounded-full"></span>
+<span class="text-[10px] font-headline font-bold uppercase tracking-widest">Normal Flow</span>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-lowest/50 px-3 py-1.5 rounded-full border border-white/20">
+<span class="text-[10px] font-headline font-bold uppercase tracking-widest text-on-surface-variant">84% Efficiency</span>
+</div>
+</div>
+</div>
+<div class="w-1/3 h-full relative rounded-2xl overflow-hidden ghost-border">
+<img alt="Abstract architectural lines" class="w-full h-full object-cover grayscale opacity-60" data-alt="abstract minimalist architectural detail showing intersecting clean white lines and soft shadows with a technical aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_OxM3aBN7qqMyGXvu_uh9bU2qKgcdoBEeheR9k9gMpVNydvThgWcE5dHzYMQeQD3ssBLV_sUCWWvLghYMzIxrWLGIsbIthrP3fwKlGZT8tkq2-A0cGGrhQcqEOPy7SbIx42RuIyrY7k-JbmDBrrFZn0-bhsYMv_G5cno7We3PyHnrtnK0Arj_z1qHsi9rHCFCGXlqQmqgB7CicWbOLFaGCcZZN2woGaok-gz4kCgugKQhfg7JM5LBQHONPxZya_-Tp4qljxEsHw"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer Structural Note -->
+<footer class="max-w-7xl mx-auto px-8 mt-24 pb-12 border-t border-outline-variant/10">
+<div class="flex justify-between items-center py-8">
+<div>
+<span class="font-headline font-bold text-emerald-900">Aetheric Studio</span>
+<p class="text-xs text-on-surface-variant mt-1 font-body">© 2024 Structured Foundations. All parameters verified.</p>
+</div>
+<div class="flex gap-8">
+<a class="text-[10px] font-headline tracking-widest uppercase text-outline hover:text-primary transition-colors" href="#">Manifesto</a>
+<a class="text-[10px] font-headline tracking-widest uppercase text-outline hover:text-primary transition-colors" href="#">Nodes</a>
+<a class="text-[10px] font-headline tracking-widest uppercase text-outline hover:text-primary transition-colors" href="#">Privacy Shell</a>
+</div>
+</div>
+</footer>
+</main>
+</body></html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Member Directory | Aetheric Event Society</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#defff2",
+                        "surface-bright": "#f8faf9",
+                        "inverse-primary": "#d0faea",
+                        "inverse-surface": "#0b0f0f",
+                        "tertiary-fixed-dim": "#d0ece0",
+                        "on-primary-fixed-variant": "#3d6357",
+                        "error": "#9f403d",
+                        "surface-container-high": "#e1eae9",
+                        "surface-dim": "#cfdddb",
+                        "surface-tint": "#40665a",
+                        "on-tertiary-fixed": "#364f46",
+                        "primary": "#40665a",
+                        "on-background": "#2a3434",
+                        "tertiary-dim": "#40584f",
+                        "surface-container-low": "#f0f4f3",
+                        "on-error-container": "#752121",
+                        "on-tertiary-container": "#486158",
+                        "surface": "#f8faf9",
+                        "background": "#f8faf9",
+                        "surface-variant": "#dae5e3",
+                        "primary-fixed-dim": "#b4ddce",
+                        "on-surface": "#2a3434",
+                        "secondary-fixed-dim": "#cfd6d1",
+                        "on-tertiary-fixed-variant": "#526b62",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-container": "#33594d",
+                        "secondary": "#59615d",
+                        "on-surface-variant": "#576160",
+                        "on-secondary": "#f4fbf6",
+                        "error-container": "#fe8983",
+                        "outline": "#727d7c",
+                        "on-primary-fixed": "#20463b",
+                        "tertiary-fixed": "#defaee",
+                        "primary-dim": "#345a4e",
+                        "surface-container": "#e9efee",
+                        "primary-fixed": "#c2ebdc",
+                        "on-secondary-fixed-variant": "#565d5a",
+                        "secondary-dim": "#4d5551",
+                        "inverse-on-surface": "#9b9d9d",
+                        "on-error": "#fff7f6",
+                        "secondary-container": "#dde4df",
+                        "primary-container": "#c2ebdc",
+                        "error-dim": "#4e0309",
+                        "tertiary-container": "#defaee",
+                        "secondary-fixed": "#dde4df",
+                        "tertiary": "#4b645b",
+                        "surface-container-highest": "#dae5e3",
+                        "outline-variant": "#a9b4b3",
+                        "on-secondary-container": "#4c5350",
+                        "on-tertiary": "#e4fff3",
+                        "on-secondary-fixed": "#3a413e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Manrope"],
+                        "label": ["Space Grotesk"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .bg-grid {
+            background-size: 40px 40px;
+            background-image: radial-gradient(circle, #a9b4b3 1px, transparent 1px);
+        }
+        .text-glazing {
+            -webkit-text-stroke: 1px rgba(169, 180, 179, 0.2);
+            color: transparent;
+            line-height: 0.8;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary-container">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#f8faf9]/80 dark:bg-[#1a1c1c]/80 backdrop-blur-xl border-b border-[#a9b4b3]/20 flex justify-between items-center px-8 h-20 max-w-full mx-auto">
+<div class="font-['Space_Grotesk'] text-xl font-bold tracking-tighter text-[#40665a] dark:text-[#507d6d] uppercase">
+            Aetheric Event Society
+        </div>
+<div class="hidden md:flex items-center space-x-8 font-['Space_Grotesk'] tracking-tight">
+<a class="text-[#40665a] dark:text-[#507d6d] border-b-2 border-[#40665a] pb-1" href="#">Directory</a>
+<a class="text-[#2a3434]/60 dark:text-[#f8faf9]/60 hover:text-[#40665a] transition-colors duration-300" href="#">Projects</a>
+<a class="text-[#2a3434]/60 dark:text-[#f8faf9]/60 hover:text-[#40665a] transition-colors duration-300" href="#">Insights</a>
+<a class="text-[#2a3434]/60 dark:text-[#f8faf9]/60 hover:text-[#40665a] transition-colors duration-300" href="#">History</a>
+</div>
+<div class="flex items-center space-x-6">
+<div class="flex space-x-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:opacity-70 transition-opacity">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:opacity-70 transition-opacity">settings</span>
+</div>
+<div class="h-10 w-10 rounded-full overflow-hidden border border-outline-variant/20">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="close-up portrait of a professional architect in a minimalist studio with soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnnq8J-jH9AJMvgobhNnC1xtAzZzSRJTeIdVeW5eQ0ZCUYgSDjw5o6d-QfYgwsBCUViZYymlF58J0CUQmyVyJbqALqrP_t4MQorvtyYvmF_cg9LecJqk9euD5888skk5SLmRV3HvJtFMaWzzn7sS-eJgfCMY7vPuLtVnoREe8aJo_TyImPfDfROQHwKYt-flMpmy8Rg6dZJsBqniOW5nK-cQl17kVo83Z8sR7AJ_NE0Ss9f6N-SjPCmOdlm0n4gThALSc7PVAYsg"/>
+</div>
+</div>
+</nav>
+<div class="flex min-h-screen pt-20">
+<!-- SideNavBar -->
+<aside class="hidden lg:flex flex-col p-6 space-y-8 h-screen w-64 border-r border-[#a9b4b3]/20 bg-[#f0f4f3] dark:bg-[#222625] sticky top-20">
+<div class="space-y-1">
+<div class="font-bold text-lg text-[#2a3434] font-headline">Aetheric Dir.</div>
+<div class="font-['Space_Grotesk'] uppercase text-[10px] tracking-[0.05em] text-[#2a3434]/50">Event Management v1.0</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center space-x-3 p-3 bg-[#ffffff] dark:bg-[#2a3434] text-[#40665a] font-bold rounded-lg transition-all duration-200 ease-in-out font-['Space_Grotesk'] uppercase text-[10px] tracking-[0.05em]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<span>Members</span>
+</a>
+<a class="flex items-center space-x-3 p-3 text-[#2a3434]/50 dark:text-[#f8faf9]/40 hover:bg-[#e9efee] dark:hover:bg-[#2d3231] transition-all duration-200 ease-in-out font-['Space_Grotesk'] uppercase text-[10px] tracking-[0.05em]" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+<span>Active Projects</span>
+</a>
+<a class="flex items-center space-x-3 p-3 text-[#2a3434]/50 dark:text-[#f8faf9]/40 hover:bg-[#e9efee] dark:hover:bg-[#2d3231] transition-all duration-200 ease-in-out font-['Space_Grotesk'] uppercase text-[10px] tracking-[0.05em]" href="#">
+<span class="material-symbols-outlined">history_edu</span>
+<span>Participation</span>
+</a>
+<a class="flex items-center space-x-3 p-3 text-[#2a3434]/50 dark:text-[#f8faf9]/40 hover:bg-[#e9efee] dark:hover:bg-[#2d3231] transition-all duration-200 ease-in-out font-['Space_Grotesk'] uppercase text-[10px] tracking-[0.05em]" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span>Archive</span>
+</a>
+</nav>
+<button class="w-full py-4 bg-primary text-on-primary font-headline uppercase text-xs tracking-widest rounded-lg hover:bg-primary-dim transition-colors">
+                New Entry
+            </button>
+<div class="pt-6 border-t border-outline-variant/20 space-y-2">
+<a class="flex items-center space-x-3 p-2 text-[#2a3434]/50 font-['Space_Grotesk'] uppercase text-[10px] tracking-[0.05em]" href="#">
+<span class="material-symbols-outlined text-sm">help_outline</span>
+<span>Support</span>
+</a>
+<a class="flex items-center space-x-3 p-2 text-[#2a3434]/50 font-['Space_Grotesk'] uppercase text-[10px] tracking-[0.05em]" href="#">
+<span class="material-symbols-outlined text-sm">logout</span>
+<span>Log Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 relative overflow-hidden bg-grid">
+<!-- Architectural Background Decoration -->
+<div class="absolute inset-0 z-0 flex flex-col justify-between p-12 opacity-10">
+<div class="text-[20vw] font-headline font-bold text-glazing uppercase">SOCIETY</div>
+<div class="text-[20vw] font-headline font-bold text-glazing uppercase self-end">ARCHIVE</div>
+</div>
+<div class="relative z-10 p-8 md:p-12 lg:p-16 max-w-7xl mx-auto">
+<!-- Header Section -->
+<header class="mb-16">
+<div class="flex items-baseline space-x-4 mb-2">
+<span class="h-[2px] w-12 bg-primary"></span>
+<h2 class="font-headline text-sm uppercase tracking-[0.2em] text-primary">Member Directory</h2>
+</div>
+<h1 class="font-headline text-5xl md:text-7xl font-bold tracking-tighter text-on-surface mb-6">
+                        Architectural <br/> <span class="text-primary italic">Curators</span>
+</h1>
+<div class="flex flex-wrap gap-4 items-center">
+<div class="bg-surface-container-lowest border border-outline-variant/20 px-4 py-2 rounded-lg flex items-center space-x-3">
+<span class="material-symbols-outlined text-primary text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 font-body text-sm w-64" placeholder="Filter by name or specialty..." type="text"/>
+</div>
+<div class="bg-surface-container-low border border-outline-variant/20 px-4 py-2 rounded-lg font-headline text-[10px] uppercase tracking-wider text-on-surface-variant cursor-pointer hover:bg-surface-container-high transition-colors">
+                            Recent Activity
+                        </div>
+<div class="bg-surface-container-low border border-outline-variant/20 px-4 py-2 rounded-lg font-headline text-[10px] uppercase tracking-wider text-on-surface-variant cursor-pointer hover:bg-surface-container-high transition-colors">
+                            Project Load
+                        </div>
+</div>
+</header>
+<!-- Bento Grid of Members -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+<!-- Member Card 1 -->
+<div class="group bg-surface-container-lowest border border-outline-variant/10 p-8 rounded-xl transition-all duration-300 hover:shadow-[0px_20px_48px_rgba(42,52,52,0.06)] hover:-translate-y-1 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-8">
+<div class="h-24 w-24 rounded-full overflow-hidden border-2 border-primary-container p-1 bg-surface">
+<img alt="Elena Vance" class="w-full h-full object-cover rounded-full" data-alt="professional woman portrait with sleek hair in a modern minimalist grey studio with clean lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDg9uD24bsu8ich6AFDIOcm_7a-YtVuKa4irOQQnVTlzRT6vj5T22crrCnwh0wJDNJD1HRD33Mh0nVLEuTb0nQ9JQorH94Z_N7RAtGAbdPZJVpCxmZxFLk-_CNNzAJ9ZbzDY2znDsstuNnFxBalajTEn01JuLeEAeN_n__BLL8Jg2t2rBgK2Cu2IjUeUT_aSetY3sqmrxHQQGPEjwDea5-PEF0lMI6P0bwwW_UxmZ_e2IUmGdrINerR2LzBmb1xNxLtB7LNLIOIAQ"/>
+</div>
+<div class="font-headline text-[10px] tracking-widest text-outline-variant uppercase">ID: AES-042</div>
+</div>
+<h3 class="font-headline text-2xl font-bold text-on-surface mb-1">Elena Vance</h3>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="bg-primary-container text-on-primary-container font-headline text-[9px] px-2 py-0.5 rounded uppercase tracking-wider">Curator</span>
+<span class="bg-surface-container text-on-secondary-container font-headline text-[9px] px-2 py-0.5 rounded uppercase tracking-wider">Spatial Logic</span>
+</div>
+<div class="space-y-6">
+<div>
+<h4 class="font-headline text-[10px] uppercase tracking-[0.1em] text-outline mb-3">Current Projects</h4>
+<ul class="space-y-2"><div class="flex flex-wrap gap-2 mt-2"><a class="px-3 py-1.5 bg-[#3a618c] text-white font-headline font-bold text-[11px] uppercase tracking-wider rounded shadow-sm hover:brightness-110 transition-all" href="#">The Glass Pavilion Zenith</a><a class="px-3 py-1.5 bg-[#426b51] text-white font-headline font-bold text-[11px] uppercase tracking-wider rounded shadow-sm hover:brightness-110 transition-all opacity-80" href="#">Sub-Atomic Gala Arch</a></div></ul>
+</div>
+</div>
+</div>
+<div class="mt-10 pt-6 border-t border-outline-variant/10">
+<h4 class="font-headline text-[10px] uppercase tracking-[0.1em] text-outline mb-3">History</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed italic">Lead Participation: "Luminescence Expo 2023", "Vertical Garden Summit"</p>
+</div>
+</div>
+<!-- Member Card 2 -->
+<div class="group bg-surface-container-lowest border border-outline-variant/10 p-8 rounded-xl transition-all duration-300 hover:shadow-[0px_20px_48px_rgba(42,52,52,0.06)] hover:-translate-y-1 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-8">
+<div class="h-24 w-24 rounded-full overflow-hidden border-2 border-primary-container p-1 bg-surface">
+<img alt="Marcus Thorne" class="w-full h-full object-cover rounded-full" data-alt="portrait of a man with spectacles and dark hair in an industrial loft setting with architectural plans" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCasAS2uVCqnyaTcrNnvI8zi1UXZ0Zzj_-3Gk9HGPxHnzzCv6-4Eq31dvIgiEBOgZ-AaNIKQ5m_WXz9bLutVcXFQehKlzZobvnXlgMSUJf07MKPucsi6YkFllEesGDtRMdOZ70J_4jHCqEPkt84urV2BkLI9pIJBFw1vPxUhNqWjmNeYgXLWdkcwqTRFIw2fGrGrUDw_ItlBTBRGgE-WhK-efaVVIOf1mJaOd1sm6o0lHt4iqVg6B836azd7aHGMW7qjqcCZl7d5Q"/>
+</div>
+<div class="font-headline text-[10px] tracking-widest text-outline-variant uppercase">ID: AES-019</div>
+</div>
+<h3 class="font-headline text-2xl font-bold text-on-surface mb-1">Marcus Thorne</h3>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="bg-primary-container text-on-primary-container font-headline text-[9px] px-2 py-0.5 rounded uppercase tracking-wider">Lead Designer</span>
+<span class="bg-surface-container text-on-secondary-container font-headline text-[9px] px-2 py-0.5 rounded uppercase tracking-wider">Atmosphere Eng.</span>
+</div>
+<div class="space-y-6">
+<div>
+<h4 class="font-headline text-[10px] uppercase tracking-[0.1em] text-outline mb-3">Current Projects</h4>
+<ul class="space-y-2"><div class="flex flex-wrap gap-2 mt-2"><a class="px-3 py-1.5 bg-[#3a618c] text-white font-headline font-bold text-[11px] uppercase tracking-wider rounded shadow-sm hover:brightness-110 transition-all" href="#">Kinetic Sculptures Assembly</a></div></ul>
+</div>
+</div>
+</div>
+<div class="mt-10 pt-6 border-t border-outline-variant/10">
+<h4 class="font-headline text-[10px] uppercase tracking-[0.1em] text-outline mb-3">History</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed italic">Managed architectural flow for "Void Sessions: Paris".</p>
+</div>
+</div>
+<!-- Member Card 3 (Asymmetric styling) -->
+<div class="group bg-primary text-on-primary p-8 rounded-xl transition-all duration-300 hover:shadow-[0px_20px_48px_rgba(64,102,90,0.2)] hover:-translate-y-1 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-8">
+<div class="h-24 w-24 rounded-full overflow-hidden border-2 border-white/20 p-1 bg-primary-dim">
+<img alt="Saffron Lee" class="w-full h-full object-cover rounded-full" data-alt="creative professional woman with glasses in a bright white creative space with green plants in background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC322QXzS4fqEILyO4lv3ARt_4XWyuO2jlayPX4_bPj6kGVvTTE_AKo88_9KBCpGqKa5CJR7yHechas6_xLOXolIfSJ8s6REVy8MakcwiGd13_yYMQyuGErJnuwoxfuHI6MsMjjxXrLaONzRkDMQUgXF5CFjWI9mlAum5R1qkQr3dupzken-Xl7lCBgYkPaA7WUrcNE_hZtQPpyhXzlTYSUFUebKBhQKzV6k6sS32tLAuBYPZHzvluK_HKrTJt4SPWoML3YxFm9ew"/>
+</div>
+<div class="font-headline text-[10px] tracking-widest text-on-primary/60 uppercase">Senior Council</div>
+</div>
+<h3 class="font-headline text-2xl font-bold mb-1">Saffron Lee</h3>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="bg-white/10 text-white font-headline text-[9px] px-2 py-0.5 rounded uppercase tracking-wider border border-white/20">Executive Lead</span>
+</div>
+<div class="space-y-6">
+<div><h4 class="font-headline text-[10px] uppercase tracking-[0.1em] text-on-primary/60 mb-3">Oversight</h4><div class="flex flex-wrap gap-2"><a class="px-3 py-1.5 bg-white/20 text-white font-headline font-bold text-[11px] uppercase tracking-wider rounded shadow-sm hover:bg-white/30 transition-all border border-white/10" href="#">Global Expansion</a><a class="px-3 py-1.5 bg-white/20 text-white font-headline font-bold text-[11px] uppercase tracking-wider rounded shadow-sm hover:bg-white/30 transition-all border border-white/10" href="#">Standards Protocol v2.0</a></div></div>
+</div>
+</div>
+<div class="mt-10 pt-6 border-t border-white/10">
+<h4 class="font-headline text-[10px] uppercase tracking-[0.1em] text-on-primary/60 mb-3">Legacy</h4>
+<p class="text-xs text-on-primary/80 leading-relaxed italic">Founding member. Orchestrated the "Emerald Archive" vault construction.</p>
+</div>
+</div>
+<!-- Member Card 4 -->
+<div class="group bg-surface-container-lowest border border-outline-variant/10 p-8 rounded-xl transition-all duration-300 hover:shadow-[0px_20px_48px_rgba(42,52,52,0.06)] hover:-translate-y-1 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-8">
+<div class="h-24 w-24 rounded-full overflow-hidden border-2 border-primary-container p-1 bg-surface">
+<img alt="Julian Beck" class="w-full h-full object-cover rounded-full" data-alt="man with beard and creative attire in a workshop setting with moody soft light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlZP4uWHXbPAo4OMwHv3JXecTDkY946qrJJoJvw0uDBRrz_o-jPxOdc7hRBXSgseMEqbIjpdyOLqQ1m7n74Ke_P2gyEFntOSspFhRuISohyu8k5klJC1cOH1pkB1UlZMbh2X1IVCICjNuu6uzJN8U4KeX23ySfFplyW4EZTHMg6dhxFraCJgovfd2IimmGMh_zFLGcmhSNnxiXxLyUXFn4WTTNmFIqMPGgyCwFaQAtMEupo_EsltPBDdnqsHkbY_uLh3CBcIzjiw"/>
+</div>
+<div class="font-headline text-[10px] tracking-widest text-outline-variant uppercase">ID: AES-087</div>
+</div>
+<h3 class="font-headline text-2xl font-bold text-on-surface mb-1">Julian Beck</h3>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="bg-primary-container text-on-primary-container font-headline text-[9px] px-2 py-0.5 rounded uppercase tracking-wider">Acoustic Logic</span>
+<span class="bg-surface-container text-on-secondary-container font-headline text-[9px] px-2 py-0.5 rounded uppercase tracking-wider">Technician</span>
+</div>
+<div class="space-y-6">
+<div>
+<h4 class="font-headline text-[10px] uppercase tracking-[0.1em] text-outline mb-3">Current Projects</h4>
+<ul class="space-y-2"><div class="flex flex-wrap gap-2 mt-2"><a class="px-3 py-1.5 bg-[#426b51] text-white font-headline font-bold text-[11px] uppercase tracking-wider rounded shadow-sm hover:brightness-110 transition-all" href="#">Echo Chamber Restructuring</a></div></ul>
+</div>
+</div>
+</div>
+<div class="mt-10 pt-6 border-t border-outline-variant/10">
+<h4 class="font-headline text-[10px] uppercase tracking-[0.1em] text-outline mb-3">History</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed italic">Consulted on sound design for the "Aetheric Hall" restoration.</p>
+</div>
+</div>
+<!-- Member Card 5 -->
+<div class="group bg-surface-container-lowest border border-outline-variant/10 p-8 rounded-xl transition-all duration-300 hover:shadow-[0px_20px_48px_rgba(42,52,52,0.06)] hover:-translate-y-1 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-8">
+<div class="h-24 w-24 rounded-full overflow-hidden border-2 border-primary-container p-1 bg-surface">
+<img alt="Amara Okafor" class="w-full h-full object-cover rounded-full" data-alt="woman wearing designer jewelry and modern minimalist clothing in a bright high-end boutique setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDW-agXwgA3muEQScROKYUoZTVH6AkLNPMiFuXpZlu5jUuPsNM866nWHmeXUQNQ-GxECdnuF90zyMzwa8Ezw6wLwR1LYE6DvVv3yejoIhQGvkU2M1VKQCZ1gmxPM4lUSCfvagFgOfYhRLEj9PF5wVuIPnRuLpBQ8BmiYK6FyDHhX2EJRUIW3uhPbBDvrqZeRBJ0j46-MIjUTrNE1OmkzRy80BSNnDZq8Gl87iywxZZ04IVpz63DNSzgZZwMF-3hMjUx5iiLGZJ1qQ"/>
+</div>
+<div class="font-headline text-[10px] tracking-widest text-outline-variant uppercase">ID: AES-102</div>
+</div>
+<h3 class="font-headline text-2xl font-bold text-on-surface mb-1">Amara Okafor</h3>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="bg-primary-container text-on-primary-container font-headline text-[9px] px-2 py-0.5 rounded uppercase tracking-wider">Lighting Dir.</span>
+<span class="bg-surface-container text-on-secondary-container font-headline text-[9px] px-2 py-0.5 rounded uppercase tracking-wider">Visualist</span>
+</div>
+<div class="space-y-6">
+<div>
+<h4 class="font-headline text-[10px] uppercase tracking-[0.1em] text-outline mb-3">Current Projects</h4>
+<ul class="space-y-2"><div class="flex flex-wrap gap-2 mt-2"><a class="px-3 py-1.5 bg-[#3a618c] text-white font-headline font-bold text-[11px] uppercase tracking-wider rounded shadow-sm hover:brightness-110 transition-all" href="#">Spectral Array Deployment</a></div></ul>
+</div>
+</div>
+</div>
+<div class="mt-10 pt-6 border-t border-outline-variant/10">
+<h4 class="font-headline text-[10px] uppercase tracking-[0.1em] text-outline mb-3">History</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed italic">Architectural lighting for the "Desert Mirage Gala".</p>
+</div>
+</div>
+<!-- Member Card 6 -->
+<div class="group bg-surface-container-lowest border border-outline-variant/10 p-8 rounded-xl transition-all duration-300 hover:shadow-[0px_20px_48px_rgba(42,52,52,0.06)] hover:-translate-y-1 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-8">
+<div class="h-24 w-24 rounded-full overflow-hidden border-2 border-primary-container p-1 bg-surface">
+<img alt="Liam Sterling" class="w-full h-full object-cover rounded-full" data-alt="man in high-end streetwear in an urban architectural setting with concrete and steel" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAF5v8YpzxJBrHhzXK53qz_c01suheFU4RhQz_Gvt0TyGiWqSb80DLwoAEL-9IEJPW1lA5Ri2azA61wGPpZKGhUU6EptoYrYNN3VyPM1rzxeRouhq7kCHCQ7Ja-W9w6PCoPeeZypC3IQk3j7ndiCrhmwiXSAY4dCPm6Hvf6bPMVkYJPyXNgyaPHmmOO_cez4uXeQBsE9Y0IIymQQmWcvA9i32dfFuQ8kwTApIFN59SU-MpURQD7Qo3HDh0S--e8l89bHTmNW7WOJg"/>
+</div>
+<div class="font-headline text-[10px] tracking-widest text-outline-variant uppercase">ID: AES-055</div>
+</div>
+<h3 class="font-headline text-2xl font-bold text-on-surface mb-1">Liam Sterling</h3>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="bg-primary-container text-on-primary-container font-headline text-[9px] px-2 py-0.5 rounded uppercase tracking-wider">Logistics Master</span>
+<span class="bg-surface-container text-on-secondary-container font-headline text-[9px] px-2 py-0.5 rounded uppercase tracking-wider">Scout</span>
+</div>
+<div class="space-y-6">
+<div>
+<h4 class="font-headline text-[10px] uppercase tracking-[0.1em] text-outline mb-3">Current Projects</h4>
+<ul class="space-y-2"><div class="flex flex-wrap gap-2 mt-2"><a class="px-3 py-1.5 bg-[#426b51] text-white font-headline font-bold text-[11px] uppercase tracking-wider rounded shadow-sm hover:brightness-110 transition-all" href="#">Remote Island Infrastructure</a></div></ul>
+</div>
+</div>
+</div>
+<div class="mt-10 pt-6 border-t border-outline-variant/10">
+<h4 class="font-headline text-[10px] uppercase tracking-[0.1em] text-outline mb-3">History</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed italic">Secured the "Hidden Tundra" site for the Society AGM.</p>
+</div>
+</div>
+</div>
+<!-- Pagination/Metadata Bar -->
+<footer class="mt-20 py-8 border-t border-outline-variant/20 flex flex-col md:flex-row justify-between items-center text-on-surface-variant">
+<div class="font-headline text-[10px] uppercase tracking-[0.2em] mb-4 md:mb-0">
+                        Showing 6 of 142 Active Members
+                    </div>
+<div class="flex items-center space-x-8 font-headline text-[10px] uppercase tracking-[0.2em]">
+<button class="hover:text-primary transition-colors disabled:opacity-30" disabled="">Previous</button>
+<div class="flex space-x-4">
+<span class="text-primary font-bold underline underline-offset-4">01</span>
+<span class="cursor-pointer hover:text-primary transition-colors">02</span>
+<span class="cursor-pointer hover:text-primary transition-colors">03</span>
+<span class="cursor-pointer hover:text-primary transition-colors">...</span>
+<span class="cursor-pointer hover:text-primary transition-colors">12</span>
+</div>
+<button class="hover:text-primary transition-colors">Next</button>
+</div>
+</footer>
+</div>
+</main>
+</div>
+<!-- Mobile Navigation Shell -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface-container-lowest/90 backdrop-blur-md border-t border-outline-variant/20 h-16 flex justify-around items-center px-4">
+<button class="flex flex-col items-center space-y-1 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-headline text-[8px] uppercase tracking-tighter">Directory</span>
+</button>
+<button class="flex flex-col items-center space-y-1 text-on-surface-variant">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="font-headline text-[8px] uppercase tracking-tighter">Projects</span>
+</button>
+<button class="flex flex-col items-center space-y-1 text-on-surface-variant">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="font-headline text-[8px] uppercase tracking-tighter">New</span>
+</button>
+<button class="flex flex-col items-center space-y-1 text-on-surface-variant">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="font-headline text-[8px] uppercase tracking-tighter">Archive</span>
+</button>
+<button class="flex flex-col items-center space-y-1 text-on-surface-variant">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="font-headline text-[8px] uppercase tracking-tighter">Profile</span>
+</button>
+</nav>
+</body></html>

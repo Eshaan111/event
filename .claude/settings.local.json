@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx prisma:*)",
+      "Bash(npx tsx:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx next:*)",
+      "Bash(npm install:*)",
+      "Bash(npx auth:*)",
+      "Bash(node:*)",
+      "Bash(cat C:/Users/ESHAAN/HAKUR/aloo-samosa/app/api/proposals/[id]/route.ts)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(k,v\\) for k,v in {**d.get\\('dependencies',{}\\), **d.get\\('devDependencies',{}\\)}.items\\(\\)]\")",
+      "Bash(xargs grep:*)",
+      "Bash(grep -v \"Warning\\\\|SSL\\\\|sslmode\\\\|libpq\\\\|major version\\\\|behavior\\\\|compatibility\\\\|See https\\\\|Use \\\\`node\")",
+      "Bash(grep -v \"Warning\\\\|SSL\\\\|sslmode\\\\|libpq\\\\|major version\\\\|behavior\\\\|compatibility\\\\|See https\\\\|Use \\\\`\")",
+      "Bash(grep -v \"Warning\\\\|SSL\\\\|sslmode\\\\|libpq\\\\|major version\\\\|semantics\\\\|compatibility\\\\|See https\\\\|Use \\\\`\")"
+    ]
+  }
+}

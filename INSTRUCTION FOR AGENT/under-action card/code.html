@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Proposals Gallery | Event Society</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f0f4f3",
+                        "surface-container-highest": "#dae5e3",
+                        "on-secondary-fixed-variant": "#565d5a",
+                        "tertiary-fixed": "#defaee",
+                        "on-surface-variant": "#576160",
+                        "outline-variant": "#a9b4b3",
+                        "tertiary-fixed-dim": "#d0ece0",
+                        "on-secondary": "#f4fbf6",
+                        "inverse-on-surface": "#9b9d9d",
+                        "surface-tint": "#40665a",
+                        "on-tertiary-fixed": "#364f46",
+                        "on-primary-fixed-variant": "#3d6357",
+                        "secondary-dim": "#4d5551",
+                        "outline": "#727d7c",
+                        "primary-fixed-dim": "#b4ddce",
+                        "surface-bright": "#f8faf9",
+                        "on-tertiary-container": "#486158",
+                        "on-tertiary-fixed-variant": "#526b62",
+                        "on-primary-container": "#33594d",
+                        "on-error-container": "#752121",
+                        "on-secondary-fixed": "#3a413e",
+                        "inverse-primary": "#d0faea",
+                        "secondary-fixed-dim": "#cfd6d1",
+                        "secondary": "#59615d",
+                        "surface-dim": "#cfdddb",
+                        "surface": "#f8faf9",
+                        "tertiary": "#4b645b",
+                        "primary-dim": "#345a4e",
+                        "on-primary-fixed": "#20463b",
+                        "on-surface": "#2a3434",
+                        "tertiary-dim": "#40584f",
+                        "on-tertiary": "#e4fff3",
+                        "inverse-surface": "#0b0f0f",
+                        "on-secondary-container": "#4c5350",
+                        "secondary-container": "#dde4df",
+                        "error-dim": "#4e0309",
+                        "secondary-fixed": "#dde4df",
+                        "error-container": "#fe8983",
+                        "primary-container": "#c2ebdc",
+                        "on-background": "#2a3434",
+                        "on-error": "#fff7f6",
+                        "primary-fixed": "#c2ebdc",
+                        "on-primary": "#defff2",
+                        "error": "#9f403d",
+                        "surface-container": "#e9efee",
+                        "surface-variant": "#dae5e3",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#f8faf9",
+                        "primary": "#40665a",
+                        "tertiary-container": "#defaee",
+                        "surface-container-high": "#e1eae9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Manrope"],
+                        "label": ["Space Grotesk"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Manrope', sans-serif; }
+        h1, h2, h3, .font-headline { font-family: 'Space Grotesk', sans-serif; }
+        .label-style { font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; letter-spacing: 0.05em; }
+    </style>
+</head>
+<body class="bg-background text-on-surface overflow-hidden">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#f8faf9]/80 dark:bg-[#1a1c1b]/80 backdrop-blur-xl border-b border-[#a9b4b3]/20 flex justify-between items-center px-8 h-20 max-w-[1920px] mx-auto">
+<div class="text-2xl font-bold tracking-tighter text-[#40665a] dark:text-[#507d6d] uppercase font-['Space_Grotesk']">
+            Event Society
+        </div>
+<div class="hidden md:flex space-x-10 font-['Space_Grotesk'] tracking-tight">
+<a class="text-[#2a3434]/60 dark:text-[#f8faf9]/60 font-medium hover:text-[#40665a] transition-colors duration-300" href="#">Gallery</a>
+<a class="text-[#2a3434]/60 dark:text-[#f8faf9]/60 font-medium hover:text-[#40665a] transition-colors duration-300" href="#">Analytics</a>
+<a class="text-[#2a3434]/60 dark:text-[#f8faf9]/60 font-medium hover:text-[#40665a] transition-colors duration-300" href="#">Departments</a>
+<a class="text-[#2a3434]/60 dark:text-[#f8faf9]/60 font-medium hover:text-[#40665a] transition-colors duration-300" href="#">Archive</a>
+</div>
+<div class="flex items-center space-x-6">
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors">notifications</button>
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors">settings</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant/30">
+<img alt="User profile avatar" data-alt="close-up portrait of a professional man with clean-cut style against a minimalist neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIO4AbRSSymUcCtmqqft6s0MmGIkNod5_sNKBp9tz47XrOUxg-iFS2E6LPfw2PpOsHoDQCC13N4Krw9e69ONbfFiEe8xWmSE3R0_oGQJk0tpeqCe2WD48I4lzXaQxWOgnHsalLQy4IWMUqi4YRC87C3HdHSn6f-j-_qbyo6bg4HTo_WUP412ab332KN46Jx8TKMeF5G-iCdxvkcOJ-f1I8iNzzv2grpKN2R1kLJKW_KhzjEO9GJ2-4YUsoYWctRqF2em6QBGpNpw"/>
+</div>
+</div>
+</nav>
+<div class="flex h-screen pt-20">
+<!-- SideNavBar -->
+<aside class="hidden lg:flex flex-col p-6 space-y-8 bg-[#f0f4f3] dark:bg-[#222625] h-screen w-64 border-r border-[#a9b4b3]/20">
+<div class="space-y-1">
+<div class="text-lg font-black text-[#2a3434] dark:text-[#f8faf9] font-['Space_Grotesk'] uppercase">Event Society</div>
+<div class="text-xs text-[#40665a] font-medium tracking-widest font-['Space_Grotesk'] uppercase">Management Portal</div>
+</div>
+<nav class="flex-grow space-y-1">
+<a class="flex items-center space-x-3 p-3 text-[#2a3434]/70 dark:text-[#f8faf9]/70 hover:bg-[#e9efee] dark:hover:bg-[#2d3231] rounded-lg transition-transform duration-200 hover:translate-x-1 group" href="#">
+<span class="material-symbols-outlined text-lg">dashboard</span>
+<span class="font-['Space_Grotesk'] text-sm tracking-wide uppercase">Dashboard</span>
+</a>
+<a class="flex items-center space-x-3 p-3 bg-[#ffffff] dark:bg-[#2a3434] text-[#40665a] dark:text-[#507d6d] font-bold rounded-lg shadow-sm group" href="#">
+<span class="material-symbols-outlined text-lg">description</span>
+<span class="font-['Space_Grotesk'] text-sm tracking-wide uppercase">Proposals</span>
+</a>
+<a class="flex items-center space-x-3 p-3 text-[#2a3434]/70 dark:text-[#f8faf9]/70 hover:bg-[#e9efee] dark:hover:bg-[#2d3231] rounded-lg transition-transform duration-200 hover:translate-x-1 group" href="#">
+<span class="material-symbols-outlined text-lg">gavel</span>
+<span class="font-['Space_Grotesk'] text-sm tracking-wide uppercase">Judges</span>
+</a>
+<a class="flex items-center space-x-3 p-3 text-[#2a3434]/70 dark:text-[#f8faf9]/70 hover:bg-[#e9efee] dark:hover:bg-[#2d3231] rounded-lg transition-transform duration-200 hover:translate-x-1 group" href="#">
+<span class="material-symbols-outlined text-lg">calendar_today</span>
+<span class="font-['Space_Grotesk'] text-sm tracking-wide uppercase">Calendar</span>
+</a>
+<a class="flex items-center space-x-3 p-3 text-[#2a3434]/70 dark:text-[#f8faf9]/70 hover:bg-[#e9efee] dark:hover:bg-[#2d3231] rounded-lg transition-transform duration-200 hover:translate-x-1 group" href="#">
+<span class="material-symbols-outlined text-lg">assessment</span>
+<span class="font-['Space_Grotesk'] text-sm tracking-wide uppercase">Reports</span>
+</a>
+</nav>
+<button class="w-full py-4 bg-primary text-on-primary font-['Space_Grotesk'] font-bold rounded-xl shadow-lg hover:brightness-110 transition-all flex items-center justify-center space-x-2">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="uppercase tracking-widest text-xs">New Proposal</span>
+</button>
+<div class="pt-8 border-t border-outline-variant/20 space-y-1">
+<a class="flex items-center space-x-3 p-3 text-[#2a3434]/70 hover:bg-[#e9efee] rounded-lg transition-all text-sm font-['Space_Grotesk'] uppercase tracking-wide" href="#">
+<span class="material-symbols-outlined">help</span>
+<span>Help Center</span>
+</a>
+<a class="flex items-center space-x-3 p-3 text-[#2a3434]/70 hover:bg-[#e9efee] rounded-lg transition-all text-sm font-['Space_Grotesk'] uppercase tracking-wide" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span>Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-grow overflow-y-auto px-8 py-12 scroll-smooth">
+<div class="max-w-7xl mx-auto">
+<!-- Page Header & Filters -->
+<header class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
+<div>
+<span class="label-style text-xs text-primary font-bold">Portal / Repository</span>
+<h1 class="text-5xl font-black tracking-tight mt-2 text-on-surface">Proposals Gallery</h1>
+</div>
+<!-- Metadata & Filter Bar -->
+<div class="flex flex-wrap items-center gap-4 bg-surface-container-low p-2 rounded-2xl border border-outline-variant/10">
+<!-- Search Mini -->
+<div class="flex items-center px-4 py-2 bg-surface-container-lowest rounded-xl border border-outline-variant/20 min-w-[240px]">
+<span class="material-symbols-outlined text-outline text-sm mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm font-body w-full" placeholder="Find a project..." type="text"/>
+</div>
+<!-- Mini Calendar Filter -->
+<div class="flex items-center space-x-1 px-4 py-2 bg-surface-container-lowest rounded-xl border border-outline-variant/20">
+<span class="material-symbols-outlined text-primary text-sm">calendar_month</span>
+<span class="text-xs font-label font-bold uppercase tracking-tighter">Oct 12 — Nov 05</span>
+</div>
+<button class="bg-primary px-6 py-2.5 text-on-primary rounded-xl font-label font-bold text-xs uppercase tracking-widest flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+                            Filter
+                        </button>
+</div>
+</header>
+<!-- Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
+<!-- HIGH PRIORITY CARD -->
+<article class="xl:col-span-2 group relative overflow-hidden bg-surface-container text-on-surface rounded-[32px] p-1 flex flex-col md:flex-row gap-6 border-[3px] border-[#10b981] shadow-[0_0_25px_-5px_rgba(16,185,129,0.2)] hover:scale-[1.005] transition-transform duration-500">
+<div class="relative w-full md:w-1/2 aspect-[4/3] md:aspect-auto overflow-hidden rounded-[28px]">
+<img alt="High Priority Proposal" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Dramatic interior of a high-tech auditorium with neon geometric lighting and modern seating arrangement, cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxDNDBYCC_YwI1kMpusFDrKK-ZR6z4Sadj5aACknqMqyZkHG4i22Dja-iB-a0zN2Qd5Bs0sjVYZX248P457ScTsO0oPjFqrhumP8vsQox4yd0fCvIfd21jtLRbBro6f0xov0gB6FfX8d3H411I8OGUOwi2QmTpreVoBK9F0FGqciKdTDlWBjtRx5udxnypWregraA-GSKj_4icJ0ZrNxNA3qbqLgZD43oxWKr6QGRAviSqxy4oBPDBnvo3tOvz6t-40cvUrneC0w"/>
+</div>
+<div class="relative flex-grow p-8 md:p-10 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-3 mb-6">
+<span class="bg-error/10 text-error px-3 py-1 rounded-full font-label text-[10px] font-black uppercase tracking-[0.15em] border border-error/20">Urgent Action</span>
+<span class="text-on-surface-variant/60 font-label text-[10px] uppercase tracking-widest font-bold">ID: 9942-X</span>
+</div>
+<h3 class="text-4xl font-black leading-tight mb-4 tracking-tighter text-on-surface">Neo-Tokyo Architectural Biennale 2025</h3>
+<p class="text-on-surface-variant leading-relaxed mb-8 max-w-md font-body text-base">
+                Finalizing spatial logistics and structural integrity certifications for the main pavilion. Immediate budgetary sign-off required for the glass infrastructure.
+            </p>
+</div>
+<div class="flex items-center justify-between mt-auto">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full border-2 border-primary/20 overflow-hidden">
+<img alt="Proposer Avatar" data-alt="portrait of a focused architect wearing minimal glasses and a dark turtleneck, professional lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1Ms19wp6XTMQu-TUy7L5bZbGTOK0hAX5nbu0CpKhboo_22oveUJjioYDNgosXArUBfJDKSbgrOCaHIkrBNNiVkVTfDI56VrUTI-wWxeGwbyaEqL5N_dMw9zCvrBsPGiN7YGuxR3hbNE7hcnaokJm0hUS4vslFo8MLFxbBQ49NzK0nCSuFWOzT5JNFxLtNHlgVVX12XOCJIjceUSBDXO-B5eTxraEiSqMTKA2IYMycA7K9koQGahrAfWkfcmBuq9PxtmG8NuVtFw"/>
+</div>
+<div>
+<div class="text-sm font-bold font-headline text-on-surface">Kenzo Hashimoto</div>
+<div class="text-[10px] uppercase tracking-widest text-on-surface-variant/70 font-label">Lead Planner</div>
+</div>
+</div>
+<button class="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center hover:brightness-110 transition-all">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Standard Card 1 -->
+<article class="bg-surface-container rounded-[24px] overflow-hidden border border-outline-variant/10 group hover:bg-surface-container-high transition-colors duration-300">
+<div class="h-56 overflow-hidden relative">
+<img alt="Event Proposal" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="a vibrant outdoor music festival stage with colorful spotlights and silhouette of a crowd at twilight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoJyM9XUogeoljhtOcsb5hV539q-HqiV0aZ_dEMiG3Gp4Nmx7uGHFDHQjnVqmL3v_ItN5yRaYn-TvDA9icU2dzC0rxKq6zmId0eIJMkgtZkvmHLcKMFDPvCxNajfuLRTEF7T4JEvzJEYdMJOkJyiN_Ew1KUSc86grr-2aQABuoPtOrjnIBseZTpHrOgJaD6d1e_vqsK-PARN5KxXVik1Gl-M5oARAb_lIEe035CH-ZXeCFn3FYXTQrD0Nueuw3V_vm7HTtPv33lA"/>
+<div class="absolute top-4 right-4 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-lg">
+<span class="text-[10px] font-label font-bold text-primary uppercase tracking-wider">Reviewing</span>
+</div>
+</div>
+<div class="p-6">
+<h4 class="text-xl font-bold tracking-tight mb-3 group-hover:text-primary transition-colors">Lumina Sound &amp; Arts Expo</h4>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/10">
+<div class="flex items-center gap-2">
+<img alt="Avatar" class="w-8 h-8 rounded-full" data-alt="close up headshot of a smiling creative professional woman with curly hair" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgTBb70E25dTBCQ0zfu_YOX0Eo7U6x5o5rNxYLbeCJkdv7qqx7uVo9njLWk6Ytl6ld939Sn44HcDMNMjB3KJr8NLjAuvRm_FC1LervTSJVEYBysBSd8C2LbJKwUQwfUJaZhUGFk3J0NIxo789KbNxZiE96vowtEwIHZgkF_5L5gO5kN-5TSv0WXyH3vBfwbQAOWEnjepTVQdh_2HbWqGtn94R4UKZkFVSmJrpxos9cM-sCkQQAyF7idczgAxGhYKo4NM7s8FhefA"/>
+<span class="text-xs font-medium text-on-surface-variant">S. Mitchell</span>
+</div>
+<div class="text-[10px] font-label font-bold uppercase text-outline">Oct 24, 2024</div>
+</div>
+</div>
+</article>
+<!-- Standard Card 2 -->
+<article class="bg-surface-container rounded-[24px] overflow-hidden border border-outline-variant/10 group hover:bg-surface-container-high transition-colors duration-300">
+<div class="h-56 overflow-hidden relative">
+<img alt="Event Proposal" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="elegant wedding reception layout in a white minimalist hall with tall flower arrangements and subtle ambient lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB96B_9BAd1InOdufJLEI5vmkmfUCC8ieBxChM-GHB2O5AAEVn-xldJHgHeXvfN11CGASVg7A7PntYYbc35wNKMlKi7sP3WIA-5ATb5ZeGvU089AwFj9VGNUjByGJJi6LHFK9s21mXEeSmV7BUUHmufsFEI-soTNFv56NFQb1lwgU8CXaoR8clbZ18TyoO8D7s88uVoGBHT8MuyleStz07F7zsvhQu-gBX9av5GMZuYx9PLxUSJv8hsSAiZiRu2ruwxNF1GwjZAkw"/>
+<div class="absolute top-4 right-4 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-lg">
+<span class="text-[10px] font-label font-bold text-on-surface-variant uppercase tracking-wider">Draft</span>
+</div>
+</div>
+<div class="p-6">
+<h4 class="text-xl font-bold tracking-tight mb-3 group-hover:text-primary transition-colors">Grand Atelier Gala</h4>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/10">
+<div class="flex items-center gap-2">
+<img alt="Avatar" class="w-8 h-8 rounded-full" data-alt="professional portrait of a man in a stylish casual outfit with a blurred architectural background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaChJJsQ-4pc53xLsLaWXsjqZwbWFpiio1Xtwo-GgC-RtJZNnqCEir8PTgt2fYMY4FniscPlQnFzsfj8jhgmU2P9lGp0_WOEotSyitlveTGQ8RT288vt8wMEBnDGJQ8DJ3j2WFlz4uvyUJUBc7477L8Cpns1Tm8q94nBWuHN8vIXiADwxcNkAUj42IpPB63CAjOotgfOyqsLVlEcmk88dlyMHkUNder_rcfEFmBD88cGnHmEm46xtC-2BsoU5cyx7kKvKT7-XIaQ"/>
+<span class="text-xs font-medium text-on-surface-variant">David Chen</span>
+</div>
+<div class="text-[10px] font-label font-bold uppercase text-outline">Oct 28, 2024</div>
+</div>
+</div>
+</article>
+<!-- Standard Card 3 -->
+<article class="bg-surface-container rounded-[24px] overflow-hidden border border-outline-variant/10 group hover:bg-surface-container-high transition-colors duration-300">
+<div class="h-56 overflow-hidden relative">
+<img alt="Event Proposal" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="close up of a high-end digital art projection on a gallery wall with deep blues and purples and geometric shapes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDR2jAASGGMSKF40-B9m-Q-lla0XPKCZ8ADsqgfxg0qk5j6XB7FOz8XyFSafSjiaThUG0tx3CT9wzggm5_aBIwXH1jGXOojCJFMnClG6abL0KEg0oGTznfV9adWZzYLJmu0l47Vgk19w6Lo9Kd-lNjBMJsGaEr90kiV1kuvINNI1j8yfW5sRCqe7QVbjDw6u5k5XhzAv4KKShDdTX2g0VT8JwkvLw4Pe3w_rsBEsmI7LlyLz35X30htmHc21lLj3IjmpVzqSRTTKw"/>
+<div class="absolute top-4 right-4 bg-primary-container/90 backdrop-blur-md px-3 py-1 rounded-lg">
+<span class="text-[10px] font-label font-bold text-on-primary-container uppercase tracking-wider">Approved</span>
+</div>
+</div>
+<div class="p-6">
+<h4 class="text-xl font-bold tracking-tight mb-3 group-hover:text-primary transition-colors">Digital Renaissance: NYC</h4>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/10">
+<div class="flex items-center gap-2">
+<img alt="Avatar" class="w-8 h-8 rounded-full" data-alt="portrait of a woman creative director with minimalist jewelry and professional attire" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHZjJkeHE6DLi-bP6hQojYp0v9zGg2iBSefRO8AlCytNl6KYR75Pzht94XpK0pSRiwsZVDSggOZxe-aU8IyRvh_ZW_hfAY2O6pM5wSH4ujzWmpOdxU6q6RoPQPa-TExMKPm9RJVItHP22oOMIoV8VuXp1BJ2Fe2Ri0sF7JMiawq4_78pSK1HPlxEGrTVQLF-YOxI0jZE0_re9s8_to7IzzmfGrFsLe_tJoLWGDsiQDOnBmsE66qTtrnG9HdUyTkiIVSLK-0s7RRw"/>
+<span class="text-xs font-medium text-on-surface-variant">Elara Vance</span>
+</div>
+<div class="text-[10px] font-label font-bold uppercase text-outline">Nov 02, 2024</div>
+</div>
+</div>
+</article>
+<!-- Bento Detail Card / Secondary Layout -->
+<article class="xl:col-span-1 bg-surface-container-lowest rounded-[24px] p-8 border border-outline-variant/20 flex flex-col justify-between">
+<div class="space-y-6">
+<div class="flex items-center justify-between">
+<span class="material-symbols-outlined text-primary p-3 bg-primary-container rounded-xl">assessment</span>
+<span class="label-style text-[10px] font-bold text-outline">Status Report</span>
+</div>
+<h4 class="text-2xl font-bold tracking-tighter">Engagement Overview</h4>
+<div class="space-y-4">
+<div class="flex items-center justify-between text-sm">
+<span class="text-on-surface-variant">Active Proposals</span>
+<span class="font-bold">142</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="w-3/4 h-full bg-primary"></div>
+</div>
+<div class="flex items-center justify-between text-sm">
+<span class="text-on-surface-variant">Awaiting Approval</span>
+<span class="font-bold text-error">12</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="w-1/4 h-full bg-error"></div>
+</div>
+</div>
+</div>
+<button class="mt-8 py-3 text-sm font-label font-bold uppercase tracking-widest text-primary border border-primary/20 rounded-xl hover:bg-primary/5 transition-colors">
+                            Download Ledger
+                        </button>
+</article>
+<!-- Asymmetric CTA Card -->
+<article class="xl:col-span-2 bg-[#f4fbf6] rounded-[32px] p-10 flex items-center justify-between border border-primary/10 overflow-hidden relative">
+<div class="absolute right-0 bottom-0 opacity-5">
+<span class="material-symbols-outlined text-[200px] -mr-10 -mb-10 text-primary" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div class="max-w-md relative z-10">
+<h3 class="text-3xl font-black tracking-tight text-on-primary-container mb-4">Launch Your Vision.</h3>
+<p class="text-on-surface-variant leading-relaxed">
+                                Our creative board is now accepting applications for the 2026 Winter Season. Submit your architectural blueprints and logistical manifestos today.
+                            </p>
+</div>
+<button class="relative z-10 w-20 h-20 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-xl group hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-3xl group-hover:rotate-45 transition-transform">north_east</span>
+</button>
+</article>
+</div>
+</div>
+<!-- Metadata Floating Bar (Signature Component) -->
+<div class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-surface-container-lowest/60 backdrop-blur-2xl border border-outline-variant/30 px-8 py-4 rounded-2xl flex items-center gap-12 shadow-2xl z-40 hidden md:flex">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-sm">database</span>
+<span class="text-[10px] font-label font-bold uppercase tracking-widest text-on-surface-variant">Sync: 12m ago</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-sm">groups</span>
+<span class="text-[10px] font-label font-bold uppercase tracking-widest text-on-surface-variant">88 Contributors</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-sm">language</span>
+<span class="text-[10px] font-label font-bold uppercase tracking-widest text-on-surface-variant">v.2.0.4 - Global</span>
+</div>
+</div>
+</main>
+</div>
+</body></html>

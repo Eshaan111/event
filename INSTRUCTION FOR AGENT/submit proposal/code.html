@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-container": "#4c5350",
+                    "inverse-primary": "#d0faea",
+                    "on-surface": "#2a3434",
+                    "on-primary-fixed-variant": "#3d6357",
+                    "on-secondary-fixed": "#3a413e",
+                    "outline": "#727d7c",
+                    "error-container": "#fe8983",
+                    "tertiary-fixed-dim": "#d0ece0",
+                    "outline-variant": "#a9b4b3",
+                    "surface-dim": "#cfdddb",
+                    "background": "#f8faf9",
+                    "tertiary": "#4b645b",
+                    "surface": "#f8faf9",
+                    "surface-container-high": "#e1eae9",
+                    "on-surface-variant": "#576160",
+                    "surface-variant": "#dae5e3",
+                    "on-secondary-fixed-variant": "#565d5a",
+                    "on-error": "#fff7f6",
+                    "on-primary-fixed": "#20463b",
+                    "surface-bright": "#f8faf9",
+                    "primary": "#40665a",
+                    "on-tertiary-fixed": "#364f46",
+                    "on-primary-container": "#33594d",
+                    "inverse-surface": "#0b0f0f",
+                    "surface-container": "#e9efee",
+                    "on-tertiary": "#e4fff3",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-fixed-dim": "#b4ddce",
+                    "on-background": "#2a3434",
+                    "primary-dim": "#345a4e",
+                    "secondary-dim": "#4d5551",
+                    "surface-tint": "#40665a",
+                    "tertiary-fixed": "#defaee",
+                    "on-error-container": "#752121",
+                    "surface-container-low": "#f0f4f3",
+                    "on-secondary": "#f4fbf6",
+                    "on-tertiary-container": "#486158",
+                    "error-dim": "#4e0309",
+                    "error": "#9f403d",
+                    "inverse-on-surface": "#9b9d9d",
+                    "on-tertiary-fixed-variant": "#526b62",
+                    "on-primary": "#defff2",
+                    "surface-container-highest": "#dae5e3",
+                    "secondary-fixed-dim": "#cfd6d1",
+                    "secondary-fixed": "#dde4df",
+                    "tertiary-container": "#defaee",
+                    "secondary": "#59615d",
+                    "secondary-container": "#dde4df",
+                    "primary-fixed": "#c2ebdc",
+                    "tertiary-dim": "#40584f",
+                    "primary-container": "#c2ebdc"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Space Grotesk"],
+                    "body": ["Manrope"],
+                    "label": ["Space Grotesk"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .dotted-grid {
+            background-image: radial-gradient(#a9b4b3 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body antialiased">
+<!-- TopNavBar: Execution of Shared Component JSON -->
+<nav class="fixed top-0 w-full z-50 border-b border-[#a9b4b3]/20 bg-[#f8faf9]/80 backdrop-blur-xl flex justify-between items-center px-8 h-16 max-w-[1920px] mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-[#2a3434] uppercase font-headline">Aetheric Studio</span>
+<div class="hidden md:flex gap-6 items-center">
+<a class="text-[#2a3434]/60 font-medium hover:text-[#507D6D] transition-colors font-headline uppercase text-[10px] tracking-widest" href="#">Dashboard</a>
+<a class="text-[#2a3434]/60 font-medium hover:text-[#507D6D] transition-colors font-headline uppercase text-[10px] tracking-widest" href="#">Exhibitions</a>
+<a class="text-[#507D6D] border-b-2 border-[#507D6D] pb-1 font-bold font-headline uppercase text-[10px] tracking-widest" href="#">Proposals</a>
+<a class="text-[#2a3434]/60 font-medium hover:text-[#507D6D] transition-colors font-headline uppercase text-[10px] tracking-widest" href="#">Library</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">settings</button>
+<div class="h-8 w-8 rounded-lg overflow-hidden border border-outline-variant/20 bg-surface-container">
+<img alt="Lead Architect Profile" class="w-full h-full object-cover" data-alt="close-up portrait of a professional architect in a modern studio environment with soft natural lighting and neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkTsvZXFpm58_ENW0O1vH6T8MF9Ju8Ljb_FsZYhmHSNJLjGfvWP8ZE1XDUHDOZos4tFtDZimBsSxKaAbhmdlZ_WZoqPRQRHKQ9_shTkPZ80TR84rqDpQjo1r-q0baw6xs6upgXvO5KlZMAIPyrDGqGS86_yg4eRi6lDkEupiz9WFmUutK70tayW8qTreHftTs9univETl8_V9R5u284b6nPO4vKW4XkJBmXP_eenqyraiY-aloTxsaU4s0KuEqXKaSlXbwMMQfVg"/>
+</div>
+</div>
+</nav>
+<!-- SideNavBar: Execution of Shared Component JSON -->
+<aside class="flex flex-col fixed left-0 top-16 h-[calc(100vh-64px)] z-40 p-4 w-72 bg-[#f0f4f3] border-r border-[#a9b4b3]/20">
+<div class="mb-8 px-4 py-2 border-l-2 border-primary">
+<div class="font-black text-[#2a3434] font-headline uppercase tracking-tighter text-sm">Project Alpha</div>
+<div class="text-[10px] uppercase tracking-widest text-on-surface-variant font-headline">Event Planning Module</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-[#2a3434]/70 hover:bg-[#e9efee] transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">architecture</span>
+<span class="font-headline text-[10px] uppercase tracking-[0.05em]">Current Projects</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-[#ffffff] text-[#507D6D] font-semibold border-r-4 border-[#507D6D] transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">edit_note</span>
+<span class="font-headline text-[10px] uppercase tracking-[0.05em]">Drafting Table</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#2a3434]/70 hover:bg-[#e9efee] transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">history_edu</span>
+<span class="font-headline text-[10px] uppercase tracking-[0.05em]">Archived Proposals</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#2a3434]/70 hover:bg-[#e9efee] transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">group</span>
+<span class="font-headline text-[10px] uppercase tracking-[0.05em]">Team Studio</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#2a3434]/70 hover:bg-[#e9efee] transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">inventory_2</span>
+<span class="font-headline text-[10px] uppercase tracking-[0.05em]">Resource Registry</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-outline-variant/10 pt-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-2 text-[#2a3434]/70 hover:bg-[#e9efee] transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary text-sm">help_outline</span>
+<span class="font-headline text-[10px] uppercase tracking-[0.05em]">Help Center</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-[#2a3434]/70 hover:bg-[#e9efee] transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary text-sm">logout</span>
+<span class="font-headline text-[10px] uppercase tracking-[0.05em]">Log Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-72 mt-16 p-8 min-h-[calc(100vh-64px)] grid grid-cols-12 gap-8 bg-background">
+<!-- Left Column: Architectural Injection Zone -->
+<div class="col-span-12 lg:col-span-7 flex flex-col gap-6">
+<header>
+<span class="font-headline text-[12px] uppercase tracking-[0.2em] text-primary font-bold mb-2 block">Phase 01 // Integration</span>
+<h1 class="font-headline text-5xl font-bold tracking-tighter text-on-surface">Submit Event Proposal</h1>
+</header>
+<section class="flex-1 min-h-[500px] border border-outline-variant/20 rounded-xl relative overflow-hidden bg-surface-container-low dotted-grid flex flex-col items-center justify-center p-12 text-center group">
+<!-- Metadata Overlay Strips -->
+<div class="absolute top-0 left-0 w-full h-8 bg-surface-dim/40 border-b border-outline-variant/10 flex items-center px-4 justify-between">
+<span class="font-headline text-[8px] uppercase tracking-widest text-on-surface-variant">UPLOADER_INTERFACE_V2.0</span>
+<span class="font-headline text-[8px] uppercase tracking-widest text-on-surface-variant">STATUS: READY</span>
+</div>
+<div class="w-24 h-24 mb-6 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 flex items-center justify-center text-primary-dim group-hover:scale-105 transition-transform duration-500">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'wght' 300;">file_upload</span>
+</div>
+<h2 class="font-headline text-2xl font-bold text-on-surface mb-2">UPLOAD PPT ASSET</h2>
+<p class="font-body text-sm text-on-surface-variant max-w-xs mb-8">
+                    Architectural precision is required for deck ingestion. <span class="font-bold text-primary italic">Classification Protocol Required</span> for all external assets.
+                </p>
+<button class="px-8 py-4 bg-primary text-on-primary rounded-md font-headline text-[12px] uppercase tracking-widest font-bold hover:bg-primary-dim transition-all active:scale-95">
+                    Browse Local Directory
+                </button>
+<div class="absolute bottom-8 left-8 right-8 flex justify-between items-end">
+<div class="text-left">
+<div class="font-headline text-[10px] uppercase text-outline mb-1">Max File Size</div>
+<div class="font-body font-bold text-on-surface text-lg">128 MB</div>
+</div>
+<div class="text-right">
+<div class="font-headline text-[10px] uppercase text-outline mb-1">Supported Format</div>
+<div class="font-body font-bold text-on-surface text-lg">.PPTX / .PDF</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Submission Metadata Form -->
+<div class="col-span-12 lg:col-span-5 flex flex-col">
+<div class="bg-surface-container-lowest border border-outline-variant/10 rounded-xl flex flex-col h-full shadow-[0px_20px_48px_rgba(42,52,52,0.04)] overflow-hidden">
+<!-- Form Header -->
+<div class="p-6 border-b border-outline-variant/10 bg-surface-container-low">
+<h3 class="font-headline text-sm uppercase tracking-widest font-bold text-on-secondary-container">Submission Metadata</h3>
+</div>
+<!-- Scrollable Form Body -->
+<div class="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
+<div class="space-y-2">
+<label class="font-headline text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Official Event Title</label>
+<input class="w-full bg-surface-container-low border border-outline-variant/20 rounded-md p-3 font-body text-on-surface placeholder:text-outline focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none" placeholder="e.g. Neo-Brutalist Symposium 2024" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="font-headline text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Target Audience <span class="text-[8px] font-normal opacity-60">(Optional)</span></label>
+<input class="w-full bg-surface-container-low border border-outline-variant/20 rounded-md p-3 font-body text-on-surface placeholder:text-outline focus:ring-1 focus:ring-primary outline-none" placeholder="Architects, Designers" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-headline text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Primary Location</label>
+<input class="w-full bg-surface-container-low border border-outline-variant/20 rounded-md p-3 font-body text-on-surface placeholder:text-outline focus:ring-1 focus:ring-primary outline-none" placeholder="London, UK" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-headline text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Scheduled Date (Range)</label>
+<div class="flex gap-2">
+<div class="relative flex-1">
+<input class="w-full bg-surface-container-low border border-outline-variant/20 rounded-md p-3 font-body text-on-surface focus:ring-1 focus:ring-primary outline-none" type="date"/>
+</div>
+<div class="flex items-center text-outline px-1">
+<span class="material-symbols-outlined">arrow_forward</span>
+</div>
+<div class="relative flex-1">
+<input class="w-full bg-surface-container-low border border-outline-variant/20 rounded-md p-3 font-body text-on-surface focus:ring-1 focus:ring-primary outline-none" type="date"/>
+</div>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-headline text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Potential Sponsors <span class="text-[8px] font-normal opacity-60">(Optional)</span></label>
+<textarea class="w-full bg-surface-container-low border border-outline-variant/20 rounded-md p-3 font-body text-on-surface placeholder:text-outline focus:ring-1 focus:ring-primary outline-none resize-none" placeholder="List key strategic partners..." rows="3"></textarea>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="font-headline text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Estimated Budget</label>
+<div class="relative">
+<span class="absolute left-3 top-3.5 font-headline text-sm text-outline">USD</span>
+<input class="w-full bg-surface-container-low border border-outline-variant/20 rounded-md p-3 pl-12 font-body text-on-surface focus:ring-1 focus:ring-primary outline-none" placeholder="0.00" type="number"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-headline text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Audience Count</label>
+<input class="w-full bg-surface-container-low border border-outline-variant/20 rounded-md p-3 font-body text-on-surface focus:ring-1 focus:ring-primary outline-none" placeholder="e.g. 500" type="number"/>
+</div>
+</div>
+</div>
+<!-- Form Actions -->
+<div class="p-8 border-t border-outline-variant/10 bg-white">
+<button class="w-full py-5 bg-primary text-on-primary rounded-md font-headline text-[14px] uppercase tracking-[0.2em] font-black hover:bg-primary-dim transition-all shadow-xl shadow-primary/10 flex items-center justify-center gap-3 group">
+                        Initialize Proposal
+                        <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<p class="mt-4 text-center text-[10px] uppercase tracking-widest text-outline font-headline">Submission constitutes acceptance of the Aetheric Studio terms</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Decorative Element: The Metadata Bar -->
+<footer class="fixed bottom-0 left-72 right-0 h-10 bg-surface-container border-t border-outline-variant/10 flex items-center px-8 justify-between z-30">
+<div class="flex gap-6 items-center">
+<span class="flex items-center gap-2 font-headline text-[8px] uppercase tracking-widest text-on-surface-variant">
+<span class="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
+                System Operational
+            </span>
+<span class="font-headline text-[8px] uppercase tracking-widest text-outline">Lat: 51.5074° N / Long: 0.1278° W</span>
+</div>
+<div class="flex gap-4">
+<span class="font-headline text-[8px] uppercase tracking-widest text-on-surface-variant">V 4.8.19_BETA</span>
+</div>
+</footer>
+</body></html>

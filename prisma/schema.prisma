@@ -1,0 +1,288 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ProposalType {
+  EVENT
+  SUMMIT
+  EXHIBITION
+  WEDDING
+  PERFORMANCE
+  INTERNAL
+}
+
+enum ProposalStatus {
+  DRAFT
+  APPROVED
+  FLAGGED
+  REJECTED
+  ACTIVE
+}
+
+model Proposal {
+  id             String          @id @default(cuid())
+  type           ProposalType
+  status         ProposalStatus  @default(DRAFT)
+
+  title          String
+  description    String?
+
+  imageGradient  String?
+  coverImageUrl  String?
+
+  dateEst        String?
+  budget         Int?
+  location       String?
+
+  // JSONB columns for flexible data
+  metadata       Json?
+  flowState      Json?
+
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  authors        ProposalAuthor[]
+  tags           ProposalTag[]
+  approvalChains ProposalApprovalChain[]
+  versions       ProposalVersion[]
+}
+
+model ProposalVersion {
+  id            String       @id @default(cuid())
+  proposalId    String
+  proposal      Proposal     @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  versionNumber Int
+
+  // Full snapshot of proposal fields at this point in time
+  title         String
+  description   String?
+  type          ProposalType
+  budget        Int?
+  dateEst       String?
+  location      String?
+  metadata      Json?
+  coverImageUrl String?
+  imageGradient String?
+
+  // Who made this change
+  editorId      String?
+  editor        User?        @relation(fields: [editorId], references: [id], onDelete: SetNull)
+  editorName    String
+
+  // What changed — action that triggered this version + field-level diff vs previous version
+  changes       Json?
+
+  createdAt     DateTime     @default(now())
+
+  @@unique([proposalId, versionNumber])
+}
+
+model ProposalAuthor {
+  id          String    @id @default(cuid())
+  proposalId  String
+  proposal    Proposal  @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  // Optional link to a real User account
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  name        String
+  role        String
+  initial     String?   @db.VarChar(2)
+  iconName    String?
+  isPrimary   Boolean   @default(false)
+}
+
+model ProposalTag {
+  id          String   @id @default(cuid())
+  proposalId  String
+  proposal    Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  label       String
+}
+
+// ── Auth / Users ───────────────────────────────────────────────
+// Required by @auth/prisma-adapter — populated automatically on OAuth sign-in
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+
+  // Profile fields editable by the user
+  bio           String?
+  specialty     String?   // e.g. "Spatial Logic", "Atmosphere Engineering"
+
+  accounts          Account[]
+  memberships       DepartmentMember[]
+  authoredProposals ProposalAuthor[]
+  proposalVersions  ProposalVersion[]
+  orgMembership     OrgMember?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+// ── Departments ────────────────────────────────────────────────
+
+enum MemberRole {
+  HEAD
+  LEAD
+  MEMBER
+  OBSERVER
+}
+
+enum DepartmentProtocol {
+  STANDARD
+  RESTRICTED
+}
+
+// Clearance governs what org-level actions a member can perform
+enum Clearance {
+  OMEGA   // Full system access
+  ALPHA   // Department admin — approve proposals, manage structure
+  BETA    // Creator — submit proposals, manage events
+  GAMMA   // Contributor — view all, comment and vote
+  DELTA   // Read-only
+}
+
+model Department {
+  id          String             @id @default(cuid())
+  name        String
+  protocol    DepartmentProtocol @default(STANDARD)
+
+  parentId    String?
+  parent      Department?        @relation("DeptHierarchy", fields: [parentId], references: [id])
+  children    Department[]       @relation("DeptHierarchy")
+
+  members        DepartmentMember[]
+  invites        DepartmentInvite[]
+  approvalChains ProposalApprovalChain[]
+
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+model DepartmentMember {
+  id           String     @id @default(cuid())
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+
+  // Linked user account (set when member has signed in)
+  userId       String?
+  user         User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  name         String     // display name — always populated
+  email        String?
+  role         MemberRole @default(MEMBER)
+  clearance    Clearance  @default(GAMMA)
+
+  joinedAt     DateTime   @default(now())
+}
+
+// ── Organisation Membership ────────────────────────────────────
+
+enum OrgRole {
+  PRESIDENT
+  VICE_PRESIDENT
+  SECRETARY
+  HEAD_LOGISTICS
+  HEAD_FINANCE
+  HEAD_MARKETING
+  HEAD_CREATIVES
+  PROJECT_LEAD
+  ASSOCIATE
+  VOLUNTEER
+}
+
+model OrgMember {
+  id       String   @id @default(cuid())
+
+  // Optional link — set when the person has signed in
+  userId   String?  @unique
+  user     User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  name     String
+  email    String?
+  orgRole  OrgRole  @default(ASSOCIATE)
+  joinedAt DateTime @default(now())
+}
+
+// ── Proposal Approval Chains ────────────────────────────────────
+
+enum ApprovalChainStatus {
+  ACTIVE
+  APPROVED
+  REJECTED
+}
+
+// One chain record per (proposal × department).
+// `steps` is a JSON array of ChainStep objects (see actions.ts for the shape).
+model ProposalApprovalChain {
+  id              String              @id @default(cuid())
+  proposalId      String
+  proposal        Proposal            @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  departmentId    String
+  department      Department          @relation(fields: [departmentId], references: [id])
+  currentStep     Int                 @default(0)
+  status          ApprovalChainStatus @default(ACTIVE)
+  steps           Json
+  // departmentId of the chain whose HEAD triggered this transfer; null for the original submission chain
+  transferredFrom String?
+
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@unique([proposalId, departmentId])
+}
+
+// ── Departments ────────────────────────────────────────────────
+
+model DepartmentInvite {
+  id           String     @id @default(cuid())
+  token        String     @unique @default(cuid())
+
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+
+  email        String
+  name         String?
+  role         MemberRole @default(MEMBER)
+  clearance    Clearance  @default(GAMMA)
+
+  // Optional org-chart title to assign on redemption
+  orgRole      OrgRole?
+
+  expiresAt    DateTime
+  usedAt       DateTime?
+
+  createdAt    DateTime   @default(now())
+}

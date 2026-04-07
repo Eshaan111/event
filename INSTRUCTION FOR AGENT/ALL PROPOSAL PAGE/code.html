@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#f0f4f3",
+                    "background": "#f8faf9",
+                    "surface-dim": "#cfdddb",
+                    "tertiary-fixed-dim": "#d0ece0",
+                    "error-dim": "#4e0309",
+                    "on-background": "#2a3434",
+                    "on-tertiary-fixed-variant": "#526b62",
+                    "on-primary": "#defff2",
+                    "surface-container": "#e9efee",
+                    "primary-fixed": "#c2ebdc",
+                    "primary-fixed-dim": "#b4ddce",
+                    "on-surface-variant": "#576160",
+                    "on-tertiary-fixed": "#364f46",
+                    "surface-container-high": "#e1eae9",
+                    "secondary-container": "#dde4df",
+                    "outline-variant": "#a9b4b3",
+                    "on-primary-fixed-variant": "#3d6357",
+                    "on-error": "#fff7f6",
+                    "inverse-surface": "#0b0f0f",
+                    "surface-variant": "#dae5e3",
+                    "primary": "#40665a",
+                    "secondary": "#59615d",
+                    "secondary-fixed-dim": "#cfd6d1",
+                    "on-primary-container": "#33594d",
+                    "surface": "#f8faf9",
+                    "primary-container": "#c2ebdc",
+                    "tertiary-container": "#defaee",
+                    "outline": "#727d7c",
+                    "secondary-dim": "#4d5551",
+                    "error-container": "#fe8983",
+                    "tertiary-fixed": "#defaee",
+                    "surface-container-highest": "#dae5e3",
+                    "inverse-primary": "#d0faea",
+                    "tertiary": "#4b645b",
+                    "on-error-container": "#752121",
+                    "on-secondary": "#f4fbf6",
+                    "on-primary-fixed": "#20463b",
+                    "surface-bright": "#f8faf9",
+                    "on-tertiary-container": "#486158",
+                    "secondary-fixed": "#dde4df",
+                    "surface-tint": "#40665a",
+                    "on-tertiary": "#e4fff3",
+                    "on-secondary-container": "#4c5350",
+                    "on-secondary-fixed-variant": "#565d5a",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-dim": "#40584f",
+                    "error": "#9f403d",
+                    "inverse-on-surface": "#9b9d9d",
+                    "on-secondary-fixed": "#3a413e",
+                    "primary-dim": "#345a4e",
+                    "on-surface": "#2a3434"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Space Grotesk"],
+                    "body": ["Manrope"],
+                    "label": ["Space Grotesk"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .ghost-border {
+            border: 1px solid rgba(64, 102, 90, 0.1);
+        }
+        .chalky-shadow {
+            box-shadow: 0px 20px 48px rgba(42, 52, 52, 0.06);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body antialiased">
+<!-- TopNavBar -->
+<nav class="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] rounded-2xl border border-emerald-900/10 dark:border-emerald-100/10 bg-emerald-50/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-2xl shadow-emerald-900/5 dark:shadow-none z-50">
+<div class="flex justify-between items-center px-8 h-16 w-full max-w-7xl mx-auto">
+<div class="text-xl font-bold tracking-tighter text-emerald-950 dark:text-emerald-50 font-headline">
+                Aetheric Studio
+            </div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-emerald-900/60 font-label tracking-widest uppercase text-xs hover:text-emerald-700 transition-colors duration-300" href="#">Portfolio</a>
+<a class="text-emerald-900/60 font-label tracking-widest uppercase text-xs hover:text-emerald-700 transition-colors duration-300" href="#">Process</a>
+<a class="text-emerald-700 border-b-2 border-emerald-700 pb-1 font-label tracking-widest uppercase text-xs" href="#">Inquiry</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-emerald-900/60 hover:text-emerald-700 transition-colors">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="text-emerald-900/60 hover:text-emerald-700 transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-primary/20">
+<img alt="Studio Principal Profile" class="w-full h-full object-cover" data-alt="professional portrait of a creative studio principal in a minimalist architectural environment with soft neutral lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCk4TeLgmcv7epZe1-2g9i2EXji7Pu1-x0Da5BbDLgJDWr_cDHHvy5SfT1M90kbduC0mWT-3h_UYV7Ed-y_EaOfk7l32ZDXWtrYWxrvNwDVqXj2kJk7MRKfqakLFNHa-gu236Vy-5nJYO7mdhS55We_S8T6Luqlh9MNS3lTmz8vmBhDkqaueE8PApBef1-guqCLo8oPwLckbTxLydzYjA4DnJAG3gAK-LT80EVsfHG2ZYKdV8DVwmjNZjghBRm40lqFkaXuJ6sOYw"/>
+</div>
+</div>
+</div>
+</nav>
+<div class="flex min-h-screen pt-24">
+<!-- SideNavBar -->
+<aside class="hidden lg:flex flex-col gap-6 p-6 h-[calc(100vh-6rem)] w-72 border-r-2 border-emerald-900/5 sticky top-24 bg-zinc-50">
+<div class="flex items-center gap-3 px-2">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container">architecture</span>
+</div>
+<div>
+<p class="font-bold text-emerald-900 font-headline leading-tight">Project Desk</p>
+<p class="text-[10px] uppercase tracking-widest text-zinc-500 font-label">V0.4.2 Structure</p>
+</div>
+</div>
+<div class="mt-4 flex flex-col gap-1">
+<a class="flex items-center gap-3 p-3 text-zinc-500 font-label text-sm hover:bg-emerald-900/5 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">edit_note</span>
+                    Drafts
+                </a>
+<a class="flex items-center gap-3 p-3 text-emerald-900 font-bold bg-emerald-900/5 rounded-lg translate-x-1 transition-all font-label text-sm" href="#">
+<span class="material-symbols-outlined">description</span>
+                    Proposals
+                </a>
+<a class="flex items-center gap-3 p-3 text-zinc-500 font-label text-sm hover:bg-emerald-900/5 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+                    Archive
+                </a>
+<a class="flex items-center gap-3 p-3 text-zinc-500 font-label text-sm hover:bg-emerald-900/5 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+                    Settings
+                </a>
+</div>
+<div class="mt-auto p-4 rounded-xl bg-surface-container-low ghost-border">
+<p class="text-xs font-label text-on-surface-variant mb-3">Ready for a new project?</p>
+<button class="w-full py-2.5 bg-primary text-on-primary rounded-md text-sm font-label tracking-wide flex items-center justify-center gap-2 active:opacity-80 transition-all scale-98">
+<span class="material-symbols-outlined text-sm">add</span>
+                    New Draft
+                </button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 px-6 md:px-12 pb-24 overflow-y-auto">
+<!-- Header Section -->
+<header class="max-w-7xl mx-auto mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<div class="flex items-center gap-2 mb-2">
+<div class="h-[1px] w-8 bg-primary/40"></div>
+<span class="text-xs font-label tracking-[0.2em] uppercase text-primary font-medium">Proposal Gallery</span>
+</div>
+<h1 class="text-5xl md:text-6xl font-headline font-bold text-on-background tracking-tighter leading-none">
+                        Active Blueprints
+                    </h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex -space-x-2">
+<img alt="Team member" class="w-10 h-10 rounded-full border-2 border-background object-cover" data-alt="portrait of a female architect in a bright studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxOR03v6U_sA-9Fj9TKxfqQKWoIAVQJDTjWC2fwgycvY_IzfMS9MDJOvCte3p7LYUqrGROdrsK9cldDYxiwiINnBhzxgxdlrjGA0pF_49DO-oIUVeTC-_e5JoQG5N6P6JcRHApKYK42xgIj3GvgoibQiR36DVoUVI1Pdbj4DlbFtFalvxhMonff27cY0c6xQP2Apmhi73n4Dwh6aLrpNGh6Br3KVpXHHw9AK9OYrcOm7qUL-Vd0g9bkWn0IvWoOGG1QLrFxyu8Jw"/>
+<img alt="Team member" class="w-10 h-10 rounded-full border-2 border-background object-cover" data-alt="portrait of a male designer with minimalist aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBRcMGfZK8mIrIoeXj4IO6QkXSULgw345C3PRbQhlQxztqH2lsqYdAjvqsZg1xm_Bd_VJ_MQQxXid_UqhBnLiCTIjdICpGECQtTbGT4Ij0wn7z4GyTeJXScRxXbDwOP05-bcc6Q4gd7A7bosEpzba4vd0RPeG7_mWQ8dz-zM4PB6RUS3hFtCXAgyKumjxgg-v9rz_KjhQwlvJ8oy9wtHd8vE4lRkVxRPCVBXwbr2MukOFq1Dlzw0qsiu2sgngZhEEAxX_Hlmo2jw"/>
+<div class="w-10 h-10 rounded-full border-2 border-background bg-surface-container-high flex items-center justify-center text-[10px] font-bold font-headline text-on-surface-variant">
+                            +4
+                        </div>
+</div>
+<button class="flex items-center gap-2 px-6 py-3 bg-primary text-on-primary rounded-md font-label text-sm tracking-widest uppercase transition-all hover:bg-primary-dim shadow-lg shadow-primary/10">
+<span class="material-symbols-outlined text-lg">add_circle</span>
+                        New Proposal
+                    </button>
+</div>
+</header>
+<!-- Proposal Grid -->
+<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+<!-- Card 1: Signed -->
+<div class="group bg-surface-container-lowest ghost-border rounded-xl chalky-shadow overflow-hidden flex flex-col transition-all hover:bg-surface-container-low">
+<div class="h-48 overflow-hidden relative">
+<img alt="Luxury villa blueprint" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="modern architectural house with large glass windows at dusk surrounded by pine trees" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBM3wVfaCQ2_9enZ2wjTE_4gQMQxMikyduBPqHMoBnBz5vdOMROeQBjx1yDfgZ43T4nt9aAtihLE75UFDknGG8fzoqDctAUgfAG6mqYpILgOeaPLeE4n9pkVjH_dhaPAdPdhjxEPOGF2GEwEBRs-ty5JcackS45b9QmaJQhxE1Fnd3nd4nVJVmceKDd-8XCXGxJ0Llh8Jw035Y5srrmnh_mabonoZWFOoTR-spAsvGkJeG7vOC6chnoq1KKhPZ87ufDtBVDBJrIWg"/>
+<div class="absolute top-4 right-4 bg-surface-container-lowest/90 backdrop-blur px-3 py-1 rounded-full border border-emerald-900/10">
+<span class="text-[10px] font-label font-bold text-primary tracking-widest uppercase flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+                                Signed
+                            </span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-xl font-headline font-bold text-on-background mb-1">Villa Obsidian</h3>
+<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Residential | Norway</p>
+</div>
+</div>
+<div class="mt-auto pt-6 flex items-center justify-between border-t border-emerald-900/5">
+<div class="text-[10px] font-label text-zinc-400">
+                                LAST EDITED: 2 DAYS AGO
+                            </div>
+<button class="text-primary hover:translate-x-1 transition-transform">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 2: In Review -->
+<div class="group bg-surface-container-lowest ghost-border rounded-xl chalky-shadow overflow-hidden flex flex-col transition-all hover:bg-surface-container-low">
+<div class="h-48 overflow-hidden relative">
+<img alt="Office complex concept" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="minimalist concrete office interior with natural light hitting structured columns and shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuuhm1y9bSe_3ZKfAt6R4zmupYuyuPuG-T_0i0bUSGa2me7XWF1Nezm2-J74C72ciT_jz6KPQ6OSM-5cpY0mPemaAc-vwzALlqC3I3tgM1rTkXTwHdX4MzLV635PEla8IKhknR14hbz8lPnw1hAf_e3QJyQYXFA4_9DYLfkkuCvt5kdm0PZQv5JuBOXW2VfcRPDUP-EWuWJX-2JYQZUL_RaMD51EW68W9X_zsOMOzqJOSQOCxpTa6pphhr2PP7Zv_jJODGvwkUsQ"/>
+<div class="absolute top-4 right-4 bg-surface-container-lowest/90 backdrop-blur px-3 py-1 rounded-full border border-emerald-900/10">
+<span class="text-[10px] font-label font-bold text-secondary tracking-widest uppercase flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">visibility</span>
+                                In Review
+                            </span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-xl font-headline font-bold text-on-background mb-1">The Monolith Hub</h3>
+<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Commercial | Berlin</p>
+</div>
+</div>
+<div class="mt-auto pt-6 flex items-center justify-between border-t border-emerald-900/5">
+<div class="text-[10px] font-label text-zinc-400">
+                                LAST EDITED: 4 HOURS AGO
+                            </div>
+<button class="text-primary hover:translate-x-1 transition-transform">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 3: Drafting -->
+<div class="group bg-surface-container-lowest ghost-border rounded-xl chalky-shadow overflow-hidden flex flex-col transition-all hover:bg-surface-container-low">
+<div class="h-48 overflow-hidden relative">
+<img alt="Luxury penthouse sketch" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="aerial view of a luxury rooftop terrace with Mediterranean style furniture and soft evening lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxUhZuoobZxr5g9Lup5qSYfh_2MMOlloa9F-mLXM_E5js2tS6VwMlOTxyEliu2D6MDBr5L0JfxorSn3clXUdXo7hyoZl_sdyY_uxpb53qmYxqwhjm1QX7Tc6gQctZ6WqVRjd4EVSzJ6oFUnYqzJtd0vzpfflT49bufyV_9YETLabmWEakzEQ3gFXZ1zQWeVpwBvjC8u9yBnQ9-RG5kXJ1_gpFMcyGqJ8AjBn85ZDZL5Ei0Sc5_0qmGyvB8xzPig4vwNKHpFGmu6Q"/>
+<div class="absolute top-4 right-4 bg-surface-container-lowest/90 backdrop-blur px-3 py-1 rounded-full border border-emerald-900/10">
+<span class="text-[10px] font-label font-bold text-on-surface-variant tracking-widest uppercase flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">edit_square</span>
+                                Drafting
+                            </span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-xl font-headline font-bold text-on-background mb-1">Azure Penthouse</h3>
+<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Hospitality | Santorini</p>
+</div>
+</div>
+<div class="mt-auto pt-6 flex items-center justify-between border-t border-emerald-900/5">
+<div class="text-[10px] font-label text-zinc-400">
+                                LAST EDITED: 15 MINS AGO
+                            </div>
+<button class="text-primary hover:translate-x-1 transition-transform">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 4: Signed -->
+<div class="group bg-surface-container-lowest ghost-border rounded-xl chalky-shadow overflow-hidden flex flex-col transition-all hover:bg-surface-container-low">
+<div class="h-48 overflow-hidden relative">
+<img alt="Eco skyscraper design" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="geometric glass skyscraper reflecting a bright blue sky with sharp vertical lines and minimalist aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDv-zV-h9EVIGCvrHbtOeD2j-LuDvOxPv4ZvcHNCXRR5piIBPPSpRT0PDTf1b6_ppB3Ocg5GeyKZxkBEr0Kpz5UdmYAHZ-KQF0XcmwJ19wj5jwep7hGgp6Crt3YBoOo-pI-L-Y0AhEHa4I1DbRtCJB3DRwLWW0AhXsmPaRmxmr-cdVn2duvVt05XnoCXNyQo290LOjh-_H8B_c5fr492DTtElusKTzEBHeC7lv9CgGfvKMqOwPS3B1YxhYYfAfBD86M3KankMRRrQ"/>
+<div class="absolute top-4 right-4 bg-surface-container-lowest/90 backdrop-blur px-3 py-1 rounded-full border border-emerald-900/10">
+<span class="text-[10px] font-label font-bold text-primary tracking-widest uppercase flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+                                Signed
+                            </span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-xl font-headline font-bold text-on-background mb-1">Vertical Eden</h3>
+<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Sustainability | Singapore</p>
+</div>
+</div>
+<div class="mt-auto pt-6 flex items-center justify-between border-t border-emerald-900/5">
+<div class="text-[10px] font-label text-zinc-400">
+                                LAST EDITED: 1 WEEK AGO
+                            </div>
+<button class="text-primary hover:translate-x-1 transition-transform">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 5: Empty State / Create New -->
+<div class="group h-full min-h-[400px] border-2 border-dashed border-emerald-900/10 rounded-xl flex flex-col items-center justify-center p-8 text-center transition-all hover:border-primary/40 hover:bg-emerald-900/[0.02]">
+<div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-6 text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-3xl">add_business</span>
+</div>
+<h3 class="text-xl font-headline font-bold text-on-background mb-2">Initiate New Blueprint</h3>
+<p class="text-sm text-on-surface-variant max-w-[200px] mb-8">Start from a template or a clean architectural slate.</p>
+<button class="px-8 py-3 bg-background border border-primary/40 text-primary rounded-md font-label text-xs tracking-widest uppercase hover:bg-primary hover:text-on-primary transition-all">
+                        Create Proposal
+                    </button>
+</div>
+</div>
+<!-- Footer Metadata Bar -->
+<footer class="max-w-7xl mx-auto mt-20 p-4 bg-surface-dim/30 rounded-xl ghost-border flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="text-[10px] font-label uppercase tracking-widest text-primary font-bold">Studio Online</span>
+</div>
+<div class="h-4 w-[1px] bg-emerald-900/10 hidden md:block"></div>
+<span class="text-[10px] font-label uppercase tracking-widest text-on-surface-variant">Storage: 78% Full</span>
+</div>
+<div class="text-[10px] font-label uppercase tracking-widest text-on-surface-variant/60">
+                    © 2024 Aetheric Studio. All Rights Reserved.
+                </div>
+</footer>
+</main>
+</div>
+</body></html>

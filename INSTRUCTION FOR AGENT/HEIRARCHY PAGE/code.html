@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Structural Hierarchy | EVENT SOCIETY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #f8faf9;
+            color: #2a3434;
+            overflow-x: hidden;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Background Glazing Text - Editorial Style */
+        .glazing-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            line-height: 0.9;
+            letter-spacing: -0.05em;
+            pointer-events: none;
+            user-select: none;
+        }
+        .dot-grid {
+            background-image: radial-gradient(#a9b4b3 1px, transparent 1px);
+            background-size: 24px 24px;
+            opacity: 0.1;
+        }
+        .ghost-border {
+            border: 1px solid rgba(169, 180, 179, 0.2);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#f4fbf6",
+                        "primary-dim": "#345a4e",
+                        "secondary-fixed": "#dde4df",
+                        "error-container": "#fe8983",
+                        "primary-fixed": "#c2ebdc",
+                        "tertiary-dim": "#40584f",
+                        "surface-tint": "#40665a",
+                        "outline-variant": "#a9b4b3",
+                        "on-secondary-container": "#4c5350",
+                        "tertiary-fixed-dim": "#d0ece0",
+                        "on-surface": "#2a3434",
+                        "on-surface-variant": "#576160",
+                        "surface-container": "#e9efee",
+                        "error-dim": "#4e0309",
+                        "tertiary-fixed": "#defaee",
+                        "primary-fixed-dim": "#b4ddce",
+                        "on-tertiary-container": "#486158",
+                        "surface-dim": "#cfdddb",
+                        "on-primary-fixed": "#20463b",
+                        "surface": "#f8faf9",
+                        "on-error": "#fff7f6",
+                        "surface-container-low": "#f0f4f3",
+                        "on-primary": "#defff2",
+                        "surface-bright": "#f8faf9",
+                        "on-primary-container": "#33594d",
+                        "inverse-surface": "#0b0f0f",
+                        "on-tertiary": "#e4fff3",
+                        "on-error-container": "#752121",
+                        "secondary-container": "#dde4df",
+                        "on-background": "#2a3434",
+                        "primary": "#40665a",
+                        "outline": "#727d7c",
+                        "surface-container-highest": "#dae5e3",
+                        "on-tertiary-fixed-variant": "#526b62",
+                        "surface-container-high": "#e1eae9",
+                        "secondary-dim": "#4d5551",
+                        "primary-container": "#c2ebdc",
+                        "inverse-primary": "#d0faea",
+                        "error": "#9f403d",
+                        "tertiary-container": "#defaee",
+                        "surface-variant": "#dae5e3",
+                        "on-secondary-fixed": "#3a413e",
+                        "tertiary": "#4b645b",
+                        "on-secondary-fixed-variant": "#565d5a",
+                        "inverse-on-surface": "#9b9d9d",
+                        "secondary-fixed-dim": "#cfd6d1",
+                        "secondary": "#59615d",
+                        "background": "#f8faf9",
+                        "on-primary-fixed-variant": "#3d6357",
+                        "on-tertiary-fixed": "#364f46"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Manrope"],
+                        "label": ["Space Grotesk"]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface selection:bg-primary-container selection:text-on-primary-container">
+<!-- Background Glazing Layer -->
+<div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+<div class="absolute inset-0 dot-grid"></div>
+<div class="glazing-text absolute -left-20 top-20 text-[20rem] text-on-surface opacity-[0.02] rotate-[-5deg]">ETHICS</div>
+<div class="glazing-text absolute -right-20 bottom-10 text-[18rem] text-on-surface opacity-[0.02] rotate-[2deg]">MISSION</div>
+<div class="glazing-text absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[15rem] text-on-surface opacity-[0.01] uppercase">SOCIETY</div>
+</div>
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#f8faf9]/80 dark:bg-[#1a1c1b]/80 backdrop-blur-xl border-b border-[#a9b4b3]/20">
+<div class="flex justify-between items-center px-8 h-20 w-full max-w-screen-2xl mx-auto">
+<div class="text-2xl font-bold tracking-tighter text-[#40665a] dark:text-[#507D6D] font-['Space_Grotesk']">EVENT SOCIETY</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-[#2a3434]/60 dark:text-[#f8faf9]/60 font-['Space_Grotesk'] tracking-tight hover:text-[#40665a] transition-colors duration-300" href="#">Architecture</a>
+<a class="text-[#40665a] dark:text-[#507D6D] font-bold border-b-2 border-[#40665a] font-['Space_Grotesk'] tracking-tight" href="#">Departments</a>
+<a class="text-[#2a3434]/60 dark:text-[#f8faf9]/60 font-['Space_Grotesk'] tracking-tight hover:text-[#40665a] transition-colors duration-300" href="#">Resources</a>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#40665a]" data-icon="warning">warning</span>
+<span class="material-symbols-outlined text-[#40665a]" data-icon="account_circle">account_circle</span>
+</div>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 hidden lg:flex flex-col h-full py-8 px-6 bg-[#f0f4f3] dark:bg-[#2a3434] h-screen w-72 border-r border-[#a9b4b3]/20 z-40 pt-28">
+<div class="flex items-center gap-3 mb-12 px-2">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="account_tree">account_tree</span>
+</div>
+<div>
+<p class="font-headline font-bold text-[#40665a] text-sm uppercase tracking-wider">System Admin</p>
+<p class="font-headline text-[10px] text-[#2a3434]/40 uppercase tracking-widest">Structural Tier 01</p>
+</div>
+</div>
+<nav class="space-y-1 flex-1">
+<a class="flex items-center gap-4 px-4 py-3 text-[#2a3434]/40 dark:text-[#f8faf9]/40 font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[12px] hover:bg-[#ffffff]/30 transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span> Dashboard
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 text-[#40665a] dark:text-[#507D6D] font-bold bg-[#ffffff]/50 dark:bg-[#ffffff]/5 font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[12px] rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span> Nodes
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 text-[#2a3434]/40 dark:text-[#f8faf9]/40 font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[12px] hover:bg-[#ffffff]/30 transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="groups">groups</span> Teams
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 text-[#2a3434]/40 dark:text-[#f8faf9]/40 font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[12px] hover:bg-[#ffffff]/30 transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span> Protocols
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 text-[#2a3434]/40 dark:text-[#f8faf9]/40 font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[12px] hover:bg-[#ffffff]/30 transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span> Settings
+            </a>
+</nav>
+<div class="mt-auto space-y-1 border-t border-[#a9b4b3]/20 pt-6">
+<a class="flex items-center gap-4 px-4 py-3 text-[#2a3434]/40 font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[12px] rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span> Support
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 text-[#2a3434]/40 font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[12px] rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span> Logout
+            </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="lg:pl-72 pt-20 min-h-screen relative z-10">
+<!-- Warning Banner -->
+<div class="bg-error-container text-on-error-container px-8 py-3 flex items-center justify-between border-b border-error">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined font-variation-settings-fill" data-icon="warning" style="font-variation-settings: 'FILL' 1;">warning</span>
+<span class="font-headline font-bold text-sm uppercase tracking-widest">Account Status: Incomplete</span>
+</div>
+<button class="bg-on-error-container text-white px-4 py-1 rounded-full text-xs font-headline font-bold uppercase tracking-tighter transition-all active:scale-95">Complete Verification</button>
+</div>
+<div class="max-w-6xl mx-auto p-8 lg:p-12 space-y-16">
+<!-- Page Header -->
+<section class="space-y-4">
+<div class="flex items-baseline gap-4">
+<span class="font-label text-primary text-xs uppercase tracking-widest font-bold">Structural Tier 01</span>
+<div class="h-[1px] flex-1 bg-outline-variant/20"></div>
+</div>
+<h1 class="font-headline text-7xl font-bold tracking-tighter text-on-surface leading-none">Departments</h1>
+<p class="font-body text-on-surface-variant max-w-xl text-lg leading-relaxed">
+                    Manage the structural integrity of your organization through node-based hierarchy. Assign leadership roles and define divisional boundaries.
+                </p>
+</section>
+<!-- Structural Hierarchy Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Main Node -->
+<div class="md:col-span-8 bg-surface-container-lowest ghost-border rounded-2xl p-8 hover:bg-surface-container-high transition-colors group cursor-default">
+<div class="flex justify-between items-start mb-12">
+<div class="space-y-1">
+<h3 class="font-headline text-3xl font-bold text-primary">Event Society Global</h3>
+<p class="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/60">Primary Root Node</p>
+</div>
+<span class="material-symbols-outlined text-primary text-4xl group-hover:scale-110 transition-transform" data-icon="hub">hub</span>
+</div>
+<div class="flex flex-wrap gap-8">
+<div class="space-y-1">
+<p class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Active Nodes</p>
+<p class="font-headline text-2xl font-bold">142</p>
+</div>
+<div class="space-y-1">
+<p class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Operational Status</p>
+<p class="font-headline text-2xl font-bold text-primary flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                                Optimal
+                            </p>
+</div>
+<div class="ml-auto">
+<button class="bg-primary text-on-primary px-6 py-3 rounded-xl font-label font-bold uppercase text-xs tracking-widest transition-all hover:bg-primary-dim active:scale-95">Edit Node</button>
+</div>
+</div>
+</div>
+<!-- Unassigned Node -->
+<div class="md:col-span-4 bg-surface-container-low ghost-border rounded-2xl p-8 flex flex-col justify-between border-dashed border-2 border-outline-variant/30">
+<div>
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-error" data-icon="person_off">person_off</span>
+<h3 class="font-headline text-xl font-bold text-on-surface">Unassigned Division</h3>
+</div>
+<p class="font-body text-sm text-on-surface-variant">This division currently lacks a designated structural head. Operational output is limited.</p>
+</div>
+<button class="w-full mt-8 bg-surface-container-highest text-on-surface-variant px-6 py-4 rounded-xl font-label font-bold uppercase text-xs tracking-widest transition-all hover:bg-primary hover:text-white group">
+                        Assign Head
+                    </button>
+</div>
+<!-- Small Nodes -->
+<div class="md:col-span-4 bg-surface-container-lowest ghost-border rounded-2xl p-6 hover:bg-surface-container-high transition-all">
+<div class="flex items-center justify-between mb-4">
+<span class="font-label text-[10px] uppercase tracking-widest text-primary font-bold">Sub-Node A-1</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm" data-icon="north_east">north_east</span>
+</div>
+<h4 class="font-headline text-lg font-bold mb-1">Logistics &amp; Flow</h4>
+<p class="font-body text-xs text-on-surface-variant">8 Members · 3 Active Threads</p>
+</div>
+<div class="md:col-span-4 bg-surface-container-lowest ghost-border rounded-2xl p-6 hover:bg-surface-container-high transition-all">
+<div class="flex items-center justify-between mb-4">
+<span class="font-label text-[10px] uppercase tracking-widest text-primary font-bold">Sub-Node B-4</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm" data-icon="north_east">north_east</span>
+</div>
+<h4 class="font-headline text-lg font-bold mb-1">Ethical Oversight</h4>
+<p class="font-body text-xs text-on-surface-variant">4 Members · 1 Pending Audit</p>
+</div>
+<div class="md:col-span-4 bg-surface-container-lowest ghost-border rounded-2xl p-6 hover:bg-surface-container-high transition-all">
+<div class="flex items-center justify-between mb-4">
+<span class="font-label text-[10px] uppercase tracking-widest text-primary font-bold">Sub-Node C-9</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm" data-icon="north_east">north_east</span>
+</div>
+<h4 class="font-headline text-lg font-bold mb-1">Creative Synergy</h4>
+<p class="font-body text-xs text-on-surface-variant">12 Members · Optimal</p>
+</div>
+</section>
+<!-- New Department Creation Form -->
+<section class="bg-surface-container-lowest rounded-3xl overflow-hidden ghost-border grid grid-cols-1 md:grid-cols-2">
+<div class="p-12 space-y-8">
+<div class="space-y-2">
+<h2 class="font-headline text-4xl font-bold tracking-tighter text-on-surface">New Department</h2>
+<p class="font-body text-on-surface-variant">Expand the organizational shell with a new structural node.</p>
+</div>
+<form class="space-y-6">
+<div class="space-y-2">
+<label class="font-label text-xs uppercase font-bold tracking-widest text-on-surface-variant">Department Name</label>
+<input class="w-full bg-surface-container-low border-outline-variant/20 rounded-xl px-4 py-4 font-body focus:ring-primary focus:border-primary transition-all" placeholder="e.g. Strategic Planning" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-label text-xs uppercase font-bold tracking-widest text-on-surface-variant">Parent Node</label>
+<select class="w-full bg-surface-container-low border-outline-variant/20 rounded-xl px-4 py-4 font-body focus:ring-primary focus:border-primary transition-all appearance-none">
+<option>Event Society Global</option>
+<option>Operational Core</option>
+<option>Unassigned Tier</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="font-label text-xs uppercase font-bold tracking-widest text-on-surface-variant">Initial Protocol</label>
+<div class="grid grid-cols-2 gap-3">
+<label class="flex items-center gap-3 p-3 bg-surface border border-outline-variant/10 rounded-xl cursor-pointer hover:border-primary transition-all">
+<input class="text-primary focus:ring-primary" name="protocol" type="radio"/>
+<span class="font-label text-[10px] uppercase font-bold">Standard</span>
+</label>
+<label class="flex items-center gap-3 p-3 bg-surface border border-outline-variant/10 rounded-xl cursor-pointer hover:border-primary transition-all">
+<input class="text-primary focus:ring-primary" name="protocol" type="radio"/>
+<span class="font-label text-[10px] uppercase font-bold">Restricted</span>
+</label>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary font-label font-bold uppercase tracking-widest py-5 rounded-xl hover:bg-primary-dim transition-all shadow-xl shadow-primary/10" type="submit">Initialize Node</button>
+</form>
+</div>
+<div class="relative min-h-[400px] bg-primary">
+<img alt="Architectural sketch" class="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-50" data-alt="abstract architectural blueprint with sharp geometric lines and soft green shadows on a matte paper texture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeibeJ5e87g-Rn23XCEhJnxY3aYqSdpIoXCnqgZ2BpfBisN-7pb1a5xLRsf_uhUpcLnsLBBF_I-P1CDYAh4QKDGMqXHFGI8U_LSSwU7grWilh8HnX6HIgxz8cSDx3eqsVh9Fo8fq4e8LcQSCikslWyY1QSA0uJoXXSl3E0nWMildBZxUd-I4PaZLVRJQJCCbL2LYapw8ZCaFxnnqaI-WVtDPgytGxT9pXs-f1Qz4WTJiUJE2Sdy4RctN3HFHufsNmGNzzodd6ZbA"/>
+<div class="absolute inset-0 p-12 flex flex-col justify-end text-white space-y-4">
+<div class="w-12 h-1 px-0 bg-white/30"></div>
+<h4 class="font-headline text-2xl font-bold italic leading-tight">"Structure is the foundation of creative freedom within the society."</h4>
+<p class="font-label text-xs uppercase tracking-[0.3em] opacity-60">— Tier 01 Mandate</p>
+</div>
+</div>
+</section>
+</div>
+<!-- Metadata Footer -->
+<footer class="mt-20 border-t border-outline-variant/20 py-12 px-8 lg:px-12 bg-surface-container-low">
+<div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+<div class="space-y-2">
+<p class="font-headline font-bold text-2xl text-primary tracking-tighter">EVENT SOCIETY</p>
+<p class="font-body text-xs text-on-surface-variant">© 2024 Architectural Ether Division. All Rights Reserved.</p>
+</div>
+<div class="flex gap-12">
+<div class="space-y-4">
+<h5 class="font-label text-[10px] uppercase tracking-widest font-bold text-on-surface">Compliance</h5>
+<ul class="font-body text-xs text-on-surface-variant space-y-2">
+<li><a class="hover:text-primary" href="#">Legal Framework</a></li>
+<li><a class="hover:text-primary" href="#">Ethical Code</a></li>
+<li><a class="hover:text-primary" href="#">Privacy Node</a></li>
+</ul>
+</div>
+<div class="space-y-4">
+<h5 class="font-label text-[10px] uppercase tracking-widest font-bold text-on-surface">Network</h5>
+<ul class="font-body text-xs text-on-surface-variant space-y-2">
+<li><a class="hover:text-primary" href="#">Global Nodes</a></li>
+<li><a class="hover:text-primary" href="#">Satellite Hubs</a></li>
+<li><a class="hover:text-primary" href="#">Archival Sync</a></li>
+</ul>
+</div>
+</div>
+</div>
+</footer>
+</main>
+<!-- Floating Action Button - Supressed on this specific detail screen per policy, but kept as indicator of platform potential -->
+<!-- Suppressing FAB on Details/Management Screen per UX Goal policy -->
+</body></html>
