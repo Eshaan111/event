@@ -5,12 +5,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const mainNav = [
-  { href: "/",            label: "Dashboard",     icon: "grid_view"       },
-  { href: "/proposals",   label: "All Proposals", icon: "description"     },
-  { href: "/events",      label: "Active Events", icon: "event_available" },
-  { href: "/departments", label: "Departments",   icon: "account_tree"    },
-  { href: "/members",     label: "Members",       icon: "group"           },
-  { href: "/archive",     label: "Archive",       icon: "inventory_2"     },
+  { href: "/", label: "Dashboard", icon: "grid_view" },
+  { href: "/proposals", label: "All Proposals", icon: "description" },
+  { href: "/events", label: "Active Events", icon: "event_available" },
+  { href: "/departments", label: "Departments", icon: "account_tree" },
+  { href: "/members", label: "Members", icon: "group" },
+  { href: "/proposals/archived", label: "Archive", icon: "inventory_2" },
 ];
 
 export default function SideNav() {
@@ -73,11 +73,11 @@ export default function SideNav() {
               style={
                 active
                   ? {
-                      backgroundColor: "#ffffff",
-                      color: "#2d5349",
-                      boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-                      border: "1px solid rgba(155,168,167,0.2)",
-                    }
+                    backgroundColor: "#ffffff",
+                    color: "#2d5349",
+                    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+                    border: "1px solid rgba(155,168,167,0.2)",
+                  }
                   : { color: "rgba(64,73,72,0.7)" }
               }
             >

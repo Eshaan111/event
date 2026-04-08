@@ -4,6 +4,7 @@ import React, { useState, useMemo, useRef, useEffect, useCallback } from "react"
 import Image from "next/image";
 import Link from "next/link";
 import type { Proposal, ProposalAuthor, ProposalTag } from "@prisma/client";
+import { format } from "date-fns";
 
 export type ProposalWithRelations = Omit<Proposal, "createdAt" | "updatedAt"> & {
   createdAt: string;
@@ -228,9 +229,19 @@ function CalendarPicker({
 /* ── Image Card ─────────────────────────────────────────────── */
 function ImageCard({ p, onOpen }: { p: ProposalWithRelations; onOpen: () => void }) {
   const primaryAuthor = p.authors.find((a) => a.isPrimary) ?? p.authors[0];
+  // Fallback: if no ProposalAuthor rows, use the submitter recorded in flowState
+  const flowSubmitter = !primaryAuthor
+    ? ((p.flowState as { nodes?: { type: string; userName: string; userInitial: string }[] } | null)
+        ?.nodes?.find((n) => n.type === "SUBMITTED") ?? null)
+    : null;
   const badge = statusToBadgeType(p.status);
   const action = p.status === "APPROVED" ? "Vote" : p.status === "FLAGGED" ? "Resolve" : "Review";
   const variant: ActionVariant = p.status === "APPROVED" ? "outline" : p.status === "FLAGGED" ? "neutral" : "primary";
+
+  const displayName    = primaryAuthor?.name    ?? flowSubmitter?.userName    ?? null;
+  const displayInitial = primaryAuthor?.initial  ?? flowSubmitter?.userInitial ?? displayName?.charAt(0) ?? "?";
+  const displayRole    = primaryAuthor?.role     ?? (flowSubmitter ? "Submitter" : null);
+  const displayIcon    = primaryAuthor?.iconName ?? null;
 
   return (
     <div
@@ -259,18 +270,20 @@ function ImageCard({ p, onOpen }: { p: ProposalWithRelations; onOpen: () => void
       <div className="p-8">
         <h3 className="font-headline text-xl font-bold mb-5 leading-tight" style={{ color: "#1a1f1f" }}>{p.title}</h3>
 
-        {primaryAuthor && (
+        {displayName && (
           <div className="flex items-center gap-4 mb-8">
             <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: "#c2ebdc", border: "2px solid rgba(45,83,73,0.15)" }}>
-              {primaryAuthor.iconName ? (
-                <span className="material-symbols-outlined" style={{ color: "#2d5349", fontSize: "1.25rem" }}>{primaryAuthor.iconName}</span>
+              {displayIcon ? (
+                <span className="material-symbols-outlined" style={{ color: "#2d5349", fontSize: "1.25rem" }}>{displayIcon}</span>
               ) : (
-                <span className="font-headline font-bold text-xs" style={{ color: "#2d5349" }}>{primaryAuthor.initial ?? primaryAuthor.name.charAt(0)}</span>
+                <span className="font-headline font-bold text-xs" style={{ color: "#2d5349" }}>{displayInitial}</span>
               )}
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-bold font-headline" style={{ color: "#1a1f1f" }}>{primaryAuthor.name}</span>
-              <span className="font-label text-[10px] uppercase tracking-wider font-bold" style={{ color: "#707977" }}>{primaryAuthor.role}</span>
+              <span className="text-sm font-bold font-headline" style={{ color: "#1a1f1f" }}>{displayName}</span>
+              {displayRole && (
+                <span className="font-label text-[10px] uppercase tracking-wider font-bold" style={{ color: "#707977" }}>{displayRole}</span>
+              )}
             </div>
           </div>
         )}
@@ -344,6 +357,50 @@ function TextCard({ p, onOpen }: { p: ProposalWithRelations; onOpen: () => void 
 }
 
 /* ── Flow State Drawer ──────────────────────────────────────── */
+function HistoryTimeline({ chain }: { chain?: { steps: unknown } | null }) {
+  if (!chain || !chain.steps) return (
+    <div className="p-8 text-center border border-dashed rounded-2xl mx-8">
+      <p className="font-label text-[10px] uppercase tracking-widest text-[#9ba8a7]">No audit history found</p>
+    </div>
+  );
+
+  const steps = chain.steps as any[];
+
+  return (
+    <div className="px-8 py-4 space-y-8 relative">
+      {/* Vertical Line */}
+      <div className="absolute left-[47px] top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#9ba8a7]/30 to-transparent" />
+      
+      {steps.map((step, i) => (
+        <div key={i} className="relative flex gap-6 group">
+          <div className="z-10 w-10 h-10 rounded-full bg-white border-2 border-[#dce5e3] flex items-center justify-center shrink-0 shadow-sm transition-colors group-hover:border-[#2d5349]">
+            <span className="material-symbols-outlined text-[18px]" style={{ color: step.status === 'APPROVED' ? '#2d5349' : step.status === 'REJECTED' ? '#9f403d' : '#707977' }}>
+              {step.status === 'APPROVED' ? 'check_circle' : step.status === 'REJECTED' ? 'cancel' : 'pending'}
+            </span>
+          </div>
+          <div className="flex-1 pt-1">
+            <div className="flex justify-between items-start mb-1">
+              <h4 className="font-headline font-bold text-sm text-[#1a1f1f]">{step.label || `Stage ${i + 1}`}</h4>
+              <span className="font-label font-bold text-[9px] uppercase text-[#9ba8a7]">{step.completedAt ? format(new Date(step.completedAt), 'MMM d, HH:mm') : 'Pending'}</span>
+            </div>
+            <p className="text-[11px] text-[#707977] leading-relaxed mb-2">
+              {step.status === 'APPROVED' ? 'Successfully approved by' : step.status === 'REJECTED' ? 'Rejected by' : 'Currently awaiting'} 
+              <span className="font-bold ml-1">
+                {step.members?.map((m: any) => m.name || m.userId).join(', ')}
+              </span>
+            </p>
+            {step.comment && (
+              <div className="bg-[#f2f5f4] p-3 rounded-lg border-l-2 border-[#2d5349] italic text-[11px] text-[#40665a]">
+                "{step.comment}"
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function FlowDrawer({ proposal, onClose }: { proposal: ProposalWithRelations | null; onClose: () => void }) {
   const open = proposal !== null;
   const flowState = proposal?.flowState as any;
@@ -359,45 +416,98 @@ function FlowDrawer({ proposal, onClose }: { proposal: ProposalWithRelations | n
         <div className="relative z-10 p-8 flex justify-between items-center" style={{ backgroundColor: "rgba(255,255,255,0.6)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid rgba(155,168,167,0.15)" }}>
           <div>
             <h2 className="font-headline text-2xl font-bold tracking-tighter" style={{ color: "#1a1f1f" }}>Flow State</h2>
-            <p className="font-label font-bold text-[10px] uppercase tracking-[0.2em] mt-1" style={{ color: "rgba(45,83,73,0.7)" }}>Proposal Architecture Lifecycle</p>
+            <p className="font-label font-bold text-[10px] uppercase tracking-[0.2em] mt-1" style={{ color: "rgba(45,83,73,0.7)" }}>Proposal lifecycle events</p>
           </div>
           <button className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:opacity-70" style={{ border: "1px solid rgba(155,168,167,0.2)", color: "#707977", backgroundColor: "rgba(255,255,255,0.8)" }} onClick={onClose}>
             <span className="material-symbols-outlined" style={{ fontSize: "1.125rem" }}>close</span>
           </button>
         </div>
 
-        <div className="relative z-10 flex-1 overflow-hidden cursor-grab active:cursor-grabbing">
-          <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 500 800" preserveAspectRatio="none">
-            {flowState?.connections?.map((conn: any, i: number) => (
-              <path key={i} d={conn.path} stroke="#9ba8a7" strokeWidth="1" fill="none" strokeDasharray="4" opacity="0.5" />
-            ))}
-            {flowState?.junctionDots?.map((dot: any, i: number) => (
-              <circle key={i} cx={dot.cx} cy={dot.cy} r="2.5" fill="#9ba8a7" />
-            ))}
-          </svg>
-          <div className="relative h-full w-full">
-            {flowState?.nodes?.map((node: any) => (
-              <div key={node.id} className={`absolute ${node.animationClass} group`} style={{ top: node.position.y, left: node.position.x }}>
-                <div className="px-6 py-2 rounded-full flex items-center gap-2 cursor-pointer" style={{ border: "1px solid rgba(155,168,167,0.6)", backgroundColor: node.pillStyle === "solid-primary" ? "#2d5349" : "#ffffff", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
-                  {node.iconName ? (
-                    <span className="material-symbols-outlined" style={{ color: node.pillStyle === "solid-primary" ? "#ffffff" : "#2d5349", fontSize: "14px" }}>{node.iconName}</span>
-                  ) : (
-                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: node.dotColor }} />
-                  )}
-                  <span className="font-label font-bold text-[11px] uppercase tracking-widest" style={{ color: node.pillStyle === "solid-primary" ? "#ffffff" : "#1a1f1f" }}>{node.label}</span>
+        <div className="relative z-10 flex-1 overflow-y-auto">
+          {(() => {
+            const nodes: {
+              id: string; type: string; userName: string; userInitial: string;
+              chainDeptName?: string; stepRole?: string; versionNumber: number;
+              changedFields?: string[]; pdfChanged?: boolean; bannerChanged?: boolean;
+              timestamp: string;
+            }[] = flowState?.nodes ?? [];
+
+            const NODE_CFG: Record<string, { bg: string; border: string; text: string; label: string; icon: string }> = {
+              SUBMITTED: { bg: "#dbeafe", border: "#3b82f6", text: "#1d4ed8", label: "Submitted", icon: "send" },
+              APPROVED:  { bg: "#c2ebdc", border: "#40665a", text: "#0f2e22", label: "Approved",  icon: "check_circle" },
+              FLAGGED:   { bg: "#fef3c7", border: "#d97706", text: "#92400e", label: "Flagged",   icon: "flag" },
+              REJECTED:  { bg: "#fee2e2", border: "#dc2626", text: "#7f1d1d", label: "Rejected",  icon: "cancel" },
+              ACTIVATED: { bg: "#defff2", border: "#40665a", text: "#0f2e22", label: "Activated", icon: "bolt" },
+            };
+
+            if (nodes.length === 0) {
+              return (
+                <div className="flex flex-col items-center justify-center h-48 gap-3">
+                  <span className="material-symbols-outlined text-4xl" style={{ color: "#dce5e3" }}>timeline</span>
+                  <p className="font-label text-[10px] uppercase tracking-widest" style={{ color: "#9ba8a7" }}>No flow events yet</p>
                 </div>
-                {node.actor && (
-                  <div className="absolute pointer-events-none opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 bg-white p-2.5 rounded-xl flex items-center gap-3 z-20" style={{ bottom: "calc(100% + 8px)", left: "50%", transform: "translateX(-50%)", minWidth: 180, border: "1px solid rgba(155,168,167,0.2)", boxShadow: "0 8px 24px rgba(0,0,0,0.1)" }}>
-                    <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 font-headline font-bold text-[10px]" style={{ backgroundColor: "#c2ebdc", border: "1px solid rgba(45,83,73,0.2)", color: "#2d5349" }}>{node.actor.initial}</div>
-                    <div className="flex flex-col">
-                      <span className="font-bold text-[10px]" style={{ color: "#1a1f1f" }}>{node.actor.name}</span>
-                      <span className="font-label font-bold text-[9px]" style={{ color: "#707977" }}>{node.actor.timestamp}</span>
+              );
+            }
+
+            return (
+              <div className="px-8 py-6 flex flex-col gap-0">
+                {nodes.map((node, i) => {
+                  const cfg = NODE_CFG[node.type] ?? NODE_CFG.SUBMITTED;
+                  const hasChanges = (node.changedFields?.length ?? 0) > 0 || node.pdfChanged || node.bannerChanged;
+                  return (
+                    <div key={node.id} className="flex gap-4">
+                      {/* Left spine */}
+                      <div className="flex flex-col items-center" style={{ width: 40 }}>
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center font-label font-black text-[12px] border-2 shrink-0"
+                          style={{ backgroundColor: cfg.bg, borderColor: cfg.border, color: cfg.text }}
+                        >
+                          {node.userInitial}
+                        </div>
+                        {i < nodes.length - 1 && (
+                          <div className="flex-1 w-[2px] my-1" style={{ backgroundColor: "rgba(155,168,167,0.25)", minHeight: 24 }} />
+                        )}
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 pb-6 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                          <span
+                            className="font-label text-[8px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full"
+                            style={{ backgroundColor: `${cfg.border}20`, color: cfg.border }}
+                          >
+                            {cfg.label}
+                          </span>
+                          {node.chainDeptName && (
+                            <span className="font-label text-[8px] uppercase tracking-widest" style={{ color: "#9ba8a7" }}>
+                              {node.chainDeptName}{node.stepRole ? ` · ${node.stepRole}` : ""}
+                            </span>
+                          )}
+                        </div>
+                        <p className="font-headline font-bold text-sm" style={{ color: "#1a1f1f" }}>{node.userName}</p>
+                        <p className="font-label text-[9px] mt-0.5" style={{ color: "#9ba8a7" }}>
+                          V{node.versionNumber} · {new Date(node.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                        </p>
+                        {hasChanges && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {node.pdfChanged && (
+                              <span className="font-label text-[8px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: "#f0f4f3", color: "#576160" }}>PDF</span>
+                            )}
+                            {node.bannerChanged && (
+                              <span className="font-label text-[8px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: "#f0f4f3", color: "#576160" }}>Banner</span>
+                            )}
+                            {node.changedFields?.map((f) => (
+                              <span key={f} className="font-label text-[8px] px-1.5 py-0.5 rounded-full capitalize" style={{ backgroundColor: "#f0f4f3", color: "#576160" }}>{f}</span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })}
               </div>
-            ))}
-          </div>
+            );
+          })()}
         </div>
 
         <div className="relative z-10 p-8 flex flex-col gap-4" style={{ backgroundColor: "rgba(255,255,255,0.4)", borderTop: "1px solid rgba(155,168,167,0.15)" }}>
@@ -429,8 +539,16 @@ const STATUS_OPTIONS: { value: string; label: string; activeBg: string; activeTe
 // Rendered only for proposals where it's currently THIS user's turn to review.
 // Matches the wide high-priority card treatment from the design reference.
 
-function ActionNeededCard({ p }: { p: ProposalWithRelations }) {
+function ActionNeededCard({ p, onOpen }: { p: ProposalWithRelations; onOpen: () => void }) {
   const primaryAuthor = p.authors.find((a) => a.isPrimary) ?? p.authors[0];
+  const flowSubmitter = !primaryAuthor
+    ? ((p.flowState as { nodes?: { type: string; userName: string; userInitial: string }[] } | null)
+        ?.nodes?.find((n) => n.type === "SUBMITTED") ?? null)
+    : null;
+  const displayName    = primaryAuthor?.name    ?? flowSubmitter?.userName    ?? null;
+  const displayInitial = primaryAuthor?.initial  ?? flowSubmitter?.userInitial ?? displayName?.charAt(0) ?? "?";
+  const displayRole    = primaryAuthor?.role     ?? (flowSubmitter ? "Submitter" : null);
+  const displayIcon    = primaryAuthor?.iconName ?? null;
 
   return (
     <div
@@ -521,42 +639,55 @@ function ActionNeededCard({ p }: { p: ProposalWithRelations }) {
         </div>
 
         <div className="flex items-center justify-between mt-auto">
-          {primaryAuthor && (
+          {displayName && (
             <div className="flex items-center gap-3">
               <div
                 className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
                 style={{ backgroundColor: "#c2ebdc", border: "2px solid rgba(45,83,73,0.15)" }}
               >
-                {primaryAuthor.iconName ? (
+                {displayIcon ? (
                   <span className="material-symbols-outlined" style={{ color: "#2d5349", fontSize: "1.1rem" }}>
-                    {primaryAuthor.iconName}
+                    {displayIcon}
                   </span>
                 ) : (
                   <span className="font-headline font-bold text-xs" style={{ color: "#2d5349" }}>
-                    {primaryAuthor.initial ?? primaryAuthor.name.charAt(0)}
+                    {displayInitial}
                   </span>
                 )}
               </div>
               <div>
                 <p className="text-sm font-bold font-headline" style={{ color: "#1a1f1f" }}>
-                  {primaryAuthor.name}
+                  {displayName}
                 </p>
-                <p className="font-label text-[10px] uppercase tracking-wider font-bold" style={{ color: "#707977" }}>
-                  {primaryAuthor.role}
-                </p>
+                {displayRole && (
+                  <p className="font-label text-[10px] uppercase tracking-wider font-bold" style={{ color: "#707977" }}>
+                    {displayRole}
+                  </p>
+                )}
               </div>
             </div>
           )}
-          <Link
-            href={`/proposals/${p.id}`}
-            className="w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95"
-            style={{ backgroundColor: "#40665a", color: "#defff2", boxShadow: "0 8px 24px rgba(64,102,90,0.35)" }}
-            aria-label="Open proposal"
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: "1.4rem" }}>
-              arrow_forward
-            </span>
-          </Link>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={(e) => { e.stopPropagation(); onOpen(); }}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-label font-black text-[10px] uppercase tracking-widest transition-all hover:opacity-80 active:scale-95"
+              style={{ backgroundColor: "rgba(64,102,90,0.12)", color: "#2d5349", border: "1px solid rgba(64,102,90,0.25)" }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: "0.9rem" }}>timeline</span>
+              View Flow
+            </button>
+            <Link
+              href={`/proposals/${p.id}`}
+              onClick={(e) => e.stopPropagation()}
+              className="w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+              style={{ backgroundColor: "#40665a", color: "#defff2", boxShadow: "0 8px 24px rgba(64,102,90,0.35)" }}
+              aria-label="Open proposal"
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: "1.4rem" }}>
+                arrow_forward
+              </span>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
@@ -573,6 +704,35 @@ export default function ProposalsClient({
 }) {
   const actionNeededSet = new Set(actionNeededIds);
   const [activeProposal, setActiveProposal] = useState<ProposalWithRelations | null>(null);
+
+  /* ── Notification state ─────────────────────────────────────── */
+  // Key: `${proposalId}::${updatedAt}` — reappears when proposal is updated
+  const [dismissedKeys, setDismissedKeys] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") return new Set();
+    try {
+      const raw = localStorage.getItem("aetheric_review_dismissed");
+      return new Set(raw ? (JSON.parse(raw) as string[]) : []);
+    } catch { return new Set(); }
+  });
+
+  function dismissNotification(proposalId: string) {
+    const p = proposals.find((x) => x.id === proposalId);
+    if (!p) return;
+    const key = `${proposalId}::${p.updatedAt}`;
+    setDismissedKeys((prev) => {
+      const next = new Set(prev);
+      next.add(key);
+      try { localStorage.setItem("aetheric_review_dismissed", JSON.stringify([...next])); } catch {}
+      return next;
+    });
+  }
+
+  const pendingNotifications = actionNeededIds
+    .map((id) => proposals.find((p) => p.id === id))
+    .filter((p): p is ProposalWithRelations => {
+      if (!p) return false;
+      return !dismissedKeys.has(`${p.id}::${p.updatedAt}`);
+    });
 
   /* Filter state */
   const [authorFilter,     setAuthorFilter]     = useState("all");
@@ -697,6 +857,70 @@ export default function ProposalsClient({
         }
         .drawer-panel.open { transform: translateX(0); }
       `}</style>
+
+      {/* ── Review Notifications ────────────────────────────────── */}
+      {pendingNotifications.length > 0 && (
+        <div
+          className="mb-6 rounded-2xl overflow-hidden"
+          style={{ border: "1px solid rgba(64,102,90,0.3)", backgroundColor: "#f0f7f4" }}
+        >
+          {/* Header */}
+          <div
+            className="px-5 py-3 flex items-center gap-3"
+            style={{ backgroundColor: "rgba(64,102,90,0.08)", borderBottom: "1px solid rgba(64,102,90,0.15)" }}
+          >
+            <span
+              className="relative flex h-2.5 w-2.5"
+            >
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60" style={{ backgroundColor: "#40665a" }} />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5" style={{ backgroundColor: "#40665a" }} />
+            </span>
+            <p className="font-label font-black text-[10px] uppercase tracking-widest" style={{ color: "#2d5349" }}>
+              {pendingNotifications.length === 1
+                ? "1 proposal awaiting your review"
+                : `${pendingNotifications.length} proposals awaiting your review`}
+            </p>
+          </div>
+
+          {/* Notification rows */}
+          {pendingNotifications.map((p) => (
+            <div
+              key={p.id}
+              className="flex items-center gap-4 px-5 py-3.5"
+              style={{ borderBottom: "1px solid rgba(64,102,90,0.08)" }}
+            >
+              {/* Colour strip */}
+              <div className="w-1 self-stretch rounded-full shrink-0" style={{ backgroundColor: "#40665a" }} />
+
+              <div className="flex-1 min-w-0">
+                <p className="font-headline font-bold text-sm truncate" style={{ color: "#1a1f1f" }}>{p.title}</p>
+                <p className="font-label text-[9px] uppercase tracking-widest mt-0.5" style={{ color: "#707977" }}>
+                  {p.status} · {new Date(p.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => { setActiveProposal(p); dismissNotification(p.id); }}
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl font-label font-black text-[10px] uppercase tracking-widest transition-all hover:opacity-80"
+                  style={{ backgroundColor: "#40665a", color: "#defff2" }}
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: "0.85rem" }}>timeline</span>
+                  Review Flow
+                </button>
+                <button
+                  onClick={() => dismissNotification(p.id)}
+                  className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:opacity-70"
+                  style={{ color: "#9ba8a7", backgroundColor: "rgba(155,168,167,0.1)" }}
+                  title="Dismiss"
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: "1rem" }}>close</span>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* ── Filters Bar ─────────────────────────────────────────── */}
       <section
@@ -849,7 +1073,7 @@ export default function ProposalsClient({
             ...filtered.filter((p) => !actionNeededSet.has(p.id)),
           ].map((p) =>
             actionNeededSet.has(p.id) ? (
-              <ActionNeededCard key={p.id} p={p} />
+              <ActionNeededCard key={p.id} p={p} onOpen={() => { setActiveProposal(p); dismissNotification(p.id); }} />
             ) : p.type === "PERFORMANCE" ? (
               <TextCard key={p.id} p={p} onOpen={() => setActiveProposal(p)} />
             ) : (

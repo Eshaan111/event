@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import ProposalDetailClient from "./ProposalDetailClient";
-import type { SerializedProposal, SerializedChain, SerializedVersion } from "./ProposalDetailClient";
+import type { SerializedProposal, SerializedChain, SerializedVersion, SerializedMeeting, SerializedComment } from "./ProposalDetailClient";
 import type { ChainStep } from "./actions";
 
 interface Props {
@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props) {
 export default async function ProposalDetailPage({ params }: Props) {
   const { id } = await params;
 
-  const [proposal, session, rawChains, departments, rawVersions] = await Promise.all([
+  const [proposal, session, rawChains, departments, rawVersions, rawMeetings, rawComments] = await Promise.all([
     prisma.proposal.findUnique({
       where:   { id },
       include: { authors: { orderBy: { isPrimary: "desc" } }, tags: true },
@@ -30,16 +30,42 @@ export default async function ProposalDetailPage({ params }: Props) {
       orderBy: { createdAt: "asc" },
     }),
     prisma.department.findMany({
-      select:  { id: true, name: true },
+      select:  {
+        id: true,
+        name: true,
+        members: { select: { userId: true, name: true, role: true } },
+      },
       orderBy: { name: "asc" },
     }),
     prisma.proposalVersion.findMany({
       where:   { proposalId: id },
       orderBy: { versionNumber: "desc" },
     }),
+    prisma.meeting.findMany({
+      where:   { proposalId: id },
+      orderBy: { scheduledAt: "asc" },
+    }),
+    prisma.proposalComment.findMany({
+      where:   { proposalId: id },
+      orderBy: { createdAt: "asc" },
+    }),
   ]);
 
   if (!proposal) notFound();
+
+  // Resolve whether the signed-in user can manage proposals (delete / schedule meetings)
+  const sessionUserId = session?.user?.id ?? null;
+  const canManageProposal = sessionUserId
+    ? !!(await prisma.departmentMember.findFirst({
+        where: {
+          userId: sessionUserId,
+          OR: [
+            { clearance: { in: ["OMEGA", "ALPHA"] } },
+            { role: "HEAD" },
+          ],
+        },
+      }))
+    : false;
 
   const serialized: SerializedProposal = {
     id:            proposal.id,
@@ -78,6 +104,25 @@ export default async function ProposalDetailPage({ params }: Props) {
     transferredFrom: c.transferredFrom,
   }));
 
+  const meetings: SerializedMeeting[] = rawMeetings.map((m) => ({
+    id:            m.id,
+    title:         m.title,
+    description:   m.description,
+    scheduledAt:   m.scheduledAt.toISOString(),
+    location:      m.location,
+    organizerId:   m.organizerId,
+    organizerName: m.organizerName,
+    createdAt:     m.createdAt.toISOString(),
+  }));
+
+  const comments: SerializedComment[] = rawComments.map((c) => ({
+    id:            c.id,
+    authorName:    c.authorName,
+    authorInitial: c.authorInitial,
+    content:       c.content,
+    createdAt:     c.createdAt.toISOString(),
+  }));
+
   const versions: SerializedVersion[] = rawVersions.map((v) => ({
     id:            v.id,
     versionNumber: v.versionNumber,
@@ -101,9 +146,12 @@ export default async function ProposalDetailPage({ params }: Props) {
       proposal={serialized}
       currentUserId={session?.user?.id ?? null}
       currentUserName={session?.user?.name ?? null}
+      canManageProposal={canManageProposal}
       chains={chains}
       departments={departments}
       versions={versions}
+      meetings={meetings}
+      comments={comments}
     />
   );
 }

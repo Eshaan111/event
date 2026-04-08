@@ -104,3 +104,4 @@ Last updated: 2026-04-08
 - [ ] UI — Events page (`/events`) — live event cards for ACTIVE proposals
 - [ ] UI — Archive page (`/archive`) — REJECTED and past proposals
 - [ ] UI — upload banner image for a proposal
+- [ ] UI — proposals active do not show author in all proposals

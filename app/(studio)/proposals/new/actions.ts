@@ -1,11 +1,13 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/auth";
 import { saveProposalAttachment } from "@/lib/proposal-attachments";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function submitProposal(formData: FormData): Promise<{ error: string } | never> {
+  const session = await auth();
   const title = (formData.get("title") as string | null)?.trim();
   const description = (formData.get("description") as string | null)?.trim() || null;
   const location = (formData.get("location") as string | null)?.trim() || null;
@@ -54,6 +56,9 @@ export async function submitProposal(formData: FormData): Promise<{ error: strin
   if (sourceAttachmentUrl) metadata.sourceAttachmentUrl = sourceAttachmentUrl;
   if (sourceAttachmentName) metadata.sourceAttachmentName = sourceAttachmentName;
 
+  const userName = session?.user?.name ?? "Unknown";
+  const userId   = session?.user?.id   ?? null;
+
   const proposal = await prisma.proposal.create({
     data: {
       type: "EVENT",
@@ -64,6 +69,15 @@ export async function submitProposal(formData: FormData): Promise<{ error: strin
       dateEst,
       budget: budgetRaw ? Math.round(parseFloat(budgetRaw)) : null,
       metadata: Object.keys(metadata).length > 0 ? (metadata as never) : undefined,
+      authors: {
+        create: {
+          name:      userName,
+          role:      "Proposer",
+          initial:   userName.charAt(0).toUpperCase(),
+          isPrimary: true,
+          ...(userId ? { userId } : {}),
+        },
+      },
     },
   });
 

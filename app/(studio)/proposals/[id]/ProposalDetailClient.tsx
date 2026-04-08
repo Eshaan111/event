@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/build/pdf.mjs";
+import { useRouter } from "next/navigation";
 import {
   approveChainStep,
   flagChainStep,
@@ -12,8 +13,13 @@ import {
   submitForReview,
   transferToAdditionalDepartment,
   replaceAttachment,
+  replaceBannerImage,
   updateProposalDetails,
   restoreVersion,
+  deleteProposal,
+  scheduleMeeting,
+  deleteMeeting,
+  addComment,
 } from "./actions";
 import type { ChainStep } from "./actions";
 
@@ -86,6 +92,25 @@ export type SerializedVersion = {
   editorName: string;
   changes: VersionChanges | null;
   createdAt: string;
+};
+
+export type SerializedMeeting = {
+  id:            string;
+  title:         string;
+  description:   string | null;
+  scheduledAt:   string; // ISO string
+  location:      string | null;
+  organizerId:   string | null;
+  organizerName: string;
+  createdAt:     string;
+};
+
+export type SerializedComment = {
+  id:            string;
+  authorName:    string;
+  authorInitial: string | null;
+  content:       string;
+  createdAt:     string;
 };
 
 /* ── Helpers ─────────────────────────────────────────────────── */
@@ -397,7 +422,7 @@ function TransferSection({
   startTransition,
 }: {
   proposalId: string;
-  departments: { id: string; name: string }[];
+  departments: { id: string; name: string; members: { userId: string | null; name: string; role: string }[] }[];
   existingChains: SerializedChain[];
   isPending: boolean;
   startTransition: (fn: () => void) => void;
@@ -508,34 +533,67 @@ function ActionButton({
   );
 }
 
+
 /* ── Main Component ──────────────────────────────────────────── */
 
 export default function ProposalDetailClient({
   proposal,
   currentUserId,
   currentUserName: _currentUserName,
+  canManageProposal,
   chains,
   departments,
   versions,
+  meetings,
+  comments: initialComments,
 }: {
   proposal: SerializedProposal;
   currentUserId: string | null;
   currentUserName: string | null;
+  canManageProposal: boolean;
   chains: SerializedChain[];
-  departments: { id: string; name: string }[];
+  departments: { id: string; name: string; members: { userId: string | null; name: string; role: string }[] }[];
   versions: SerializedVersion[];
+  meetings: SerializedMeeting[];
+  comments: SerializedComment[];
 }) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [isReplacing, startReplaceTransition] = useTransition();
+  const [isBannerUploading, startBannerTransition] = useTransition();
   const [isRestoring, startRestoreTransition] = useTransition();
   const [isSavingEdit, startSaveEditTransition] = useTransition();
+  const [isDeletingProposal, startDeleteTransition] = useTransition();
+  const [isMeetingPending, startMeetingTransition] = useTransition();
+  const [isCommentPending, startCommentTransition] = useTransition();
+
+  // Comment discussion state
+  const [comments, setComments] = useState<SerializedComment[]>(initialComments);
+  const [commentText, setCommentText] = useState("");
+  const [commentError, setCommentError] = useState<string | null>(null);
+  const [briefTab, setBriefTab] = useState<"brief" | "discussion">("brief");
+  const commentsEndRef = useRef<HTMLDivElement>(null);
+
   const [pdfPage, setPdfPage] = useState(1);
   const [pdfPageCount, setPdfPageCount] = useState<number | null>(null);
   const uploadRef = useRef<HTMLInputElement>(null);
+  const bannerUploadRef = useRef<HTMLInputElement>(null);
 
   // Version history state
   const [viewingVersion, setViewingVersion] = useState<SerializedVersion | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
+
+  // Delete confirmation
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  // Meetings state
+  const [meetingsOpen, setMeetingsOpen] = useState(false);
+  const [showScheduleForm, setShowScheduleForm] = useState(false);
+  const [meetTitle, setMeetTitle]       = useState("");
+  const [meetDesc, setMeetDesc]         = useState("");
+  const [meetDate, setMeetDate]         = useState("");
+  const [meetLocation, setMeetLocation] = useState("");
+  const [meetError, setMeetError]       = useState<string | null>(null);
 
   // Inline edit state
   const [isEditing, setIsEditing] = useState(false);
@@ -561,16 +619,30 @@ export default function ProposalDetailClient({
 
   const pid = shortId(proposal.id);
   const primaryAuthor = proposal.authors.find((a) => a.isPrimary) ?? proposal.authors[0];
-  // Always use the live proposal's metadata for the asset viewer — past versions may
-  // reference deleted attachment files (only one PDF is stored at a time).
+  // When viewing a past version, prefer that version's stored attachment URL.
+  // Fall back to the live proposal's file for versions snapshotted before per-version
+  // storage was introduced (those old URLs were deleted on replacement).
   const liveMeta = proposal.metadata as Record<string, unknown> | null;
-  const attachmentUrl = (liveMeta?.attachmentUrl as string | null) ?? null;
-  const attachmentName = (liveMeta?.attachmentName as string | null) ?? null;
+  const displayMeta = display.metadata as Record<string, unknown> | null;
+  const attachmentUrl =
+    (displayMeta?.attachmentUrl as string | null) ??
+    (liveMeta?.attachmentUrl as string | null) ??
+    null;
+  const attachmentName =
+    (displayMeta?.attachmentName as string | null) ??
+    (liveMeta?.attachmentName as string | null) ??
+    null;
   const isPdfAttachment = attachmentName?.toLowerCase().endsWith(".pdf") ?? false;
-  // display.metadata is still used for non-attachment metadata fields (risk level, etc.)
-  const meta = display.metadata as Record<string, unknown> | null;
+  // meta alias kept for non-attachment metadata fields
+  const meta = displayMeta;
 
   useEffect(() => { setPdfPage(1); }, [proposal.id, proposal.updatedAt]);
+
+  useEffect(() => {
+    if (briefTab === "discussion") {
+      commentsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [briefTab, comments.length]);
 
   useEffect(() => {
     setPdfPageCount(null);
@@ -909,181 +981,226 @@ export default function ProposalDetailClient({
           <StatusBadge status={proposal.status} />
         </div>
 
-        {/* Right: department chain bars (replaces author avatar area) */}
-        <div className="shrink-0">
-          {hasChains ? (
-            <ApprovalChainBars
-              chains={chains}
-              currentUserId={currentUserId}
-              proposal={proposal}
-            />
-          ) : (
-            /* Fallback: show author avatars when no chain exists yet */
-            <div className="flex items-center -space-x-3">
-              {proposal.authors.slice(0, 3).map((a, idx) => (
-                <div key={a.id} style={{ zIndex: 10 - idx }}>
-                  <AuthorAvatar
-                    name={a.name}
-                    initial={a.initial}
-                    iconName={a.iconName}
-                    size={10}
-                    ring
-                  />
-                </div>
-              ))}
-              {proposal.authors.length > 3 && (
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-[10px] font-bold z-10"
-                  style={{ backgroundColor: "#e1eae9", color: "#576160", border: "2px solid #f0f4f3" }}
-                >
-                  +{proposal.authors.length - 3}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
       </div>
 
       {/* ── Chain legend (full detail, below header) ─────────────── */}
-      {hasChains && (
-        <div
-          className="px-6 py-4 rounded-2xl flex flex-col gap-4"
-          style={{
-            backgroundColor: "#f0f4f3",
-            border: "1px solid rgba(169,180,179,0.08)",
-          }}
-        >
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-base" style={{ color: "#40665a" }}>
-              account_tree
-            </span>
-            <h4
-              className="font-label text-[10px] uppercase tracking-widest font-bold"
-              style={{ color: "#40665a" }}
-            >
-              Approval Chains
-            </h4>
-          </div>
+      {hasChains && (() => {
+        const activeDeptIds = new Set(chains.map((c) => c.departmentId));
+        const ghostDepts = departments.filter((d) => !activeDeptIds.has(d.id));
+        const ROLE_TIERS: { role: string; label: string }[] = [
+          { role: "MEMBER", label: "Member" },
+          { role: "LEAD",   label: "Lead"   },
+          { role: "HEAD",   label: "Head"   },
+        ];
 
-          <div className="flex flex-wrap gap-8">
-            {chains.map((chain) => (
-              <div key={chain.id} className="flex flex-col gap-3">
-                {/* Department header */}
-                <div className="flex items-center gap-2">
-                  <span
-                    className="font-label text-[10px] uppercase tracking-widest font-bold"
-                    style={{ color: "#2a3434" }}
-                  >
-                    {chain.departmentName}
-                  </span>
-                  {chain.transferredFrom && (
+        return (
+          <div
+            className="px-6 py-4 rounded-2xl flex flex-col gap-4"
+            style={{
+              backgroundColor: "#f0f4f3",
+              border: "1px solid rgba(169,180,179,0.08)",
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-base" style={{ color: "#40665a" }}>
+                account_tree
+              </span>
+              <h4
+                className="font-label text-[10px] uppercase tracking-widest font-bold"
+                style={{ color: "#40665a" }}
+              >
+                Approval Chains
+              </h4>
+            </div>
+
+            <div className="flex flex-wrap gap-8 items-start">
+              {/* ── Active chains ── */}
+              {chains.map((chain) => (
+                <div key={chain.id} className="flex flex-col gap-3">
+                  <div className="flex items-center gap-2">
                     <span
-                      className="font-label text-[8px] uppercase tracking-widest px-1.5 py-0.5 rounded"
-                      style={{ backgroundColor: "rgba(45,83,73,0.1)", color: "#40665a" }}
+                      className="font-label text-[10px] uppercase tracking-widest font-bold"
+                      style={{ color: "#2a3434" }}
                     >
-                      transferred
+                      {chain.departmentName}
                     </span>
-                  )}
-                </div>
+                    {chain.transferredFrom && (
+                      <span
+                        className="font-label text-[8px] uppercase tracking-widest px-1.5 py-0.5 rounded"
+                        style={{ backgroundColor: "rgba(45,83,73,0.1)", color: "#40665a" }}
+                      >
+                        transferred
+                      </span>
+                    )}
+                  </div>
 
-                {/* Steps with connecting line */}
-                <div className="relative flex items-center gap-0">
-                  {chain.steps.map((step, si) => {
-                    const approved = step.status === "APPROVED";
-                    const active   = step.status === "ACTIVE" || step.status === "FLAGGED";
-                    const flagged  = step.status === "FLAGGED";
+                  <div className="relative flex items-center gap-0">
+                    {chain.steps.map((step, si) => {
+                      const approved = step.status === "APPROVED";
+                      const active   = step.status === "ACTIVE" || step.status === "FLAGGED";
+                      const flagged  = step.status === "FLAGGED";
 
-                    return (
-                      <div key={si} className="flex items-center">
-                        {/* Connector */}
-                        {si > 0 && (
-                          <div
-                            className="w-6 h-[2px] shrink-0"
-                            style={{
-                              backgroundColor: approved
-                                ? "#40665a"
-                                : active
-                                ? "#40665a"
-                                : "rgba(169,180,179,0.3)",
-                              opacity: step.status === "PENDING" ? 0.4 : 1,
-                            }}
-                          />
-                        )}
-
-                        {/* Step group */}
-                        <div className="flex flex-col items-center gap-1">
-                          {/* Role label */}
-                          <span
-                            className="font-label text-[8px] uppercase tracking-widest"
-                            style={{
-                              color: approved ? "#40665a" : active ? "#40665a" : "#a9b4b3",
-                            }}
-                          >
-                            {step.role === "HEAD" ? "Head" : step.role === "LEAD" ? "Lead" : "Member"}
-                            {flagged && " · ⚑"}
-                          </span>
-
-                          {/* Member avatars for this step */}
-                          <div className="flex items-center">
-                            {step.members.map((m, mi) => (
-                              <div
-                                key={mi}
-                                style={{ marginLeft: mi === 0 ? 0 : "-6px", zIndex: step.members.length - mi }}
-                              >
-                                <ChainAvatar
-                                  name={m.name}
-                                  initial={m.initial}
-                                  stepStatus={step.status}
-                                  isApprovedByUser={
-                                    !!currentUserId &&
-                                    step.approvals.some((a) => a.userId === currentUserId)
-                                  }
-                                />
-                              </div>
-                            ))}
-                          </div>
-
-                          {/* Approval timestamp */}
-                          {step.approvals.length > 0 && (
-                            <span
-                              className="font-label text-[8px] tracking-wide"
-                              style={{ color: "#40665a" }}
-                            >
-                              {new Date(step.approvals[0].approvedAt).toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                              })}
-                            </span>
+                      return (
+                        <div key={si} className="flex items-center">
+                          {si > 0 && (
+                            <div
+                              className="w-6 h-[2px] shrink-0"
+                              style={{
+                                backgroundColor: approved || active ? "#40665a" : "rgba(169,180,179,0.3)",
+                                opacity: step.status === "PENDING" ? 0.4 : 1,
+                              }}
+                            />
                           )}
+                          <div className="flex flex-col items-center gap-1">
+                            <span
+                              className="font-label text-[8px] uppercase tracking-widest"
+                              style={{ color: approved ? "#40665a" : active ? "#40665a" : "#a9b4b3" }}
+                            >
+                              {step.role === "HEAD" ? "Head" : step.role === "LEAD" ? "Lead" : "Member"}
+                              {flagged && " · ⚑"}
+                            </span>
+                            <div className="flex items-center">
+                              {step.members.map((m, mi) => (
+                                <div
+                                  key={mi}
+                                  style={{ marginLeft: mi === 0 ? 0 : "-6px", zIndex: step.members.length - mi }}
+                                >
+                                  <ChainAvatar
+                                    name={m.name}
+                                    initial={m.initial}
+                                    stepStatus={step.status}
+                                    isApprovedByUser={
+                                      !!currentUserId &&
+                                      step.approvals.some((a) => a.userId === currentUserId)
+                                    }
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                            {step.approvals.length > 0 && (
+                              <span className="font-label text-[8px] tracking-wide" style={{ color: "#40665a" }}>
+                                {new Date(step.approvals[0].approvedAt).toLocaleDateString("en-US", {
+                                  month: "short",
+                                  day: "numeric",
+                                })}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
 
-          {/* Legend */}
-          <div className="flex items-center gap-4 pt-1">
-            {[
-              { dot: "#c2ebdc", border: "#40665a", label: "Approved" },
-              { dot: "#40665a", border: "#40665a", label: "Awaiting" },
-              { dot: "#e9efee", border: "rgba(169,180,179,0.35)", label: "Pending" },
-            ].map(({ dot, border, label }) => (
-              <div key={label} className="flex items-center gap-1.5">
-                <div
-                  className="w-3 h-3 rounded-full border"
-                  style={{ backgroundColor: dot, borderColor: border }}
-                />
-                <span className="font-label text-[9px] tracking-wide" style={{ color: "#576160" }}>
-                  {label}
-                </span>
-              </div>
-            ))}
+              {/* ── Divider between active and ghost ── */}
+              {ghostDepts.length > 0 && (
+                <div className="self-stretch w-[1px]" style={{ backgroundColor: "rgba(169,180,179,0.2)" }} />
+              )}
+
+              {/* ── Ghost departments (not yet transferred) ── */}
+              {ghostDepts.map((dept) => {
+                const tiers = ROLE_TIERS.filter((t) =>
+                  dept.members.some((m) => m.role === t.role)
+                );
+                // Always show at least HEAD
+                const visibleTiers = tiers.length > 0 ? tiers : [{ role: "HEAD", label: "Head" }];
+
+                return (
+                  <div key={dept.id} className="flex flex-col gap-3">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="font-label text-[10px] uppercase tracking-widest font-bold"
+                        style={{ color: "#2a3434" }}
+                      >
+                        {dept.name}
+                      </span>
+                      <span
+                        className="font-label text-[8px] uppercase tracking-widest px-1.5 py-0.5 rounded"
+                        style={{ backgroundColor: "rgba(169,180,179,0.18)", color: "#707e7c", border: "1px dashed rgba(169,180,179,0.5)" }}
+                      >
+                        not transferred
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-0">
+                      {visibleTiers.map((tier, ti) => {
+                        const members = dept.members.filter((m) => m.role === tier.role);
+                        return (
+                          <div key={tier.role} className="flex items-center">
+                            {ti > 0 && (
+                              <div
+                                className="w-6 h-[2px] shrink-0"
+                                style={{ backgroundColor: "rgba(169,180,179,0.45)" }}
+                              />
+                            )}
+                            <div className="flex flex-col items-center gap-1">
+                              <span
+                                className="font-label text-[8px] uppercase tracking-widest"
+                                style={{ color: "#707e7c" }}
+                              >
+                                {tier.label}
+                              </span>
+                              <div className="flex items-center">
+                                {members.length > 0 ? members.map((m, mi) => (
+                                  <div
+                                    key={mi}
+                                    title={m.name}
+                                    className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold border-2 shrink-0"
+                                    style={{
+                                      marginLeft: mi === 0 ? 0 : "-6px",
+                                      zIndex: members.length - mi,
+                                      backgroundColor: "#dde5e3",
+                                      color: "#576160",
+                                      borderColor: "rgba(169,180,179,0.55)",
+                                      borderStyle: "dashed",
+                                    }}
+                                  >
+                                    {m.name.charAt(0).toUpperCase()}
+                                  </div>
+                                )) : (
+                                  /* Placeholder if no members in this tier */
+                                  <div
+                                    className="w-8 h-8 rounded-full flex items-center justify-center border-2 shrink-0"
+                                    style={{
+                                      backgroundColor: "#dde5e3",
+                                      borderColor: "rgba(169,180,179,0.55)",
+                                      borderStyle: "dashed",
+                                    }}
+                                  />
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Legend */}
+            <div className="flex items-center gap-4 pt-1">
+              {[
+                { dot: "#c2ebdc", border: "#40665a", label: "Approved" },
+                { dot: "#40665a", border: "#40665a", label: "Awaiting" },
+                { dot: "#e9efee", border: "rgba(169,180,179,0.35)", label: "Pending" },
+              ].map(({ dot, border, label }) => (
+                <div key={label} className="flex items-center gap-1.5">
+                  <div
+                    className="w-3 h-3 rounded-full border"
+                    style={{ backgroundColor: dot, borderColor: border }}
+                  />
+                  <span className="font-label text-[9px] tracking-wide" style={{ color: "#576160" }}>
+                    {label}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* ── Central Layout: Bento ──────────────────────────────── */}
       <div className="grid grid-cols-12 gap-6 relative">
@@ -1126,36 +1243,68 @@ export default function ProposalDetailClient({
             const ctrlBtn = "flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-label font-bold text-[10px] uppercase tracking-widest";
             const ctrlStyle = { backgroundColor: "rgba(42,52,52,0.9)", color: "#f8faf9", border: "1px solid rgba(255,255,255,0.15)" };
 
+            function handleBannerChange(e: React.ChangeEvent<HTMLInputElement>) {
+              const f = e.target.files?.[0];
+              if (!f) return;
+              const fd = new FormData();
+              fd.set("file", f);
+              startBannerTransition(async () => { await replaceBannerImage(proposal.id, fd); });
+              e.target.value = "";
+            }
+
             return (
               <div className="group relative rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(169,180,179,0.1)" }}>
                 <input ref={uploadRef} type="file" accept=".pptx,.pdf" className="hidden" onChange={handleUploadChange} />
+                <input ref={bannerUploadRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" onChange={handleBannerChange} />
 
-                {isPdfAttachment && attachmentUrl ? (
-                  <div style={{ height: "520px" }}>
-                    <iframe
-                      key={pdfViewerUrl ?? "proposal-viewer"}
-                      src={pdfViewerUrl ?? undefined}
-                      className="w-full h-full"
-                      style={{ border: "none", display: "block" }}
-                      title={attachmentName ?? "Proposal PDF"}
+                {(() => {
+                  // Banner stored in metadata.bannerUrl — use plain <img> to avoid
+                  // next/image optimization issues with locally-written files.
+                  const bannerUrl = (displayMeta?.bannerUrl as string | null) ?? null;
+                  if (isPdfAttachment && attachmentUrl) {
+                    return (
+                      <div style={{ height: "520px" }}>
+                        <iframe
+                          key={pdfViewerUrl ?? "proposal-viewer"}
+                          src={pdfViewerUrl ?? undefined}
+                          className="w-full h-full"
+                          style={{ border: "none", display: "block" }}
+                          title={attachmentName ?? "Proposal PDF"}
+                        />
+                      </div>
+                    );
+                  }
+                  if (bannerUrl) {
+                    return (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={bannerUrl}
+                        alt={display.title}
+                        className="w-full aspect-video object-cover transition-transform duration-500 group-hover:scale-[1.01]"
+                        style={{ display: "block" }}
+                      />
+                    );
+                  }
+                  if (display.coverImageUrl) {
+                    return (
+                      <div className="relative aspect-video">
+                        <Image
+                          src={display.coverImageUrl}
+                          alt={display.title}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-[1.01]"
+                          sizes="(max-width: 1280px) 100vw, 66vw"
+                        />
+                      </div>
+                    );
+                  }
+                  return (
+                    <div
+                      className="aspect-video"
+                      style={{ background: display.imageGradient ?? "#e9efee" }}
                     />
-                  </div>
-                ) : display.coverImageUrl ? (
-                  <div className="relative aspect-video">
-                    <Image
-                      src={display.coverImageUrl}
-                      alt={display.title}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-[1.01]"
-                      sizes="(max-width: 1280px) 100vw, 66vw"
-                    />
-                  </div>
-                ) : (
-                  <div
-                    className="aspect-video"
-                    style={{ background: display.imageGradient ?? "#e9efee" }}
-                  />
-                )}
+                  );
+                })()}
 
                 {/* Top-right controls */}
                 <div className="absolute top-4 right-4 flex gap-2 z-40">
@@ -1171,6 +1320,27 @@ export default function ProposalDetailClient({
                       Original PPTX
                     </a>
                   )}
+                  {/* Banner image upload — always visible, separate from the PDF slot */}
+                  {(() => {
+                    const hasBanner = !!(liveMeta?.bannerUrl as string | null);
+                    return (
+                      <button
+                        onClick={() => bannerUploadRef.current?.click()}
+                        disabled={isBannerUploading}
+                        className={ctrlBtn}
+                        style={ctrlStyle}
+                        title={hasBanner ? "Replace banner image" : "Upload banner image"}
+                      >
+                        {isBannerUploading ? (
+                          <span className="w-3 h-3 rounded-full border-2 border-white/30 border-t-white animate-spin inline-block" />
+                        ) : (
+                          <span className="material-symbols-outlined text-sm">image</span>
+                        )}
+                        {isBannerUploading ? "Uploading…" : hasBanner ? "Banner" : "Add Banner"}
+                      </button>
+                    );
+                  })()}
+                  {/* PDF / PPTX upload */}
                   <button
                     onClick={() => uploadRef.current?.click()}
                     disabled={isReplacing}
@@ -1231,63 +1401,213 @@ export default function ProposalDetailClient({
             );
           })()}
 
-          {/* Description + Authors + Tags */}
+          {/* Brief & Context + Peer Discussion tabs */}
           <div
             className="rounded-2xl overflow-hidden flex flex-col"
-            style={{ backgroundColor: "#f0f4f3", border: "1px solid rgba(169,180,179,0.1)" }}
+            style={{ backgroundColor: "#f0f4f3", border: "1px solid rgba(169,180,179,0.1)", minHeight: "500px" }}
           >
+            {/* Tab bar */}
             <div
-              className="px-6 py-4 flex justify-between items-center"
-              style={{ borderBottom: "1px solid rgba(169,180,179,0.1)", backgroundColor: "rgba(248,250,249,0.5)" }}
+              className="flex border-b"
+              style={{ borderColor: "rgba(169,180,179,0.1)", backgroundColor: "rgba(248,250,249,0.5)" }}
             >
-              <h4
-                className="font-headline font-bold text-sm flex items-center gap-2"
-                style={{ color: "#40665a" }}
+              <button
+                onClick={() => setBriefTab("brief")}
+                className="px-6 py-4 font-headline font-bold text-xs uppercase tracking-widest transition-colors"
+                style={{
+                  color: briefTab === "brief" ? "#40665a" : "rgba(87,97,96,0.6)",
+                  borderBottom: briefTab === "brief" ? "2px solid #40665a" : "2px solid transparent",
+                  backgroundColor: briefTab === "brief" ? "#f8faf9" : "transparent",
+                }}
               >
-                <span className="material-symbols-outlined text-lg">article</span>
-                BRIEF &amp; CONTEXT
-              </h4>
-              <div className="flex items-center gap-3">
-                {proposal.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {proposal.tags.map((t) => (
-                      <span
-                        key={t.id}
-                        className="px-2 py-1 text-[10px] font-bold uppercase tracking-tight rounded"
-                        style={{ backgroundColor: "#dae5e3", color: "#40665a" }}
-                      >
-                        {t.label}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                {!viewingVersion && (
-                  <button
-                    onClick={() => {
-                      setEditTitle(proposal.title);
-                      setEditDesc(proposal.description ?? "");
-                      setEditBudget(proposal.budget?.toString() ?? "");
-                      setEditDateEst(proposal.dateEst ?? "");
-                      setEditLocation(proposal.location ?? "");
-                      setEditType(proposal.type);
-                      setIsEditing((v) => !v);
-                    }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-label font-bold text-[10px] uppercase tracking-widest transition-all hover:opacity-80"
-                    style={isEditing
-                      ? { backgroundColor: "rgba(186,26,26,0.08)", color: "#ba1a1a", border: "1px solid rgba(186,26,26,0.2)" }
-                      : { backgroundColor: "#e9efee", color: "#576160", border: "1px solid rgba(169,180,179,0.2)" }
-                    }
+                Brief &amp; Context
+              </button>
+              <button
+                onClick={() => setBriefTab("discussion")}
+                className="px-6 py-4 font-headline font-bold text-xs uppercase tracking-widest transition-colors flex items-center gap-2"
+                style={{
+                  color: briefTab === "discussion" ? "#40665a" : "rgba(87,97,96,0.6)",
+                  borderBottom: briefTab === "discussion" ? "2px solid #40665a" : "2px solid transparent",
+                  backgroundColor: briefTab === "discussion" ? "#f8faf9" : "transparent",
+                }}
+              >
+                Peer Discussion
+                {comments.length > 0 && (
+                  <span
+                    className="px-2 py-0.5 rounded-full font-label text-[10px]"
+                    style={{ backgroundColor: "rgba(64,102,90,0.1)", color: "#40665a" }}
                   >
-                    <span className="material-symbols-outlined" style={{ fontSize: "0.85rem" }}>
-                      {isEditing ? "close" : "edit"}
-                    </span>
-                    {isEditing ? "Cancel" : "Edit"}
-                  </button>
+                    {comments.length}
+                  </span>
                 )}
-              </div>
+              </button>
+
+              {/* Right-side edit button — only visible on brief tab */}
+              {briefTab === "brief" && (
+                <div className="ml-auto flex items-center gap-3 px-4">
+                  {proposal.tags.length > 0 && (
+                    <div className="hidden md:flex flex-wrap gap-2">
+                      {proposal.tags.map((t) => (
+                        <span
+                          key={t.id}
+                          className="px-2 py-1 text-[10px] font-bold uppercase tracking-tight rounded"
+                          style={{ backgroundColor: "#dae5e3", color: "#40665a" }}
+                        >
+                          {t.label}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {!viewingVersion && (
+                    <button
+                      onClick={() => {
+                        setEditTitle(proposal.title);
+                        setEditDesc(proposal.description ?? "");
+                        setEditBudget(proposal.budget?.toString() ?? "");
+                        setEditDateEst(proposal.dateEst ?? "");
+                        setEditLocation(proposal.location ?? "");
+                        setEditType(proposal.type);
+                        setIsEditing((v) => !v);
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-label font-bold text-[10px] uppercase tracking-widest transition-all hover:opacity-80"
+                      style={isEditing
+                        ? { backgroundColor: "rgba(186,26,26,0.08)", color: "#ba1a1a", border: "1px solid rgba(186,26,26,0.2)" }
+                        : { backgroundColor: "#e9efee", color: "#576160", border: "1px solid rgba(169,180,179,0.2)" }
+                      }
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: "0.85rem" }}>
+                        {isEditing ? "close" : "edit"}
+                      </span>
+                      {isEditing ? "Cancel" : "Edit"}
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
-            {isEditing && !viewingVersion ? (
+            {/* ── Discussion tab content ── */}
+            {briefTab === "discussion" ? (
+              <div className="flex flex-col flex-1" style={{ minHeight: "420px" }}>
+                {/* Comment stream */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-6" style={{ maxHeight: "360px" }}>
+                  {comments.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 gap-2 opacity-50">
+                      <span className="material-symbols-outlined text-3xl" style={{ color: "#9ba8a7" }}>forum</span>
+                      <p className="font-label text-[10px] uppercase tracking-widest" style={{ color: "#9ba8a7" }}>
+                        No discussion yet — be the first
+                      </p>
+                    </div>
+                  ) : (
+                    comments.map((c) => (
+                      <div key={c.id} className="flex gap-4">
+                        {/* Avatar */}
+                        <div
+                          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 font-headline font-bold text-[11px]"
+                          style={{ backgroundColor: "#c2ebdc", color: "#2d5349" }}
+                        >
+                          {c.authorInitial ?? c.authorName.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-1">
+                            <span
+                              className="font-headline font-bold text-[10px] uppercase tracking-tight"
+                              style={{ color: "#2a3434" }}
+                            >
+                              {c.authorName}
+                            </span>
+                            <span
+                              className="text-[9px] uppercase tracking-widest font-medium"
+                              style={{ color: "#9ba8a7" }}
+                            >
+                              {(() => {
+                                const diff = Date.now() - new Date(c.createdAt).getTime();
+                                if (diff < 60000)  return "just now";
+                                if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+                                if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+                                return new Date(c.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+                              })()}
+                            </span>
+                          </div>
+                          <div
+                            className="p-3 rounded-xl rounded-tl-none"
+                            style={{ backgroundColor: "#ffffff", border: "1px solid rgba(169,180,179,0.1)" }}
+                          >
+                            <p className="text-[11px] font-body leading-relaxed" style={{ color: "#2a3434" }}>
+                              {c.content}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                  <div ref={commentsEndRef} />
+                </div>
+
+                {/* Comment input */}
+                <div
+                  className="p-5 pt-0"
+                  style={{ borderTop: "1px solid rgba(169,180,179,0.08)" }}
+                >
+                  {commentError && (
+                    <p className="font-body text-[10px] mb-2" style={{ color: "#9f403d" }}>{commentError}</p>
+                  )}
+                  <div className="relative mt-4">
+                    <textarea
+                      value={commentText}
+                      onChange={(e) => setCommentText(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          if (!commentText.trim() || isCommentPending) return;
+                          startCommentTransition(async () => {
+                            setCommentError(null);
+                            const res = await addComment(proposal.id, commentText);
+                            if ("error" in res) {
+                              setCommentError(res.error);
+                            } else {
+                              setComments((prev) => [...prev, res]);
+                              setCommentText("");
+                            }
+                          });
+                        }
+                      }}
+                      placeholder="Type a message… (Enter to send, Shift+Enter for newline)"
+                      rows={2}
+                      className="w-full rounded-xl px-4 py-3 pr-12 text-xs font-body resize-none outline-none transition-all"
+                      style={{
+                        backgroundColor: "rgba(64,102,90,0.04)",
+                        border: "1.5px solid rgba(169,180,179,0.2)",
+                        color: "#2a3434",
+                      }}
+                      onFocus={(e) => { (e.target as HTMLTextAreaElement).style.borderColor = "rgba(64,102,90,0.4)"; }}
+                      onBlur={(e)  => { (e.target as HTMLTextAreaElement).style.borderColor = "rgba(169,180,179,0.2)"; }}
+                    />
+                    <button
+                      disabled={!commentText.trim() || isCommentPending}
+                      onClick={() => {
+                        if (!commentText.trim() || isCommentPending) return;
+                        startCommentTransition(async () => {
+                          setCommentError(null);
+                          const res = await addComment(proposal.id, commentText);
+                          if ("error" in res) {
+                            setCommentError(res.error);
+                          } else {
+                            setComments((prev) => [...prev, res]);
+                            setCommentText("");
+                          }
+                        });
+                      }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all disabled:opacity-40"
+                      style={{ backgroundColor: "#40665a", color: "#defff2" }}
+                    >
+                      <span className="material-symbols-outlined text-base">
+                        {isCommentPending ? "hourglass_top" : "send"}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : isEditing && !viewingVersion ? (
               /* ── Edit form ── */
               <div className="p-6 flex flex-col gap-5">
                 <div className="flex flex-col gap-1.5">
@@ -1716,8 +2036,267 @@ export default function ProposalDetailClient({
               )}
             </div>
           )}
+
+          {/* ── Meetings ─────────────────────────────────────────── */}
+          {canManageProposal && (
+            <div
+              className="rounded-2xl overflow-hidden"
+              style={{ backgroundColor: "#f0f4f3", border: "1px solid rgba(169,180,179,0.1)" }}
+            >
+              <button
+                onClick={() => setMeetingsOpen((v) => !v)}
+                className="w-full px-5 py-4 flex items-center justify-between transition-all hover:opacity-80"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-base" style={{ color: "#40665a" }}>calendar_month</span>
+                  <h4 className="font-label text-[10px] uppercase tracking-widest font-bold" style={{ color: "#40665a" }}>
+                    Meetings
+                  </h4>
+                  {meetings.length > 0 && (
+                    <span
+                      className="font-label text-[9px] font-bold px-2 py-0.5 rounded-full"
+                      style={{ backgroundColor: "#40665a", color: "#defff2" }}
+                    >
+                      {meetings.length}
+                    </span>
+                  )}
+                </div>
+                <span className="material-symbols-outlined text-base" style={{ color: "#576160" }}>
+                  {meetingsOpen ? "expand_less" : "expand_more"}
+                </span>
+              </button>
+
+              {meetingsOpen && (
+                <div
+                  className="flex flex-col"
+                  style={{ borderTop: "1px solid rgba(169,180,179,0.1)" }}
+                >
+                  {/* Meeting list */}
+                  {meetings.length === 0 && !showScheduleForm && (
+                    <p className="px-5 py-4 font-body text-[10px]" style={{ color: "#a9b4b3" }}>
+                      No meetings scheduled yet.
+                    </p>
+                  )}
+
+                  {meetings.map((m) => {
+                    const dt = new Date(m.scheduledAt);
+                    const isPast = dt < new Date();
+                    return (
+                      <div
+                        key={m.id}
+                        className="flex items-start gap-3 px-5 py-3.5"
+                        style={{ borderBottom: "1px solid rgba(169,180,179,0.08)" }}
+                      >
+                        {/* Date block */}
+                        <div
+                          className="shrink-0 flex flex-col items-center justify-center w-10 h-10 rounded-xl"
+                          style={{ backgroundColor: isPast ? "#e9efee" : "#defff2", color: isPast ? "#576160" : "#40665a" }}
+                        >
+                          <span className="font-label font-black text-[11px] leading-none">
+                            {dt.toLocaleDateString("en-US", { day: "numeric" })}
+                          </span>
+                          <span className="font-label text-[8px] uppercase tracking-widest">
+                            {dt.toLocaleDateString("en-US", { month: "short" })}
+                          </span>
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <p className="font-body text-[10px] font-semibold truncate" style={{ color: "#2a3434" }}>
+                              {m.title}
+                            </p>
+                            {isPast && (
+                              <span className="font-label text-[8px] uppercase tracking-widest px-1 py-0.5 rounded shrink-0" style={{ backgroundColor: "#e9efee", color: "#a9b4b3" }}>
+                                Past
+                              </span>
+                            )}
+                          </div>
+                          <p className="font-body text-[9px] mt-0.5" style={{ color: "#576160" }}>
+                            {dt.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                            {m.location && ` · ${m.location}`}
+                          </p>
+                          {m.description && (
+                            <p className="font-body text-[9px] mt-0.5 truncate" style={{ color: "#a9b4b3" }}>
+                              {m.description}
+                            </p>
+                          )}
+                          <p className="font-body text-[9px] mt-0.5" style={{ color: "#a9b4b3" }}>
+                            {m.organizerName}
+                          </p>
+                        </div>
+
+                        <button
+                          onClick={() =>
+                            startMeetingTransition(async () => {
+                              await deleteMeeting(m.id, proposal.id);
+                            })
+                          }
+                          disabled={isMeetingPending}
+                          className="shrink-0 p-1 rounded-lg transition-all hover:opacity-70 disabled:opacity-30"
+                          title="Delete meeting"
+                        >
+                          <span className="material-symbols-outlined" style={{ fontSize: "14px", color: "#9f403d" }}>delete</span>
+                        </button>
+                      </div>
+                    );
+                  })}
+
+                  {/* Schedule form */}
+                  {showScheduleForm ? (
+                    <div className="px-5 py-4 flex flex-col gap-3" style={{ borderTop: meetings.length > 0 ? "1px solid rgba(169,180,179,0.08)" : undefined }}>
+                      <p className="font-label text-[9px] uppercase tracking-widest font-bold" style={{ color: "#576160" }}>
+                        Schedule Meeting
+                      </p>
+                      <input
+                        type="text"
+                        placeholder="Title"
+                        value={meetTitle}
+                        onChange={(e) => setMeetTitle(e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg font-body text-[11px] outline-none"
+                        style={{ backgroundColor: "#fff", border: "1px solid rgba(169,180,179,0.3)", color: "#2a3434" }}
+                      />
+                      <input
+                        type="datetime-local"
+                        value={meetDate}
+                        onChange={(e) => setMeetDate(e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg font-body text-[11px] outline-none"
+                        style={{ backgroundColor: "#fff", border: "1px solid rgba(169,180,179,0.3)", color: "#2a3434" }}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Location (optional)"
+                        value={meetLocation}
+                        onChange={(e) => setMeetLocation(e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg font-body text-[11px] outline-none"
+                        style={{ backgroundColor: "#fff", border: "1px solid rgba(169,180,179,0.3)", color: "#2a3434" }}
+                      />
+                      <textarea
+                        placeholder="Description (optional)"
+                        value={meetDesc}
+                        onChange={(e) => setMeetDesc(e.target.value)}
+                        rows={2}
+                        className="w-full px-3 py-2 rounded-lg font-body text-[11px] outline-none resize-none"
+                        style={{ backgroundColor: "#fff", border: "1px solid rgba(169,180,179,0.3)", color: "#2a3434" }}
+                      />
+                      {meetError && (
+                        <p className="font-body text-[10px]" style={{ color: "#9f403d" }}>{meetError}</p>
+                      )}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() =>
+                            startMeetingTransition(async () => {
+                              setMeetError(null);
+                              const res = await scheduleMeeting(proposal.id, {
+                                title:       meetTitle,
+                                description: meetDesc,
+                                scheduledAt: meetDate,
+                                location:    meetLocation,
+                              });
+                              if (res && "error" in res) {
+                                setMeetError(res.error);
+                              } else {
+                                setMeetTitle(""); setMeetDesc(""); setMeetDate(""); setMeetLocation("");
+                                setShowScheduleForm(false);
+                              }
+                            })
+                          }
+                          disabled={isMeetingPending}
+                          className="flex-1 px-3 py-2 rounded-lg font-label font-bold text-[10px] uppercase tracking-widest transition-all hover:opacity-80 disabled:opacity-50"
+                          style={{ backgroundColor: "#40665a", color: "#defff2" }}
+                        >
+                          {isMeetingPending ? "Saving…" : "Save"}
+                        </button>
+                        <button
+                          onClick={() => { setShowScheduleForm(false); setMeetError(null); }}
+                          className="px-3 py-2 rounded-lg font-label font-bold text-[10px] uppercase tracking-widest transition-all hover:opacity-70"
+                          style={{ backgroundColor: "#e9efee", color: "#576160" }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setShowScheduleForm(true)}
+                      className="mx-5 my-3 flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-label font-bold text-[10px] uppercase tracking-widest transition-all hover:opacity-80"
+                      style={{ backgroundColor: "#defff2", color: "#40665a", border: "1px dashed rgba(64,102,90,0.3)" }}
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>add</span>
+                      Schedule Meeting
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── Delete proposal ───────────────────────────────────── */}
+          {canManageProposal && (
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-label font-bold text-[10px] uppercase tracking-widest transition-all hover:opacity-80"
+              style={{ backgroundColor: "rgba(159,64,61,0.06)", color: "#9f403d", border: "1px solid rgba(159,64,61,0.15)" }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>delete_forever</span>
+              Delete Proposal
+            </button>
+          )}
         </div>
       </div>
+
+      {/* ── Delete confirm modal ──────────────────────────────────── */}
+      {showDeleteConfirm && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ backgroundColor: "rgba(0,0,0,0.45)", backdropFilter: "blur(4px)" }}
+          onClick={() => setShowDeleteConfirm(false)}
+        >
+          <div
+            className="relative w-full max-w-sm mx-4 rounded-2xl p-6 flex flex-col gap-4"
+            style={{ backgroundColor: "#fff", boxShadow: "0 20px 60px rgba(0,0,0,0.18)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start gap-3">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                style={{ backgroundColor: "rgba(159,64,61,0.1)" }}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: "20px", color: "#9f403d" }}>delete_forever</span>
+              </div>
+              <div>
+                <h3 className="font-headline text-[15px] font-bold" style={{ color: "#2a3434" }}>Delete Proposal</h3>
+                <p className="font-body text-[11px] mt-1" style={{ color: "#576160" }}>
+                  This will permanently delete <span className="font-semibold" style={{ color: "#2a3434" }}>{proposal.title}</span> and all its versions, approval chains, and attachments. This cannot be undone.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2 pt-1">
+              <button
+                onClick={() => {
+                  startDeleteTransition(async () => {
+                    const res = await deleteProposal(proposal.id);
+                    if ("deleted" in res) {
+                      router.push("/proposals");
+                    }
+                  });
+                }}
+                disabled={isDeletingProposal}
+                className="flex-1 px-4 py-2.5 rounded-xl font-label font-bold text-[11px] uppercase tracking-widest transition-all hover:opacity-80 disabled:opacity-50"
+                style={{ backgroundColor: "#9f403d", color: "#fff" }}
+              >
+                {isDeletingProposal ? "Deleting…" : "Delete"}
+              </button>
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 px-4 py-2.5 rounded-xl font-label font-bold text-[11px] uppercase tracking-widest transition-all hover:opacity-70"
+                style={{ backgroundColor: "#e9efee", color: "#576160" }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

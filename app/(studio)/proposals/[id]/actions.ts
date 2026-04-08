@@ -5,8 +5,26 @@ import { auth } from "@/auth";
 import {
   removeProposalAttachments,
   saveProposalAttachment,
+  saveBannerImage,
 } from "@/lib/proposal-attachments";
 import { revalidatePath } from "next/cache";
+
+/* ── Flow state shape ─────────────────────────────────────────── */
+
+export type FlowNode = {
+  id:             string;
+  type:           "SUBMITTED" | "APPROVED" | "FLAGGED" | "REJECTED" | "ACTIVATED";
+  userId:         string | null;
+  userName:       string;
+  userInitial:    string;
+  chainDeptName?: string;
+  stepRole?:      "MEMBER" | "LEAD" | "HEAD";
+  versionNumber:  number;
+  changedFields?: string[];
+  pdfChanged?:    boolean;
+  bannerChanged?: boolean;
+  timestamp:      string; // ISO
+};
 
 /* ── Chain step shape (mirrored in ProposalDetailClient.tsx) ── */
 
@@ -44,6 +62,7 @@ async function snapshotProposal(
   editorName: string,
   action: "SUBMITTED" | "APPROVED" | "FLAGGED" | "REJECTED",
   chainDeptName?: string,
+  stepRole?: "MEMBER" | "LEAD" | "HEAD",
 ) {
   const proposal = await prisma.proposal.findUnique({ where: { id: proposalId } });
   if (!proposal) return;
@@ -76,9 +95,14 @@ async function snapshotProposal(
   // PDF diff — compare attachmentName in metadata
   const prevMeta = prev?.metadata as Record<string, unknown> | null;
   const currMeta = proposal.metadata as Record<string, unknown> | null;
-  const prevPdf  = (prevMeta?.attachmentName as string | null) ?? null;
-  const currPdf  = (currMeta?.attachmentName as string | null) ?? null;
+  const prevPdf    = (prevMeta?.attachmentName as string | null) ?? null;
+  const currPdf    = (currMeta?.attachmentName as string | null) ?? null;
   const pdfChanged = prev !== null && prevPdf !== currPdf;
+
+  // Banner diff — compare bannerName in metadata
+  const prevBanner    = (prevMeta?.bannerName as string | null) ?? null;
+  const currBanner    = (currMeta?.bannerName as string | null) ?? null;
+  const bannerChanged = prev !== null && prevBanner !== currBanner;
 
   const changes: Record<string, unknown> = { action };
   if (chainDeptName)                         changes.chainDeptName = chainDeptName;
@@ -87,6 +111,9 @@ async function snapshotProposal(
     changes.pdfChanged   = true;
     changes.prevPdfName  = prevPdf;
     changes.newPdfName   = currPdf;
+  }
+  if (bannerChanged) {
+    changes.bannerChanged = true;
   }
 
   await prisma.proposalVersion.create({
@@ -104,8 +131,32 @@ async function snapshotProposal(
       imageGradient: proposal.imageGradient,
       editorId:      editorId ?? undefined,
       editorName,
-      changes,
+      changes:       changes as never,
     },
+  });
+
+  // Push a node to the proposal's flowState so the flow map stays in sync
+  const oldFlow = (proposal.flowState as { nodes?: FlowNode[] } | null) ?? { nodes: [] };
+  const existingNodes: FlowNode[] = oldFlow.nodes ?? [];
+
+  const node: FlowNode = {
+    id:            `fn-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    type:          action,
+    userId:        editorId,
+    userName:      editorName,
+    userInitial:   editorName.charAt(0).toUpperCase(),
+    versionNumber: nextVersion,
+    timestamp:     new Date().toISOString(),
+  };
+  if (chainDeptName)                         node.chainDeptName = chainDeptName;
+  if (stepRole)                              node.stepRole      = stepRole;
+  if (Object.keys(changedFields).length > 0) node.changedFields = Object.keys(changedFields);
+  if (pdfChanged)                            node.pdfChanged    = true;
+  if (bannerChanged)                         node.bannerChanged = true;
+
+  await prisma.proposal.update({
+    where: { id: proposalId },
+    data:  { flowState: { nodes: [...existingNodes, node] } as never },
   });
 }
 
@@ -144,7 +195,8 @@ export async function replaceAttachment(
     };
   }
 
-  await removeProposalAttachments(oldMeta ?? undefined);
+  // Do NOT delete the old file — it may be referenced by a past version snapshot.
+  // All historical files are cleaned up only when the proposal itself is deleted.
 
   const newMeta = {
     ...(oldMeta ?? {}),
@@ -160,6 +212,49 @@ export async function replaceAttachment(
   });
 
   revalidatePath(`/proposals/${id}`);
+}
+
+/* ── Replace banner image ────────────────────────────────────── */
+// Stores the new image without deleting the old one, so past version snapshots
+// that captured the previous coverImageUrl remain valid.
+
+export async function replaceBannerImage(
+  id: string,
+  formData: FormData,
+): Promise<{ error: string } | void> {
+  const file = formData.get("file") as File | null;
+  if (!file || file.size === 0) return { error: "No file provided." };
+
+  let saved;
+  try {
+    saved = await saveBannerImage(file);
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Image upload failed." };
+  }
+
+  // Store the banner URL inside metadata JSON so it can be referenced by any
+  // version snapshot without going through next/image optimization.
+  // Also mirror to coverImageUrl for the proposal card gallery.
+  const proposal = await prisma.proposal.findUnique({
+    where: { id },
+    select: { metadata: true },
+  });
+  const oldMeta = (proposal?.metadata as Record<string, unknown> | null) ?? {};
+
+  await prisma.proposal.update({
+    where: { id },
+    data: {
+      coverImageUrl: saved.bannerUrl,
+      metadata: {
+        ...oldMeta,
+        bannerUrl:  saved.bannerUrl,
+        bannerName: file.name,
+      } as never,
+    },
+  });
+
+  revalidatePath(`/proposals/${id}`);
+  revalidatePath("/proposals");
 }
 
 /* ── Submit for review ───────────────────────────────────────── */
@@ -316,7 +411,7 @@ export async function approveChainStep(proposalId: string, chainId: string) {
     });
   }
 
-  await snapshotProposal(proposalId, userId, userName, "APPROVED", chain.department.name);
+  await snapshotProposal(proposalId, userId, userName, "APPROVED", chain.department.name, currentStep.role as "MEMBER" | "LEAD" | "HEAD");
 
   revalidate(proposalId);
 }
@@ -355,7 +450,7 @@ export async function flagChainStep(proposalId: string, chainId: string) {
     data: { status: "FLAGGED" },
   });
 
-  await snapshotProposal(proposalId, userId, userName, "FLAGGED", chain.department.name);
+  await snapshotProposal(proposalId, userId, userName, "FLAGGED", chain.department.name, currentStep.role as "MEMBER" | "LEAD" | "HEAD");
 
   revalidate(proposalId);
 }
@@ -396,7 +491,7 @@ export async function rejectChainStep(proposalId: string, chainId: string) {
     data: { status: "REJECTED" },
   });
 
-  await snapshotProposal(proposalId, userId, userName, "REJECTED", chain.department.name);
+  await snapshotProposal(proposalId, userId, userName, "REJECTED", chain.department.name, currentStep.role as "MEMBER" | "LEAD" | "HEAD");
 
   revalidate(proposalId);
 }
@@ -436,25 +531,31 @@ export async function transferToAdditionalDepartment(
   });
   if (!targetDept) return;
 
-  const headMembers: ChainMember[] = targetDept.members
-    .filter((m) => m.role === "HEAD")
-    .map((m) => ({
-      userId: m.userId,
-      name: m.name,
-      initial: m.name.charAt(0).toUpperCase(),
-    }));
+  // Build the full MEMBER → LEAD → HEAD chain for the target department,
+  // skipping tiers that have no members assigned.
+  const steps: ChainStep[] = ROLE_ORDER
+    .map((role) => {
+      const roleMembers: ChainMember[] = targetDept.members
+        .filter((m) => m.role === role)
+        .map((m) => ({
+          userId: m.userId,
+          name:    m.name,
+          initial: m.name.charAt(0).toUpperCase(),
+        }));
+      return {
+        role,
+        label:    stepLabel(role),
+        members:  roleMembers,
+        approvals: [],
+        status:   "PENDING" as const,
+      };
+    })
+    .filter((s) => s.members.length > 0);
 
-  if (headMembers.length === 0) return;
+  if (steps.length === 0) return;
 
-  const steps: ChainStep[] = [
-    {
-      role: "HEAD",
-      label: "Department Head",
-      members: headMembers,
-      approvals: [],
-      status: "ACTIVE",
-    },
-  ];
+  // Activate the first (lowest) step so it is immediately actionable
+  steps[0].status = "ACTIVE";
 
   // Use the first approved chain's department as the "source"
   const sourceDeptId = approvedChains[0]?.departmentId ?? null;
@@ -491,9 +592,35 @@ export async function transferToAdditionalDepartment(
 /* ── Activate ────────────────────────────────────────────────── */
 
 export async function activateProposal(id: string) {
+  const session  = await auth();
+  const userId   = session?.user?.id   ?? null;
+  const userName = session?.user?.name ?? "Unknown";
+
+  const proposal = await prisma.proposal.findUnique({
+    where: { id },
+    select: { flowState: true, versions: { orderBy: { versionNumber: "desc" }, take: 1 } },
+  });
+
+  const oldFlow      = (proposal?.flowState as { nodes?: FlowNode[] } | null) ?? { nodes: [] };
+  const existingNodes: FlowNode[] = oldFlow.nodes ?? [];
+  const lastVersion  = proposal?.versions[0]?.versionNumber ?? 0;
+
+  const node: FlowNode = {
+    id:            `fn-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    type:          "ACTIVATED",
+    userId,
+    userName,
+    userInitial:   userName.charAt(0).toUpperCase(),
+    versionNumber: lastVersion,
+    timestamp:     new Date().toISOString(),
+  };
+
   await prisma.proposal.update({
     where: { id },
-    data: { status: "ACTIVE" },
+    data: {
+      status:    "ACTIVE",
+      flowState: { nodes: [...existingNodes, node] } as never,
+    },
   });
   revalidate(id);
 }
@@ -527,6 +654,121 @@ export async function updateProposalDetails(
   revalidate(id);
 }
 
+/* ── Permission helper ───────────────────────────────────────── */
+
+async function assertCanManage(userId: string): Promise<boolean> {
+  const m = await prisma.departmentMember.findFirst({
+    where: {
+      userId,
+      OR: [
+        { clearance: { in: ["OMEGA", "ALPHA"] } },
+        { role: "HEAD" },
+      ],
+    },
+  });
+  return !!m;
+}
+
+/* ── Delete proposal ─────────────────────────────────────────── */
+
+export async function deleteProposal(
+  id: string,
+): Promise<{ error: string } | { deleted: true }> {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) return { error: "Not authenticated." };
+  if (!(await assertCanManage(userId))) return { error: "Not authorized." };
+
+  // Collect all stored file URLs from the proposal and every version snapshot,
+  // then delete every unique local file before removing the DB record.
+  const [proposal, allVersions] = await Promise.all([
+    prisma.proposal.findUnique({
+      where: { id },
+      select: { metadata: true, coverImageUrl: true },
+    }),
+    prisma.proposalVersion.findMany({
+      where: { proposalId: id },
+      select: { metadata: true, coverImageUrl: true },
+    }),
+  ]);
+
+  const seen = new Set<string>();
+  const allUrls: string[] = [];
+
+  function collect(url: string | null | undefined) {
+    if (typeof url === "string" && url.startsWith("/uploads/") && !seen.has(url)) {
+      seen.add(url);
+      allUrls.push(url);
+    }
+  }
+
+  // PDF / PPTX attachments (stored in metadata JSON)
+  const metaList = [
+    proposal?.metadata as Record<string, unknown> | null,
+    ...allVersions.map((v) => v.metadata as Record<string, unknown> | null),
+  ].filter(Boolean) as Record<string, unknown>[];
+
+  for (const m of metaList) {
+    collect(m.attachmentUrl as string | null);
+    collect(m.sourceAttachmentUrl as string | null);
+  }
+
+  // Banner images (stored in coverImageUrl column)
+  collect(proposal?.coverImageUrl);
+  for (const v of allVersions) collect(v.coverImageUrl);
+
+  await Promise.all(allUrls.map((u) => removeProposalAttachments({ attachmentUrl: u })));
+
+  await prisma.proposal.delete({ where: { id } });
+  revalidatePath("/proposals");
+  return { deleted: true };
+}
+
+/* ── Schedule a meeting ──────────────────────────────────────── */
+
+export async function scheduleMeeting(
+  proposalId: string,
+  data: { title: string; description?: string; scheduledAt: string; location?: string },
+): Promise<{ error: string } | void> {
+  const session = await auth();
+  const userId   = session?.user?.id;
+  const userName = session?.user?.name ?? "Unknown";
+  if (!userId) return { error: "Not authenticated." };
+  if (!(await assertCanManage(userId))) return { error: "Not authorized." };
+
+  if (!data.title.trim()) return { error: "Title is required." };
+  if (!data.scheduledAt)  return { error: "Date & time are required." };
+
+  await prisma.meeting.create({
+    data: {
+      proposalId,
+      title:        data.title.trim(),
+      description:  data.description?.trim() || null,
+      scheduledAt:  new Date(data.scheduledAt),
+      location:     data.location?.trim() || null,
+      organizerId:  userId,
+      organizerName: userName,
+    },
+  });
+
+  revalidatePath(`/proposals/${proposalId}`);
+}
+
+/* ── Delete a meeting ────────────────────────────────────────── */
+
+export async function deleteMeeting(
+  meetingId: string,
+  proposalId: string,
+): Promise<{ error: string } | void> {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) return { error: "Not authenticated." };
+  if (!(await assertCanManage(userId))) return { error: "Not authorized." };
+
+  await prisma.meeting.delete({ where: { id: meetingId } });
+  revalidatePath(`/proposals/${proposalId}`);
+}
+
 /* ── Restore a version ───────────────────────────────────────── */
 // Restores field data from a past version. No snapshot on restore.
 
@@ -553,4 +795,40 @@ export async function restoreVersion(
   });
 
   revalidate(proposalId);
+}
+
+
+/* ── Comments ─────────────────────────────────────────────────── */
+
+export async function addComment(
+  proposalId: string,
+  content: string,
+): Promise<{ error: string } | { id: string; authorName: string; authorInitial: string | null; content: string; createdAt: string }> {
+  const session = await auth();
+  const trimmed = content.trim();
+  if (!trimmed) return { error: "Comment cannot be empty." };
+
+  const authorName    = session?.user?.name ?? "Anonymous";
+  const authorInitial = authorName.charAt(0).toUpperCase();
+  const authorId      = session?.user?.id ?? null;
+
+  const comment = await prisma.proposalComment.create({
+    data: {
+      proposalId,
+      content:      trimmed,
+      authorName,
+      authorInitial,
+      ...(authorId ? { authorId } : {}),
+    },
+  });
+
+  revalidate(proposalId);
+
+  return {
+    id:            comment.id,
+    authorName:    comment.authorName,
+    authorInitial: comment.authorInitial,
+    content:       comment.content,
+    createdAt:     comment.createdAt.toISOString(),
+  };
 }

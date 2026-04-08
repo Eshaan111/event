@@ -52,6 +52,8 @@ model Proposal {
   tags           ProposalTag[]
   approvalChains ProposalApprovalChain[]
   versions       ProposalVersion[]
+  meetings       Meeting[]
+  comments       ProposalComment[]
 }
 
 model ProposalVersion {
@@ -126,6 +128,8 @@ model User {
   memberships       DepartmentMember[]
   authoredProposals ProposalAuthor[]
   proposalVersions  ProposalVersion[]
+  scheduledMeetings Meeting[]
+  proposalComments  ProposalComment[]
   orgMembership     OrgMember?
 
   createdAt     DateTime  @default(now())
@@ -246,6 +250,41 @@ enum ApprovalChainStatus {
 
 // One chain record per (proposal × department).
 // `steps` is a JSON array of ChainStep objects (see actions.ts for the shape).
+// ── Meetings ───────────────────────────────────────────────────
+
+model Meeting {
+  id            String   @id @default(cuid())
+  proposalId    String
+  proposal      Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  title         String
+  description   String?
+  scheduledAt   DateTime
+  location      String?
+
+  organizerId   String?
+  organizer     User?    @relation(fields: [organizerId], references: [id], onDelete: SetNull)
+  organizerName String
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model ProposalComment {
+  id            String   @id @default(cuid())
+  proposalId    String
+  proposal      Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  authorId      String?
+  author        User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorName    String
+  authorInitial String?  @db.VarChar(2)
+
+  content       String
+
+  createdAt     DateTime @default(now())
+}
+
 model ProposalApprovalChain {
   id              String              @id @default(cuid())
   proposalId      String

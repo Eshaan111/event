@@ -6,6 +6,7 @@ import { promisify } from "util";
 const execFileAsync = promisify(execFile);
 
 const VALID_EXTENSIONS = new Set([".pdf", ".pptx"]);
+const VALID_IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
 
 type AttachmentMeta = {
   attachmentUrl?: string;
@@ -105,6 +106,23 @@ export async function saveProposalAttachment(file: File): Promise<Required<Attac
     sourceAttachmentUrl: publicUrlFromName(sourceFileName),
     sourceAttachmentName: file.name,
   };
+}
+
+export async function saveBannerImage(file: File): Promise<{ bannerUrl: string }> {
+  const ext = path.extname(file.name).toLowerCase();
+  if (!VALID_IMAGE_EXTENSIONS.has(ext)) {
+    throw new Error("Only JPG, PNG, WebP, or GIF files are supported for the banner.");
+  }
+
+  const uploadDir = path.join(process.cwd(), "public", "uploads");
+  await fs.mkdir(uploadDir, { recursive: true });
+
+  const fileName = randomName(ext);
+  const filePath = path.join(uploadDir, fileName);
+  const bytes = await file.arrayBuffer();
+  await fs.writeFile(filePath, Buffer.from(bytes));
+
+  return { bannerUrl: publicUrlFromName(fileName) };
 }
 
 export async function removeProposalAttachments(meta: AttachmentMeta | null | undefined) {

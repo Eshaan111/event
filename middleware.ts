@@ -15,7 +15,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/invite") ||
     pathname.startsWith("/api/auth") ||
     pathname.startsWith("/api/invite") ||
-    pathname.startsWith("/dev");
+    pathname.startsWith("/dev") ||
+    pathname.startsWith("/uploads");
 
   // Unauthenticated user on a protected route → /register
   if (!isPublic && !session?.user) {
