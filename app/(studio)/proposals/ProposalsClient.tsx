@@ -16,11 +16,14 @@ export type ProposalWithRelations = Omit<Proposal, "createdAt" | "updatedAt"> & 
 /* ── Helpers ────────────────────────────────────────────────── */
 
 function statusToBadgeType(status: string): BadgeType {
-  if (status === "APPROVED") return "approved";
-  if (status === "FLAGGED")  return "flagged";
-  if (status === "ACTIVE")   return "active";
-  if (status === "DRAFT")    return "draft";
-  if (status === "REJECTED") return "rejected";
+  if (status === "APPROVED")  return "approved";
+  if (status === "FLAGGED")   return "flagged";
+  if (status === "ACTIVE")    return "active";
+  // DRAFT maps to "draft" badge → label shows "Pending"
+  if (status === "DRAFT")     return "draft";
+  // REJECTED + COMPLETED both collapse to "archived"
+  if (status === "REJECTED")  return "archived";
+  if (status === "COMPLETED") return "archived";
   return "draft";
 }
 
@@ -39,14 +42,27 @@ function fmtDate(d: Date) {
 }
 
 /* ── Badge ──────────────────────────────────────────────────── */
-type BadgeType = "approved" | "flagged" | "active" | "draft" | "rejected";
+// ── Status group mapping (PENDING / ACTIVE / ARCHIVED) ───────────
+// Individual raw statuses map to one of the three top-level notation groups.
+const STATUS_GROUP: Record<string, "PENDING" | "ACTIVE" | "ARCHIVED"> = {
+  DRAFT:     "PENDING",
+  FLAGGED:   "PENDING",
+  APPROVED:  "PENDING",
+  ACTIVE:    "ACTIVE",
+  REJECTED:  "ARCHIVED",
+  COMPLETED: "ARCHIVED",
+};
+
+type BadgeType = "approved" | "flagged" | "active" | "draft" | "archived";
 
 const badgeConfig: Record<BadgeType, { label: string; bg: string; text: string; border: string; glow?: string }> = {
-  approved:        { label: "Approved",        bg: "#d3dbd6",             text: "#0f1d19",  border: "transparent" },
-  flagged:         { label: "Flagged",         bg: "rgba(186,26,26,0.1)", text: "#ba1a1a",  border: "rgba(186,26,26,0.2)" },
-  active:          { label: "Active",          bg: "#c2ebdc",             text: "#0f2e22",  border: "transparent" },
-  draft:           { label: "Draft",           bg: "rgba(112,121,119,0.1)", text: "#3d4a47", border: "rgba(112,121,119,0.2)" },
-  rejected:        { label: "Rejected",        bg: "rgba(159,64,61,0.1)", text: "#9f403d",  border: "rgba(159,64,61,0.2)" },
+  // Pending sub-states — shown with their specific label so team can still tell them apart
+  approved:  { label: "Approved",  bg: "#d3dbd6",               text: "#0f1d19",  border: "transparent" },
+  flagged:   { label: "Flagged",   bg: "rgba(186,26,26,0.1)",   text: "#ba1a1a",  border: "rgba(186,26,26,0.2)" },
+  draft:     { label: "Pending",   bg: "rgba(112,121,119,0.1)", text: "#3d4a47",  border: "rgba(112,121,119,0.2)" },
+  // Top-level notation groups
+  active:    { label: "Active",    bg: "#c2ebdc",               text: "#0f2e22",  border: "transparent" },
+  archived:  { label: "Archived",  bg: "rgba(100,100,100,0.1)", text: "#505a58",  border: "rgba(100,100,100,0.2)" },
 };
 
 function Badge({ type }: { type: BadgeType }) {
@@ -527,12 +543,27 @@ function FlowDrawer({ proposal, onClose }: { proposal: ProposalWithRelations | n
 }
 
 /* ── Status Pills Config ────────────────────────────────────── */
-const STATUS_OPTIONS: { value: string; label: string; activeBg: string; activeText: string }[] = [
-  { value: "DRAFT",     label: "Draft",    activeBg: "rgba(112,121,119,0.15)", activeText: "#3d4a47" },
-  { value: "APPROVED",  label: "Approved", activeBg: "#d3dbd6",                activeText: "#0f1d19" },
-  { value: "FLAGGED",       label: "Flagged",        activeBg: "rgba(186,26,26,0.12)",   activeText: "#ba1a1a" },
-  { value: "ACTIVE",        label: "Active",         activeBg: "#c2ebdc",                activeText: "#0f2e22" },
-  { value: "REJECTED",      label: "Rejected",       activeBg: "rgba(159,64,61,0.12)",   activeText: "#9f403d" },
+// Three top-level notation groups. Each group value maps to one or more raw DB statuses
+// via STATUS_GROUP above — the filter logic uses that mapping.
+const STATUS_OPTIONS: { value: "PENDING" | "ACTIVE" | "ARCHIVED"; label: string; sub: string; activeBg: string; activeText: string; activeBorder: string }[] = [
+  {
+    value: "PENDING",
+    label: "Pending",
+    sub:   "Draft · Flagged · Approved",
+    activeBg: "rgba(112,121,119,0.15)", activeText: "#3d4a47", activeBorder: "rgba(112,121,119,0.35)",
+  },
+  {
+    value: "ACTIVE",
+    label: "Active",
+    sub:   "Live events",
+    activeBg: "#c2ebdc", activeText: "#0f2e22", activeBorder: "transparent",
+  },
+  {
+    value: "ARCHIVED",
+    label: "Archived",
+    sub:   "Completed · Rejected",
+    activeBg: "rgba(100,100,100,0.12)", activeText: "#505a58", activeBorder: "rgba(100,100,100,0.3)",
+  },
 ];
 
 /* ── Action Needed Card ─────────────────────────────────────── */
@@ -792,8 +823,11 @@ export default function ProposalsClient({
     return proposals.filter((p) => {
       // Author
       if (authorFilter !== "all" && !p.authors.some((a) => a.name === authorFilter)) return false;
-      // Status
-      if (statusFilters.size > 0 && !statusFilters.has(p.status)) return false;
+      // Status — filter by notation group (PENDING / ACTIVE / ARCHIVED)
+      if (statusFilters.size > 0) {
+        const group = STATUS_GROUP[p.status] ?? "PENDING";
+        if (!statusFilters.has(group)) return false;
+      }
       // Submission date range
       if (submissionRange.start || submissionRange.end) {
         const sub = new Date(p.createdAt);
@@ -1019,7 +1053,7 @@ export default function ProposalsClient({
           </button>
         </div>
 
-        {/* Row 2: Status pills */}
+        {/* Row 2: Status notation pills — PENDING / ACTIVE / ARCHIVED */}
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-label font-bold text-[10px] uppercase tracking-[0.15em] mr-2" style={{ color: "#707977" }}>Status</span>
           {STATUS_OPTIONS.map((s) => {
@@ -1028,15 +1062,25 @@ export default function ProposalsClient({
               <button
                 key={s.value}
                 onClick={() => toggleStatus(s.value)}
-                className="px-4 py-1.5 rounded-full font-label font-black text-[10px] uppercase tracking-[0.12em] transition-all"
+                className="flex flex-col items-start px-4 py-2 rounded-xl font-label transition-all"
                 style={{
                   backgroundColor: active ? s.activeBg : "transparent",
-                  color:           active ? s.activeText : "#9ba8a7",
-                  border:          active ? "1px solid transparent" : "1px solid rgba(155,168,167,0.35)",
+                  border:          active ? `1px solid ${s.activeBorder}` : "1px solid rgba(155,168,167,0.35)",
                   boxShadow:       active ? "0 2px 8px rgba(0,0,0,0.06)" : "none",
                 }}
               >
-                {s.label}
+                <span
+                  className="font-black text-[11px] uppercase tracking-[0.12em]"
+                  style={{ color: active ? s.activeText : "#707977" }}
+                >
+                  {s.label}
+                </span>
+                <span
+                  className="text-[8px] font-bold tracking-wider"
+                  style={{ color: active ? `${s.activeText}99` : "#b0bcba" }}
+                >
+                  {s.sub}
+                </span>
               </button>
             );
           })}

@@ -24,6 +24,7 @@ enum ProposalStatus {
   FLAGGED
   REJECTED
   ACTIVE
+  COMPLETED
 }
 
 model Proposal {
@@ -54,6 +55,7 @@ model Proposal {
   versions       ProposalVersion[]
   meetings       Meeting[]
   comments       ProposalComment[]
+  eventReport    EventReport?
 }
 
 model ProposalVersion {
@@ -131,6 +133,7 @@ model User {
   scheduledMeetings Meeting[]
   proposalComments  ProposalComment[]
   orgMembership     OrgMember?
+  eventReports      EventReport[]
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -304,6 +307,54 @@ model ProposalApprovalChain {
 }
 
 // ── Departments ────────────────────────────────────────────────
+
+// ── Event Report ───────────────────────────────────────────────
+// Filed after a COMPLETED event to capture post-event actuals.
+// One-to-one with Proposal; created the first time the report is submitted
+// and can be updated any time afterward.
+
+model EventReport {
+  id          String   @id @default(cuid())
+  proposalId  String   @unique
+  proposal    Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  // Timing actuals
+  actualDate  DateTime?
+
+  // Location (may differ from the planned location)
+  actualLocation String?
+
+  // Budget reconciliation
+  actualSpend    Int?      // actual expenditure (same units as Proposal.budget)
+
+  // Attendance
+  signedUpCount    Int?    // people who registered / signed up
+  actualAttendance Int?    // people who physically showed up
+
+  // Narrative
+  summary    String?
+  highlights String?
+  challenges String?
+
+  // Internal quality score (1–5)
+  internalRating Int?
+
+  // Uploaded file arrays — stored as JSON: { url, name, originalName, size }[]
+  // receipts: bills, invoices, financial documents
+  // media:    photos, videos, PDFs, decks from the event
+  receipts Json?
+  media    Json?
+
+  // Who filed the report
+  reportedById   String?
+  reportedBy     User?    @relation(fields: [reportedById], references: [id], onDelete: SetNull)
+  reportedByName String   @default("Unknown")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ── Department Invites ─────────────────────────────────────────
 
 model DepartmentInvite {
   id           String     @id @default(cuid())

@@ -21,6 +21,7 @@ import {
   deleteMeeting,
   addComment,
 } from "./actions";
+import { completeProposal } from "@/app/(studio)/proposals/archived/actions";
 import type { ChainStep } from "./actions";
 
 GlobalWorkerOptions.workerSrc = new URL(
@@ -135,6 +136,7 @@ const STATUS_BADGE: Record<string, { label: string; bg: string; text: string; bo
   ACTIVE:        { label: "Active",          bg: "#c2ebdc",               text: "#0f2e22", border: "transparent" },
   DRAFT:         { label: "Draft",           bg: "rgba(112,121,119,0.1)", text: "#3d4a47", border: "rgba(112,121,119,0.2)" },
   REJECTED:      { label: "Rejected",        bg: "rgba(159,64,61,0.1)",   text: "#9f403d", border: "rgba(159,64,61,0.2)" },
+  COMPLETED:     { label: "Completed",       bg: "rgba(45,83,73,0.12)",   text: "#2d5349", border: "rgba(45,83,73,0.25)" },
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -703,12 +705,45 @@ export default function ProposalDetailClient({
       );
     }
 
-    // ACTIVE / terminal states
+    // ACTIVE — show "Complete Event" for managers
     if (proposal.status === "ACTIVE") {
       return (
-        <p className="font-label text-[10px] uppercase tracking-widest text-center py-2" style={{ color: "#a9b4b3" }}>
-          Proposal is live
-        </p>
+        <div className="flex flex-col gap-3">
+          <p className="font-label text-[10px] uppercase tracking-widest text-center" style={{ color: "#a9b4b3" }}>
+            Proposal is live
+          </p>
+          {canManageProposal && (
+            <ActionButton
+              label="Mark as Completed"
+              icon="task_alt"
+              variant="outline"
+              onClick={() => {
+                if (confirm("Mark this event as completed? It will move to the archive.")) {
+                  startTransition(() => { void completeProposal(proposal.id); });
+                }
+              }}
+              disabled={isPending}
+            />
+          )}
+        </div>
+      );
+    }
+
+    if (proposal.status === "COMPLETED") {
+      return (
+        <div className="flex flex-col gap-3">
+          <p className="font-label text-[10px] uppercase tracking-widest text-center" style={{ color: "#2d5349" }}>
+            Event completed
+          </p>
+          <Link
+            href="/proposals/archived"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-label font-black text-[11px] uppercase tracking-widest transition-all hover:opacity-80"
+            style={{ backgroundColor: "#dce5e3", color: "#1a1f1f" }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: "1rem" }}>inventory_2</span>
+            View in Archive
+          </Link>
+        </div>
       );
     }
 
