@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
+import { getOrgId } from "@/lib/org";
 import DepartmentsClient, { type SerializedDepartment } from "./DepartmentsClient";
 
 export const metadata: Metadata = {
@@ -9,7 +10,11 @@ export const metadata: Metadata = {
 };
 
 export default async function DepartmentsPage() {
+  const session = await auth();
+  const orgId   = await getOrgId(session?.user?.id);
+
   const all = await prisma.department.findMany({
+    where: { orgId: orgId ?? "__none__" },
     include: {
       members: { orderBy: { role: "asc" } },
       invites: {
@@ -21,13 +26,18 @@ export default async function DepartmentsPage() {
   });
 
   // ── Current user context ─────────────────────────────────────
-  const session       = await auth();
   const currentUserId = session?.user?.id ?? null;
 
   let editableDeptIds:    string[] | "ALL" = [];
   let currentUserOrgRole: string | null    = null;
+  let canCreateDept = false;
+
+  // Org roles that can manage all departments regardless of dept membership
+  const EXEC_ORG_ROLES = ["PRESIDENT", "VICE_PRESIDENT", "SECRETARY"];
 
   if (currentUserId) {
+    canCreateDept = true; // any signed-in user can create departments
+
     const [myMemberships, orgMembership] = await Promise.all([
       // Use already-fetched members to avoid extra query
       Promise.resolve(all.flatMap((d) => d.members).filter((m) => m.userId === currentUserId)),
@@ -39,7 +49,10 @@ export default async function DepartmentsPage() {
 
     currentUserOrgRole = orgMembership?.orgRole ?? null;
 
-    if (myMemberships.some((m) => m.clearance === "OMEGA" || m.clearance === "ALPHA")) {
+    if (
+      (currentUserOrgRole && EXEC_ORG_ROLES.includes(currentUserOrgRole)) ||
+      myMemberships.some((m) => m.clearance === "OMEGA" || m.clearance === "ALPHA")
+    ) {
       editableDeptIds = "ALL";
     } else {
       const managedRootIds = myMemberships
@@ -100,6 +113,7 @@ export default async function DepartmentsPage() {
       rootDepts={rootDepts}
       editableDeptIds={editableDeptIds}
       currentUserOrgRole={currentUserOrgRole}
+      canCreateDept={canCreateDept}
     />
   );
 }

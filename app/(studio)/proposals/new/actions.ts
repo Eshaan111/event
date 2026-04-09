@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
+import { getOrgId } from "@/lib/org";
 import { saveProposalAttachment } from "@/lib/proposal-attachments";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -58,6 +59,7 @@ export async function submitProposal(formData: FormData): Promise<{ error: strin
 
   const userName = session?.user?.name ?? "Unknown";
   const userId   = session?.user?.id   ?? null;
+  const orgId    = await getOrgId(userId);
 
   const proposal = await prisma.proposal.create({
     data: {
@@ -69,6 +71,7 @@ export async function submitProposal(formData: FormData): Promise<{ error: strin
       dateEst,
       budget: budgetRaw ? Math.round(parseFloat(budgetRaw)) : null,
       metadata: Object.keys(metadata).length > 0 ? (metadata as never) : undefined,
+      orgId: orgId ?? undefined,
       authors: {
         create: {
           name:      userName,

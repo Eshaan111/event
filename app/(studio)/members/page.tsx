@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/auth";
+import { getOrgId } from "@/lib/org";
 import MembersClient, { type MemberCardData } from "./MembersClient";
 
 export const metadata: Metadata = {
@@ -8,24 +10,36 @@ export const metadata: Metadata = {
 };
 
 export default async function MembersPage() {
+  const session = await auth();
+  const orgId   = await getOrgId(session?.user?.id);
+
   const [users, manualOrgMembers] = await Promise.all([
+    // Only fetch users who belong to this org (via OrgMember or a dept in this org)
     prisma.user.findMany({
+      where: {
+        OR: [
+          { orgMembership: { orgId: orgId ?? "__none__" } },
+          { memberships:   { some: { department: { orgId: orgId ?? "__none__" } } } },
+        ],
+      },
       include: {
         memberships: {
+          where:   { department: { orgId: orgId ?? "__none__" } },
           include: { department: { select: { name: true } } },
-          orderBy:  { joinedAt: "asc" },
+          orderBy: { joinedAt: "asc" },
         },
         authoredProposals: {
+          where:   { proposal: { orgId: orgId ?? "__none__" } },
           include: { proposal: { select: { id: true, title: true, type: true } } },
-          orderBy:  { proposal: { createdAt: "desc" } },
+          orderBy: { proposal: { createdAt: "desc" } },
         },
         orgMembership: true,
       },
       orderBy: { createdAt: "asc" },
     }),
-    // OrgMembers that haven't signed in yet (no User account linked)
+    // Manual contacts in this org that haven't signed in yet
     prisma.orgMember.findMany({
-      where:   { userId: null },
+      where:   { userId: null, orgId: orgId ?? "__none__" },
       orderBy: { joinedAt: "asc" },
     }),
   ]);

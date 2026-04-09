@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { PrismaClient, ProposalType, ProposalStatus, type MemberRole, type Clearance, type OrgRole } from '@prisma/client';
+import { PrismaClient, ProposalType, ProposalStatus, type OrgRole, type MemberRole, type Clearance } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
@@ -75,9 +75,17 @@ async function main() {
   console.log("Seeding database...");
   await prisma.proposal.deleteMany();
 
+  // Create (or reuse) the seed organisation
+  let seedOrg = await prisma.organization.findFirst({ where: { name: "Aetheric Studio (Seed)" } });
+  if (!seedOrg) {
+    seedOrg = await prisma.organization.create({ data: { name: "Aetheric Studio (Seed)" } });
+  }
+  const seedOrgId = seedOrg.id;
+
   /* 1 ── Met Gala 2026: The Kinetic Silk Road */
   await prisma.proposal.create({
     data: {
+      orgId: seedOrgId,
       type: ProposalType.EVENT,
       status: ProposalStatus.DRAFT,
       title: "Met Gala 2026: The Kinetic Silk Road",
@@ -114,6 +122,7 @@ async function main() {
   /* 2 ── Neo-Baroque Summit: Digital Heritage */
   await prisma.proposal.create({
     data: {
+      orgId: seedOrgId,
       type: ProposalType.SUMMIT,
       status: ProposalStatus.APPROVED,
       title: "Neo-Baroque Summit: Digital Heritage",
@@ -151,6 +160,7 @@ async function main() {
   /* 3 ── The Floating Orchestra: Venice Tides */
   await prisma.proposal.create({
     data: {
+      orgId: seedOrgId,
       type: ProposalType.PERFORMANCE,
       status: ProposalStatus.FLAGGED,
       title: "The Floating Orchestra: Venice Tides",
@@ -187,6 +197,7 @@ async function main() {
   /* 4 ── AI Fashion Week: Generated Couture */
   await prisma.proposal.create({
     data: {
+      orgId: seedOrgId,
       type: ProposalType.INTERNAL,
       status: ProposalStatus.DRAFT,
       title: "AI Fashion Week: Generated Couture",
@@ -224,6 +235,7 @@ async function main() {
   /* 5 ── Desert Noir: The Saharan Pavilion */
   await prisma.proposal.create({
     data: {
+      orgId: seedOrgId,
       type: ProposalType.EXHIBITION,
       status: ProposalStatus.APPROVED,
       title: "Desert Noir: The Saharan Pavilion",
@@ -261,6 +273,7 @@ async function main() {
   /* 6 ── Solstice Gala: Arctic Edition */
   await prisma.proposal.create({
     data: {
+      orgId: seedOrgId,
       type: ProposalType.EVENT,
       status: ProposalStatus.DRAFT,
       title: "Solstice Gala: Arctic Edition",
@@ -297,6 +310,7 @@ async function main() {
   /* 7 ── Hyperion Summit: Future of Craft */
   await prisma.proposal.create({
     data: {
+      orgId: seedOrgId,
       type: ProposalType.SUMMIT,
       status: ProposalStatus.DRAFT,
       title: "Hyperion Summit: Future of Craft",
@@ -334,6 +348,7 @@ async function main() {
   /* 8 ── Requiem for the Archive */
   await prisma.proposal.create({
     data: {
+      orgId: seedOrgId,
       type: ProposalType.PERFORMANCE,
       status: ProposalStatus.APPROVED,
       title: "Requiem for the Archive",
@@ -371,6 +386,7 @@ async function main() {
   /* 9 ── Chromatic Wedding: House of Valentin */
   await prisma.proposal.create({
     data: {
+      orgId: seedOrgId,
       type: ProposalType.WEDDING,
       status: ProposalStatus.ACTIVE,
       title: "Chromatic Wedding: House of Valentin",
@@ -409,6 +425,7 @@ async function main() {
   /* 10 ── Liminal Spaces: Global Architecture Biennale */
   await prisma.proposal.create({
     data: {
+      orgId: seedOrgId,
       type: ProposalType.EXHIBITION,
       status: ProposalStatus.DRAFT,
       title: "Liminal Spaces: Global Architecture Biennale",
@@ -447,6 +464,7 @@ async function main() {
   /* 11 ── Studio Residency: The Unwritten City */
   await prisma.proposal.create({
     data: {
+      orgId: seedOrgId,
       type: ProposalType.INTERNAL,
       status: ProposalStatus.DRAFT,
       title: "Studio Residency: The Unwritten City",
@@ -483,6 +501,7 @@ async function main() {
   /* 12 ── Neon Carnivale: São Paulo Street Summit */
   await prisma.proposal.create({
     data: {
+      orgId: seedOrgId,
       type: ProposalType.EVENT,
       status: ProposalStatus.FLAGGED,
       title: "Neon Carnivale: São Paulo Street Summit",
@@ -521,6 +540,7 @@ async function main() {
   console.log("Database seeded with 12 proposals ✓");
 
   await seedMembers();
+  await seedDemo();
 }
 
 /* ── Members & Departments seed ─────────────────────────────── */
@@ -548,55 +568,45 @@ function slugEmail(first: string, last: string): string {
 }
 
 type MemberDef = {
-  first:     string;
-  last:      string;
-  orgRole:   OrgRole;
-  deptKey:   "creative" | "production" | "finance" | "technology";
-  deptRole:  MemberRole;
-  clearance: Clearance;
+  first:   string;
+  last:    string;
+  orgRole: OrgRole;
 };
 
 const MEMBER_DEFS: MemberDef[] = [
-  // ── Creative Direction ──────────────────────────────────────
-  { first: "Isabelle", last: "Voss",      orgRole: "HEAD_CREATIVES", deptKey: "creative",   deptRole: "HEAD",     clearance: "ALPHA" },
-  { first: "Rajan",    last: "Mehta",     orgRole: "PROJECT_LEAD",   deptKey: "creative",   deptRole: "LEAD",     clearance: "BETA"  },
-  { first: "Nadia",    last: "Solberg",   orgRole: "ASSOCIATE",      deptKey: "creative",   deptRole: "MEMBER",   clearance: "BETA"  },
-  { first: "Felix",    last: "Hartmann",  orgRole: "ASSOCIATE",      deptKey: "creative",   deptRole: "MEMBER",   clearance: "GAMMA" },
-  { first: "Chioma",   last: "Adeyemi",   orgRole: "VOLUNTEER",      deptKey: "creative",   deptRole: "OBSERVER", clearance: "DELTA" },
-
-  // ── Production & Logistics ──────────────────────────────────
-  { first: "Marco",    last: "Delacroix", orgRole: "HEAD_LOGISTICS", deptKey: "production", deptRole: "HEAD",     clearance: "ALPHA" },
-  { first: "Yuna",     last: "Kim",       orgRole: "PROJECT_LEAD",   deptKey: "production", deptRole: "LEAD",     clearance: "BETA"  },
-  { first: "Tariq",    last: "AlRashid",  orgRole: "ASSOCIATE",      deptKey: "production", deptRole: "MEMBER",   clearance: "BETA"  },
-  { first: "Saoirse",  last: "Murphy",    orgRole: "ASSOCIATE",      deptKey: "production", deptRole: "MEMBER",   clearance: "GAMMA" },
-  { first: "Dani",     last: "Reyes",     orgRole: "VOLUNTEER",      deptKey: "production", deptRole: "OBSERVER", clearance: "DELTA" },
-
-  // ── Finance & Strategy ──────────────────────────────────────
-  { first: "Priscilla",last: "Okafor",    orgRole: "HEAD_FINANCE",   deptKey: "finance",    deptRole: "HEAD",     clearance: "ALPHA" },
-  { first: "Lukas",    last: "Bauer",     orgRole: "SECRETARY",      deptKey: "finance",    deptRole: "LEAD",     clearance: "BETA"  },
-  { first: "MeiLing",  last: "Zhou",      orgRole: "ASSOCIATE",      deptKey: "finance",    deptRole: "MEMBER",   clearance: "BETA"  },
-  { first: "Arjun",    last: "Patel",     orgRole: "ASSOCIATE",      deptKey: "finance",    deptRole: "MEMBER",   clearance: "GAMMA" },
-  { first: "Camille",  last: "Dubois",    orgRole: "VOLUNTEER",      deptKey: "finance",    deptRole: "OBSERVER", clearance: "DELTA" },
-
-  // ── Technology & Innovation ─────────────────────────────────
-  { first: "Aleksei",  last: "Volkov",    orgRole: "PRESIDENT",      deptKey: "technology", deptRole: "HEAD",     clearance: "OMEGA" },
-  { first: "Hana",     last: "Suzuki",    orgRole: "VICE_PRESIDENT", deptKey: "technology", deptRole: "LEAD",     clearance: "ALPHA" },
-  { first: "Kwame",    last: "Asante",    orgRole: "PROJECT_LEAD",   deptKey: "technology", deptRole: "MEMBER",   clearance: "BETA"  },
-  { first: "Lena",     last: "Fischer",   orgRole: "ASSOCIATE",      deptKey: "technology", deptRole: "MEMBER",   clearance: "GAMMA" },
-  { first: "Omar",     last: "Sharif",    orgRole: "VOLUNTEER",      deptKey: "technology", deptRole: "OBSERVER", clearance: "DELTA" },
+  { first: "Aleksei",  last: "Volkov",    orgRole: "PRESIDENT"      },
+  { first: "Hana",     last: "Suzuki",    orgRole: "VICE_PRESIDENT" },
+  { first: "Lukas",    last: "Bauer",     orgRole: "SECRETARY"      },
+  { first: "Marco",    last: "Delacroix", orgRole: "HEAD_LOGISTICS" },
+  { first: "Priscilla",last: "Okafor",    orgRole: "HEAD_FINANCE"   },
+  { first: "Isabelle", last: "Voss",      orgRole: "HEAD_CREATIVES" },
+  { first: "Kwame",    last: "Asante",    orgRole: "PROJECT_LEAD"   },
+  { first: "Rajan",    last: "Mehta",     orgRole: "PROJECT_LEAD"   },
+  { first: "Yuna",     last: "Kim",       orgRole: "PROJECT_LEAD"   },
+  { first: "Nadia",    last: "Solberg",   orgRole: "ASSOCIATE"      },
+  { first: "Felix",    last: "Hartmann",  orgRole: "ASSOCIATE"      },
+  { first: "Tariq",    last: "AlRashid",  orgRole: "ASSOCIATE"      },
+  { first: "Saoirse",  last: "Murphy",    orgRole: "ASSOCIATE"      },
+  { first: "MeiLing",  last: "Zhou",      orgRole: "ASSOCIATE"      },
+  { first: "Arjun",    last: "Patel",     orgRole: "ASSOCIATE"      },
+  { first: "Lena",     last: "Fischer",   orgRole: "ASSOCIATE"      },
+  { first: "Chioma",   last: "Adeyemi",   orgRole: "VOLUNTEER"      },
+  { first: "Dani",     last: "Reyes",     orgRole: "VOLUNTEER"      },
+  { first: "Camille",  last: "Dubois",    orgRole: "VOLUNTEER"      },
+  { first: "Omar",     last: "Sharif",    orgRole: "VOLUNTEER"      },
 ];
 
 async function seedMembers() {
-  console.log("Seeding departments & members…");
+  console.log("Seeding org members…");
 
-  // ── 1. Wipe existing seed data ────────────────────────────────
-  // Approval chains reference departments — delete them first
-  await prisma.proposalApprovalChain.deleteMany();
+  // ── 1. Find or create the seed org ──────────────────────────
+  let seedOrg = await prisma.organization.findFirst({ where: { name: "Aetheric Studio (Seed)" } });
+  if (!seedOrg) {
+    seedOrg = await prisma.organization.create({ data: { name: "Aetheric Studio (Seed)" } });
+  }
+  const seedOrgId = seedOrg.id;
 
-  // Delete departments (cascades DepartmentMember + DepartmentInvite)
-  await prisma.department.deleteMany();
-
-  // Delete boilerplate users (and their OrgMembers via cascade SetNull)
+  // ── 2. Wipe existing seed users (and their OrgMembers) ──────
   const seedUsers = await prisma.user.findMany({
     where:  { email: { endsWith: "@aetheric.seed" } },
     select: { id: true },
@@ -607,47 +617,404 @@ async function seedMembers() {
     await prisma.user.deleteMany({ where: { id: { in: seedIds } } });
   }
 
-  // ── 2. Create 4 departments ───────────────────────────────────
-  const [creative, production, finance, technology] = await Promise.all([
-    prisma.department.create({ data: { name: "Creative Direction" } }),
-    prisma.department.create({ data: { name: "Production & Logistics" } }),
-    prisma.department.create({ data: { name: "Finance & Strategy" } }),
-    prisma.department.create({ data: { name: "Technology & Innovation" } }),
-  ]);
-
-  const deptMap = { creative, production, finance, technology };
-
-  // ── 3. Create users + org memberships + dept memberships ─────
+  // ── 3. Create users + org memberships ───────────────────────
   for (const def of MEMBER_DEFS) {
-    const dept      = deptMap[def.deptKey];
-    const deptName  = dept.name;
-    const roleLabel = orgRoleLabel(def.orgRole);
-    // Display name follows the requested convention
-    const displayName = `${roleLabel} - ${deptName} - ${def.first} ${def.last}`;
+    const roleLabel   = orgRoleLabel(def.orgRole);
+    const displayName = `${roleLabel} - ${def.first} ${def.last}`;
     const email       = slugEmail(def.first, def.last);
 
     const user = await prisma.user.create({
       data: { name: displayName, email },
     });
 
-    await Promise.all([
-      prisma.orgMember.create({
-        data: { userId: user.id, name: displayName, email, orgRole: def.orgRole },
-      }),
-      prisma.departmentMember.create({
-        data: {
-          departmentId: dept.id,
-          userId:       user.id,
-          name:         displayName,
-          email,
-          role:         def.deptRole,
-          clearance:    def.clearance,
-        },
-      }),
-    ]);
+    await prisma.orgMember.create({
+      data: { userId: user.id, name: displayName, email, orgRole: def.orgRole, orgId: seedOrgId },
+    });
   }
 
-  console.log(`Seeded 4 departments and ${MEMBER_DEFS.length} members ✓`);
+  console.log(`Seeded ${MEMBER_DEFS.length} org members ✓`);
+}
+
+/* ── DEMO Org Seed ───────────────────────────────────────────── */
+
+type DemoDef = {
+  first:    string;
+  last:     string;
+  orgRole:  OrgRole;
+  deptKey:  "creative" | "production" | "finance" | "tech";
+  role:     MemberRole;
+  clearance: Clearance;
+};
+
+const DEMO_DEPTS = {
+  creative:   "Creative Direction",
+  production: "Production & Logistics",
+  finance:    "Finance & Strategy",
+  tech:       "Technology & Innovation",
+} as const;
+
+const DEMO_DEFS: DemoDef[] = [
+  // Creative Direction
+  { first: "Zara",   last: "Marchetti",  orgRole: "PRESIDENT",      deptKey: "creative",   role: "HEAD",    clearance: "OMEGA" },
+  { first: "Kai",    last: "Nakamura",   orgRole: "HEAD_CREATIVES",  deptKey: "creative",   role: "LEAD",    clearance: "ALPHA" },
+  { first: "Nina",   last: "Vasquez",    orgRole: "ASSOCIATE",       deptKey: "creative",   role: "MEMBER",  clearance: "BETA"  },
+  // Production & Logistics
+  { first: "Ethan",  last: "Oduya",      orgRole: "HEAD_LOGISTICS",  deptKey: "production", role: "HEAD",    clearance: "OMEGA" },
+  { first: "Lola",   last: "Berger",     orgRole: "PROJECT_LEAD",    deptKey: "production", role: "LEAD",    clearance: "ALPHA" },
+  { first: "Soren",  last: "Lindgren",   orgRole: "ASSOCIATE",       deptKey: "production", role: "MEMBER",  clearance: "BETA"  },
+  // Finance & Strategy
+  { first: "Maya",   last: "Goldstein",  orgRole: "HEAD_FINANCE",    deptKey: "finance",    role: "HEAD",    clearance: "OMEGA" },
+  { first: "Ariel",  last: "Santos",     orgRole: "SECRETARY",       deptKey: "finance",    role: "LEAD",    clearance: "ALPHA" },
+  { first: "Tobias", last: "Richter",    orgRole: "ASSOCIATE",       deptKey: "finance",    role: "MEMBER",  clearance: "GAMMA" },
+  // Technology & Innovation
+  { first: "Luna",   last: "Chen",       orgRole: "VICE_PRESIDENT",  deptKey: "tech",       role: "HEAD",    clearance: "ALPHA" },
+  { first: "Remi",   last: "Adeyemi",    orgRole: "PROJECT_LEAD",    deptKey: "tech",       role: "LEAD",    clearance: "BETA"  },
+  { first: "Petra",  last: "Kowalski",   orgRole: "VOLUNTEER",       deptKey: "tech",       role: "MEMBER",  clearance: "GAMMA" },
+];
+
+async function seedDemo() {
+  console.log("Seeding DEMO org…");
+
+  // ── 1. Find or create the DEMO org ──────────────────────────
+  let demoOrg = await prisma.organization.findFirst({ where: { name: "DEMO" } });
+  if (!demoOrg) {
+    demoOrg = await prisma.organization.create({ data: { name: "DEMO" } });
+  }
+  const demoOrgId = demoOrg.id;
+
+  // ── 2. Clean existing DEMO data ──────────────────────────────
+  await prisma.proposal.deleteMany({ where: { orgId: demoOrgId } });
+
+  const demoDepts = await prisma.department.findMany({
+    where: { orgId: demoOrgId },
+    select: { id: true },
+  });
+  const demoDeptIds = demoDepts.map((d) => d.id);
+  if (demoDeptIds.length > 0) {
+    await prisma.departmentMember.deleteMany({ where: { departmentId: { in: demoDeptIds } } });
+  }
+  await prisma.department.deleteMany({ where: { orgId: demoOrgId } });
+
+  const demoUsers = await prisma.user.findMany({
+    where: { email: { endsWith: "@aetheric.demo" } },
+    select: { id: true },
+  });
+  const demoIds = demoUsers.map((u) => u.id);
+  if (demoIds.length > 0) {
+    await prisma.orgMember.deleteMany({ where: { userId: { in: demoIds } } });
+    await prisma.user.deleteMany({ where: { id: { in: demoIds } } });
+  }
+
+  // ── 3. Create departments ─────────────────────────────────────
+  const deptRecords: Record<string, string> = {};
+  for (const [key, name] of Object.entries(DEMO_DEPTS)) {
+    const dept = await prisma.department.create({
+      data: { name, orgId: demoOrgId },
+    });
+    deptRecords[key] = dept.id;
+  }
+
+  // ── 4. Create users + memberships ────────────────────────────
+  const userMap: Record<string, string> = {}; // email → userId
+  for (const def of DEMO_DEFS) {
+    const clean  = (s: string) => s.toLowerCase().replace(/[^a-z]/g, "");
+    const email  = `${clean(def.first)}.${clean(def.last)}@aetheric.demo`;
+    const deptName = DEMO_DEPTS[def.deptKey];
+    const roleLabel = orgRoleLabel(def.orgRole);
+    const displayName = `${roleLabel} - ${def.first} ${def.last}`;
+
+    const user = await prisma.user.create({ data: { name: displayName, email } });
+    userMap[email] = user.id;
+
+    await prisma.orgMember.create({
+      data: { userId: user.id, name: displayName, email, orgRole: def.orgRole, orgId: demoOrgId },
+    });
+
+    await prisma.departmentMember.create({
+      data: {
+        departmentId: deptRecords[def.deptKey],
+        userId:       user.id,
+        name:         displayName,
+        email,
+        role:         def.role,
+        clearance:    def.clearance,
+      },
+    });
+  }
+
+  // ── 5. Create proposals at all lifecycle stages ───────────────
+  // Helper: get userId by name search
+  const demoUser = (first: string, last: string) => {
+    const clean = (s: string) => s.toLowerCase().replace(/[^a-z]/g, "");
+    return `${clean(first)}.${clean(last)}@aetheric.demo`;
+  };
+
+  /* DRAFT 1 */
+  await prisma.proposal.create({
+    data: {
+      orgId:        demoOrgId,
+      type:         ProposalType.EVENT,
+      status:       ProposalStatus.DRAFT,
+      title:        "Future Visionaries Gala 2026",
+      description:  "An annual fundraising gala celebrating emerging talent across design, fashion, and technology. Still in early concept phase — venue and talent roster to be confirmed.",
+      imageGradient:"linear-gradient(135deg, #1a1030 0%, #2d1f50 50%, #12091f 100%)",
+      coverImageUrl:"https://picsum.photos/seed/gala2026/800/500",
+      dateEst:      "Nov 2026",
+      location:     "TBC — London or Paris",
+      budget:       1200000,
+      flowState:    makeFlowState({
+        submitter: { name: "Zara Marchetti", initial: "Z", timestamp: "MAR 10, 09:00" },
+        reviewer:  { name: "Not Assigned",   initial: "—", timestamp: "PENDING" },
+        approver:  { name: "Not Assigned",   initial: "—", timestamp: "PENDING" },
+        activeLabel: "Draft Stage",
+      }),
+      metadata: {
+        concept: "annual showcase",
+        talentCategories: ["design", "fashion", "technology"],
+        riskLevel: "low",
+        lastUpdatedBy: "Zara Marchetti",
+      },
+      authors: { create: [{ name: "Zara Marchetti", role: "Creative Director", initial: "Z", isPrimary: true }] },
+      tags:    { create: [{ label: "Draft" }, { label: "Gala" }, { label: "Annual" }] },
+    },
+  });
+
+  /* DRAFT 2 */
+  await prisma.proposal.create({
+    data: {
+      orgId:        demoOrgId,
+      type:         ProposalType.INTERNAL,
+      status:       ProposalStatus.DRAFT,
+      title:        "Studio Branding Refresh",
+      description:  "Internal proposal to update the studio's visual identity system — wordmark, colour palette, motion tokens, and digital templates. Scoping phase only.",
+      imageGradient:"linear-gradient(135deg, #1f2937 0%, #374151 50%, #111827 100%)",
+      dateEst:      "Q2 2026",
+      location:     "Studio HQ",
+      budget:       35000,
+      flowState:    makeFlowState({
+        submitter: { name: "Kai Nakamura", initial: "K", timestamp: "MAR 15, 14:00" },
+        reviewer:  { name: "Zara Marchetti", initial: "Z", timestamp: "PENDING" },
+        approver:  { name: "Not Assigned",   initial: "—", timestamp: "PENDING" },
+        activeLabel: "Under Review",
+      }),
+      metadata: {
+        internalOnly: true,
+        deliverables: ["wordmark", "palette", "motion tokens"],
+        riskLevel: "low",
+        lastUpdatedBy: "Kai Nakamura",
+      },
+      authors: { create: [{ name: "Kai Nakamura", role: "Design Lead", initial: "K", isPrimary: true }] },
+      tags:    { create: [{ label: "Draft" }, { label: "Internal" }, { label: "Branding" }] },
+    },
+  });
+
+  /* APPROVED */
+  await prisma.proposal.create({
+    data: {
+      orgId:        demoOrgId,
+      type:         ProposalType.SUMMIT,
+      status:       ProposalStatus.APPROVED,
+      title:        "Creative Technologies Summit",
+      description:  "A two-day international summit exploring AI-assisted design, generative media, and the ethics of creative automation. Speakers confirmed. Budget approved.",
+      imageGradient:"linear-gradient(135deg, #0a2540 0%, #1a4a70 50%, #061830 100%)",
+      coverImageUrl:"https://picsum.photos/seed/techsummit/800/500",
+      dateEst:      "Sep 2026",
+      location:     "Design Museum, London",
+      budget:       580000,
+      flowState:    makeFlowState({
+        submitter: { name: "Luna Chen",      initial: "L", timestamp: "FEB 01, 10:00" },
+        reviewer:  { name: "Maya Goldstein", initial: "M", timestamp: "FEB 14, 15:30" },
+        approver:  { name: "Zara Marchetti", initial: "Z", timestamp: "FEB 22, 09:00" },
+        activeLabel: "Summit Approved",
+      }),
+      metadata: {
+        speakers: ["Refik Anadol Studio", "Holly Herndon"],
+        sessions: 10,
+        maxDelegates: 250,
+        riskLevel: "low",
+        lastUpdatedBy: "Luna Chen",
+      },
+      authors: { create: [
+        { name: "Luna Chen",   role: "Programme Director", initial: "L", isPrimary: true },
+        { name: "Remi Adeyemi", role: "Tech Producer",    initial: "R", isPrimary: false },
+      ]},
+      tags: { create: [{ label: "Approved" }, { label: "Summit" }, { label: "AI" }] },
+    },
+  });
+
+  /* FLAGGED */
+  await prisma.proposal.create({
+    data: {
+      orgId:        demoOrgId,
+      type:         ProposalType.EXHIBITION,
+      status:       ProposalStatus.FLAGGED,
+      title:        "Voices of the Diaspora: Photo Exhibition",
+      description:  "A touring photography exhibition documenting diaspora communities across 8 cities. Flagged pending rights clearance for all 120 commissioned works.",
+      imageGradient:"linear-gradient(135deg, #3d2008 0%, #7a4010 50%, #2a1505 100%)",
+      coverImageUrl:"https://picsum.photos/seed/diaspora/800/500",
+      dateEst:      "Oct 2026",
+      location:     "Touring — 8 cities",
+      budget:       420000,
+      flowState:    makeFlowState({
+        submitter: { name: "Nina Vasquez",   initial: "N", timestamp: "JAN 20, 11:00" },
+        reviewer:  { name: "Ethan Oduya",    initial: "E", timestamp: "FEB 03, 16:00" },
+        approver:  { name: "Review Board",   initial: "R", timestamp: "FLAGGED" },
+        activeLabel: "Awaiting Clearance",
+      }),
+      metadata: {
+        worksCount: 120,
+        citiesCount: 8,
+        rightsStatus: "pending",
+        flagReason: "Rights clearance outstanding for 37 works",
+        riskLevel: "medium",
+        lastUpdatedBy: "Ethan Oduya",
+      },
+      authors: { create: [
+        { name: "Nina Vasquez", role: "Lead Curator",      initial: "N", isPrimary: true },
+        { name: "Lola Berger",  role: "Logistics Manager", initial: "L", isPrimary: false },
+      ]},
+      tags: { create: [{ label: "Flagged" }, { label: "Exhibition" }, { label: "Photography" }] },
+    },
+  });
+
+  /* REJECTED */
+  await prisma.proposal.create({
+    data: {
+      orgId:        demoOrgId,
+      type:         ProposalType.EVENT,
+      status:       ProposalStatus.REJECTED,
+      title:        "Midnight Runway: Rooftop Fashion Show",
+      description:  "A late-night outdoor runway event on a central London rooftop. Rejected due to noise abatement regulations and structural load concerns raised by building management.",
+      imageGradient:"linear-gradient(135deg, #0f0f0f 0%, #2a2a2a 50%, #050505 100%)",
+      dateEst:      "Jul 2026",
+      location:     "Central London Rooftop (unconfirmed)",
+      budget:       290000,
+      flowState:    makeFlowState({
+        submitter: { name: "Nina Vasquez",   initial: "N", timestamp: "DEC 10, 20:00" },
+        reviewer:  { name: "Ariel Santos",   initial: "A", timestamp: "DEC 18, 14:00" },
+        approver:  { name: "Zara Marchetti", initial: "Z", timestamp: "JAN 05, 10:00" },
+        activeLabel: "Rejected",
+      }),
+      metadata: {
+        rejectionReason: "Noise regulations + structural load concerns",
+        reviewedBy: "Zara Marchetti",
+        riskLevel: "high",
+        lastUpdatedBy: "Ariel Santos",
+      },
+      authors: { create: [
+        { name: "Nina Vasquez", role: "Creative Lead",      initial: "N", isPrimary: true },
+        { name: "Soren Lindgren", role: "Production Lead",  initial: "S", isPrimary: false },
+      ]},
+      tags: { create: [{ label: "Rejected" }, { label: "Fashion" }, { label: "Outdoor" }] },
+    },
+  });
+
+  /* ACTIVE 1 */
+  await prisma.proposal.create({
+    data: {
+      orgId:        demoOrgId,
+      type:         ProposalType.PERFORMANCE,
+      status:       ProposalStatus.ACTIVE,
+      title:        "Sound & Structure: A Spatial Audio Experience",
+      description:  "An immersive spatial audio installation running across three floors of a converted warehouse. Live performance component with rotating guest composers every two weeks.",
+      imageGradient:"linear-gradient(135deg, #0d2a1e 0%, #1a4a38 50%, #092015 100%)",
+      coverImageUrl:"https://picsum.photos/seed/spatialaudio/800/500",
+      dateEst:      "Apr–Jun 2026",
+      location:     "Tobacco Dock, London",
+      budget:       340000,
+      flowState:    makeFlowState({
+        submitter: { name: "Remi Adeyemi",   initial: "R", timestamp: "JAN 10, 09:00" },
+        reviewer:  { name: "Luna Chen",      initial: "L", timestamp: "JAN 22, 13:30" },
+        approver:  { name: "Zara Marchetti", initial: "Z", timestamp: "FEB 01, 10:00" },
+        activeLabel: "Live Installation",
+      }),
+      metadata: {
+        duration: "3 months",
+        rotatingComposers: true,
+        capacity: 300,
+        ticketTiers: ["General", "Opening Night", "Patron"],
+        riskLevel: "low",
+        lastUpdatedBy: "Remi Adeyemi",
+      },
+      authors: { create: [
+        { name: "Remi Adeyemi", role: "Technical Director",  initial: "R", isPrimary: true },
+        { name: "Kai Nakamura", role: "Installation Design", initial: "K", isPrimary: false },
+      ]},
+      tags: { create: [{ label: "Active" }, { label: "Audio" }, { label: "Installation" }] },
+    },
+  });
+
+  /* ACTIVE 2 */
+  await prisma.proposal.create({
+    data: {
+      orgId:        demoOrgId,
+      type:         ProposalType.WEDDING,
+      status:       ProposalStatus.ACTIVE,
+      title:        "Private Wedding: Castello di Amore",
+      description:  "Destination wedding for a private client at a Tuscan estate. Full creative direction including floral design, lighting, and a bespoke string quartet programme. Currently in live production.",
+      imageGradient:"linear-gradient(135deg, #3a1a2e 0%, #6a2a50 50%, #2a0f22 100%)",
+      coverImageUrl:"https://picsum.photos/seed/tuscany/800/500",
+      dateEst:      "Jun 2026",
+      location:     "Castello di Amore, Tuscany",
+      budget:       4500000,
+      flowState:    makeFlowState({
+        submitter: { name: "Lola Berger",    initial: "L", timestamp: "NOV 15, 11:00" },
+        reviewer:  { name: "Ethan Oduya",    initial: "E", timestamp: "DEC 01, 14:00" },
+        approver:  { name: "Zara Marchetti", initial: "Z", timestamp: "DEC 10, 09:30" },
+        activeLabel: "Live Production",
+      }),
+      metadata: {
+        guestCount: 150,
+        venueExclusivity: "full weekend",
+        floralPartner: "Atelier Botanique",
+        riskLevel: "medium",
+        lastUpdatedBy: "Lola Berger",
+      },
+      authors: { create: [
+        { name: "Lola Berger",    role: "Event Director",    initial: "L", isPrimary: true },
+        { name: "Ethan Oduya",    role: "Logistics Lead",    initial: "E", isPrimary: false },
+        { name: "Zara Marchetti", role: "Creative Director", initial: "Z", isPrimary: false },
+      ]},
+      tags: { create: [{ label: "Active" }, { label: "Wedding" }, { label: "Destination" }] },
+    },
+  });
+
+  /* COMPLETED */
+  await prisma.proposal.create({
+    data: {
+      orgId:        demoOrgId,
+      type:         ProposalType.EXHIBITION,
+      status:       ProposalStatus.COMPLETED,
+      title:        "Material Futures: Graduate Design Showcase",
+      description:  "A completed group exhibition showcasing 28 graduate designers exploring sustainable material innovation. Ran for 6 weeks. Fully documented and archived.",
+      imageGradient:"linear-gradient(135deg, #0f2a1a 0%, #1e4a30 50%, #0a1f12 100%)",
+      coverImageUrl:"https://picsum.photos/seed/graduate/800/500",
+      dateEst:      "Jan 2026",
+      location:     "Barbican Curve Gallery, London",
+      budget:       95000,
+      flowState:    makeFlowState({
+        submitter: { name: "Kai Nakamura",   initial: "K", timestamp: "OCT 01, 09:00" },
+        reviewer:  { name: "Nina Vasquez",   initial: "N", timestamp: "OCT 12, 13:00" },
+        approver:  { name: "Zara Marchetti", initial: "Z", timestamp: "OCT 20, 10:00" },
+        activeLabel: "Completed",
+      }),
+      metadata: {
+        designersShowcased: 28,
+        duration: "6 weeks",
+        visitorsTotal: 4800,
+        pressFeatures: ["Dezeen", "It's Nice That", "Wallpaper*"],
+        riskLevel: "low",
+        lastUpdatedBy: "Kai Nakamura",
+      },
+      authors: { create: [
+        { name: "Kai Nakamura", role: "Lead Curator",    initial: "K", isPrimary: true },
+        { name: "Nina Vasquez", role: "Co-Curator",      initial: "N", isPrimary: false },
+      ]},
+      tags: { create: [{ label: "Completed" }, { label: "Graduate" }, { label: "Sustainability" }] },
+    },
+  });
+
+  console.log(`DEMO org seeded: 4 departments, ${DEMO_DEFS.length} users, 8 proposals ✓`);
 }
 
 main()

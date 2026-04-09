@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
+import { getOrgId } from "@/lib/org";
 import { revalidatePath } from "next/cache";
 import type { MemberRole, Clearance, OrgRole } from "@prisma/client";
 
@@ -30,6 +31,8 @@ function safeOrgRole(v: string | null | undefined): OrgRole | null {
 /* ── Create department ──────────────────────────────────────── */
 
 export async function createDepartment(formData: FormData) {
+  const session  = await auth();
+  const orgId    = await getOrgId(session?.user?.id);
   const name     = (formData.get("name") as string)?.trim();
   const protocol = (formData.get("protocol") as string) ?? "STANDARD";
   const parentId = (formData.get("parentId") as string) || null;
@@ -41,6 +44,7 @@ export async function createDepartment(formData: FormData) {
       name,
       protocol: protocol === "RESTRICTED" ? "RESTRICTED" : "STANDARD",
       parentId: parentId || null,
+      orgId:    orgId ?? undefined,
     },
   });
 

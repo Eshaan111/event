@@ -27,6 +27,16 @@ enum ProposalStatus {
   COMPLETED
 }
 
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  members     OrgMember[]
+  departments Department[]
+  proposals   Proposal[]
+}
+
 model Proposal {
   id             String          @id @default(cuid())
   type           ProposalType
@@ -45,6 +55,9 @@ model Proposal {
   // JSONB columns for flexible data
   metadata       Json?
   flowState      Json?
+
+  orgId          String?
+  org            Organization?   @relation(fields: [orgId], references: [id])
 
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
@@ -190,6 +203,9 @@ model Department {
   parent      Department?        @relation("DeptHierarchy", fields: [parentId], references: [id])
   children    Department[]       @relation("DeptHierarchy")
 
+  orgId       String?
+  org         Organization?      @relation(fields: [orgId], references: [id])
+
   members        DepartmentMember[]
   invites        DepartmentInvite[]
   approvalChains ProposalApprovalChain[]
@@ -241,6 +257,9 @@ model OrgMember {
   email    String?
   orgRole  OrgRole  @default(ASSOCIATE)
   joinedAt DateTime @default(now())
+
+  orgId    String?
+  org      Organization? @relation(fields: [orgId], references: [id])
 }
 
 // ── Proposal Approval Chains ────────────────────────────────────

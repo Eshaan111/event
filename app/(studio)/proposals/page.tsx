@@ -2,17 +2,21 @@ export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
+import { getOrgId } from "@/lib/org";
 import ProposalsClient from "./ProposalsClient";
 import type { ProposalWithRelations } from "./ProposalsClient";
 import type { ChainStep } from "@/app/(studio)/proposals/[id]/actions";
 
 export default async function ProposalsPage() {
-  const [proposals, session] = await Promise.all([
+  const session  = await auth();
+  const orgId    = await getOrgId(session?.user?.id);
+
+  const [proposals] = await Promise.all([
     prisma.proposal.findMany({
+      where:   { orgId: orgId ?? "__none__" },
       include: { authors: true, tags: true },
       orderBy: { createdAt: "desc" },
     }),
-    auth(),
   ]);
 
   const currentUserId = session?.user?.id ?? null;
@@ -21,7 +25,7 @@ export default async function ProposalsPage() {
   const actionNeededIds: string[] = [];
   if (currentUserId) {
     const activeChains = await prisma.proposalApprovalChain.findMany({
-      where: { status: "ACTIVE" },
+      where: { status: "ACTIVE", proposal: { orgId: orgId ?? "__none__" } },
       select: { proposalId: true, currentStep: true, steps: true },
     });
 

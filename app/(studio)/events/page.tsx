@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
+import { getOrgId } from "@/lib/org";
 import { redirect } from "next/navigation";
 import EventsClient from "./EventsClient";
 import { fetchEventReports } from "@/app/(studio)/proposals/archived/actions";
@@ -12,9 +13,10 @@ export default async function EventsPage() {
   if (!session) redirect("/register");
 
   const userId = session.user?.id ?? null;
+  const orgId  = await getOrgId(userId);
 
   const proposals = await prisma.proposal.findMany({
-    where: { status: "ACTIVE" },
+    where: { status: "ACTIVE", orgId: orgId ?? "__none__" },
     include: {
       authors:       { orderBy: { isPrimary: "desc" } },
       tags:          true,

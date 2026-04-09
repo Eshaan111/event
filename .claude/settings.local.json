@@ -16,7 +16,8 @@
       "Bash(grep -v \"Warning\\\\|SSL\\\\|sslmode\\\\|libpq\\\\|major version\\\\|semantics\\\\|compatibility\\\\|See https\\\\|Use \\\\`\")",
       "Bash(ls C:\\\\Users\\\\ESHAAN\\\\HAKUR\\\\aloo-samosa\\\\types*)",
       "Bash(bash:*)",
-      "Bash(npx --prefix \"C:/Users/ESHAAN/HAKUR/aloo-samosa\" tsc --noEmit)"
+      "Bash(npx --prefix \"C:/Users/ESHAAN/HAKUR/aloo-samosa\" tsc --noEmit)",
+      "Bash(wc:*)"
     ]
   }
 }

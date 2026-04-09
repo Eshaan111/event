@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
+import { getOrgId } from "@/lib/org";
 import { redirect } from "next/navigation";
 import ArchiveClient from "./ArchiveClient";
 import { fetchEventReports } from "./actions";
@@ -11,9 +12,12 @@ export default async function ArchivedProposalsPage() {
   const session = await auth();
   if (!session) redirect("/register");
 
-  // Fetch all completed + rejected proposals
+  const orgId = await getOrgId(session.user?.id);
+
+  // Fetch all completed + rejected proposals for this org
   const proposals = await prisma.proposal.findMany({
     where: {
+      orgId:  orgId ?? "__none__",
       status: {
         in: ["COMPLETED", "REJECTED"] as never[],
       },

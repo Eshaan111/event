@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
+import { getOrgId } from "@/lib/org";
 import ProposalDetailClient from "./ProposalDetailClient";
 import type { SerializedProposal, SerializedChain, SerializedVersion, SerializedMeeting, SerializedComment } from "./ProposalDetailClient";
 import type { ChainStep } from "./actions";
@@ -18,18 +19,21 @@ export async function generateMetadata({ params }: Props) {
 export default async function ProposalDetailPage({ params }: Props) {
   const { id } = await params;
 
-  const [proposal, session, rawChains, departments, rawVersions, rawMeetings, rawComments] = await Promise.all([
+  const session = await auth();
+  const orgId   = await getOrgId(session?.user?.id);
+
+  const [proposal, rawChains, departments, rawVersions, rawMeetings, rawComments] = await Promise.all([
     prisma.proposal.findUnique({
       where:   { id },
       include: { authors: { orderBy: { isPrimary: "desc" } }, tags: true },
     }),
-    auth(),
     prisma.proposalApprovalChain.findMany({
       where:   { proposalId: id },
       include: { department: { select: { id: true, name: true } } },
       orderBy: { createdAt: "asc" },
     }),
     prisma.department.findMany({
+      where:  { orgId: orgId ?? "__none__" },
       select:  {
         id: true,
         name: true,
@@ -51,7 +55,8 @@ export default async function ProposalDetailPage({ params }: Props) {
     }),
   ]);
 
-  if (!proposal) notFound();
+  // Guard: proposal must exist and belong to the current user's org
+  if (!proposal || (proposal.orgId && proposal.orgId !== orgId)) notFound();
 
   // Resolve whether the signed-in user can manage proposals (delete / schedule meetings)
   const sessionUserId = session?.user?.id ?? null;

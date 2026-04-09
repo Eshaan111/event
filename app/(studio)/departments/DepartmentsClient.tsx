@@ -733,10 +733,12 @@ export default function DepartmentsClient({
   rootDepts,
   editableDeptIds,
   currentUserOrgRole,
+  canCreateDept,
 }: {
   rootDepts:          SerializedDepartment[];
   editableDeptIds:    string[] | "ALL";
   currentUserOrgRole: string | null;
+  canCreateDept:      boolean;
 }) {
   const [createOpen, setCreateOpen] = useState(false);
 
@@ -745,9 +747,6 @@ export default function DepartmentsClient({
     if (editableDeptIds === "ALL") return true;
     return editableDeptIds.includes(deptId);
   }
-
-  // Whether the user can manage anything at all (gates top-level actions)
-  const hasAnyAccess = editableDeptIds === "ALL" || editableDeptIds.length > 0;
 
   function flatAll(depts: SerializedDepartment[]): SerializedDepartment[] {
     return depts.flatMap((d) => [d, ...flatAll(d.children)]);
@@ -788,7 +787,7 @@ export default function DepartmentsClient({
               Manage the structural hierarchy of your organisation. Add signed-in members directly or generate secure invite links for new people.
             </p>
           </div>
-          {hasAnyAccess && (
+          {canCreateDept && (
             <button
               onClick={() => setCreateOpen((v) => !v)}
               className="px-6 py-3 rounded-xl font-label font-black text-[11px] uppercase tracking-widest transition-all active:scale-95 shrink-0"
@@ -837,7 +836,7 @@ export default function DepartmentsClient({
           <span className="material-symbols-outlined text-outline-variant" style={{ fontSize: "3rem" }}>account_tree</span>
           <p className="font-headline text-xl font-bold text-on-surface">No departments yet</p>
           <p className="font-body text-sm text-on-surface-variant max-w-xs">Create your first structural node to start building the hierarchy.</p>
-          {hasAnyAccess && (
+          {canCreateDept && (
             <button onClick={() => setCreateOpen(true)} className="mt-2 px-6 py-3 rounded-xl font-label font-black text-[11px] uppercase tracking-widest bg-primary text-on-primary hover:bg-primary-dim transition-all">+ New Department</button>
           )}
         </div>

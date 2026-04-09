@@ -15,8 +15,9 @@ export default async function RedeemInvitePage({ searchParams }: Props) {
 
   const invite = await prisma.departmentInvite.findUnique({
     where:   { token },
-    include: { department: { select: { name: true } } },
+    include: { department: { select: { name: true, orgId: true } } },
   });
+  const inviteOrgId = invite?.department?.orgId ?? null;
 
   if (!invite || invite.usedAt || invite.expiresAt < new Date()) redirect("/departments");
 
@@ -54,19 +55,24 @@ export default async function RedeemInvitePage({ searchParams }: Props) {
     });
   }
 
-  // If the invite carried an org role assignment, create OrgMember (skip if they already have one)
-  if (invite.orgRole) {
-    const existingOrgMember = await prisma.orgMember.findUnique({ where: { userId: user.id } });
-    if (!existingOrgMember) {
-      await prisma.orgMember.create({
-        data: {
-          userId:  user.id,
-          name:    user.name ?? user.email,
-          email:   user.email,
-          orgRole: invite.orgRole,
-        },
-      });
-    }
+  // Ensure the redeemer has an OrgMember record linked to this org
+  const existingOrgMember = await prisma.orgMember.findUnique({ where: { userId: user.id } });
+  if (!existingOrgMember) {
+    await prisma.orgMember.create({
+      data: {
+        userId:  user.id,
+        name:    user.name ?? user.email,
+        email:   user.email,
+        orgRole: invite.orgRole ?? "ASSOCIATE",
+        orgId:   inviteOrgId ?? undefined,
+      },
+    });
+  } else if (!existingOrgMember.orgId && inviteOrgId) {
+    // Backfill orgId for existing OrgMember without one
+    await prisma.orgMember.update({
+      where: { id: existingOrgMember.id },
+      data:  { orgId: inviteOrgId },
+    });
   }
 
   await prisma.departmentInvite.update({

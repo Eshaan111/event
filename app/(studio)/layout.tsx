@@ -1,11 +1,28 @@
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
+import { getOrgId } from "@/lib/org";
 import SideNav from "@/app/components/SideNav";
 import TopNav from "@/app/components/TopNav";
 
-export default function StudioLayout({
+export default async function StudioLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth();
+  const userId  = session?.user?.id ?? null;
+
+  // If the JWT user ID no longer exists in the DB (e.g. after a dev re-seed),
+  // force re-sign-in so the user gets a fresh token with the new ID.
+  if (userId) {
+    const userExists = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+    if (!userExists) redirect("/register");
+  }
+
+  const orgId = await getOrgId(userId);
+  if (!orgId) redirect("/onboarding");
+
   return (
     <div className="flex min-h-screen">
       {/* Fixed sidebar — w-64 = 16rem */}
