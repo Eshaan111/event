@@ -36,7 +36,8 @@ export default async function DepartmentsPage() {
   const EXEC_ORG_ROLES = ["PRESIDENT", "VICE_PRESIDENT", "SECRETARY"];
 
   if (currentUserId) {
-    canCreateDept = true; // any signed-in user can create departments
+    // Only execs and OMEGA/ALPHA members can create departments
+    canCreateDept = false;
 
     const [myMemberships, orgMembership] = await Promise.all([
       // Use already-fetched members to avoid extra query
@@ -54,6 +55,7 @@ export default async function DepartmentsPage() {
       myMemberships.some((m) => m.clearance === "OMEGA" || m.clearance === "ALPHA")
     ) {
       editableDeptIds = "ALL";
+      canCreateDept   = true;
     } else {
       const managedRootIds = myMemberships
         .filter((m) => m.role === "HEAD" || m.role === "LEAD")

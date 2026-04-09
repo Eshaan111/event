@@ -20,6 +20,12 @@ export default async function StudioLayout({
     if (!userExists) redirect("/register");
   }
 
+  // Students have their own portal — redirect them away from the studio.
+  if (userId) {
+    const student = await prisma.student.findUnique({ where: { userId }, select: { id: true } });
+    if (student) redirect("/student");
+  }
+
   const orgId = await getOrgId(userId);
   if (!orgId) redirect("/onboarding");
 

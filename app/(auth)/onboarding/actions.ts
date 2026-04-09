@@ -5,19 +5,29 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getOrgId } from "@/lib/org";
 
+const DEFAULT_DEPARTMENTS: { name: string; protocol: "STANDARD" | "RESTRICTED" }[] = [
+  { name: "Marketing",         protocol: "STANDARD"   },
+  { name: "Creative Design",   protocol: "STANDARD"   },
+  { name: "Finance",           protocol: "STANDARD"   },
+  { name: "On-site Execution", protocol: "STANDARD"   },
+  { name: "Council",           protocol: "RESTRICTED" },
+];
+
+async function resolveUser() {
+  const session = await auth();
+  if (!session?.user?.email) redirect("/register");
+  const dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
+  if (!dbUser) redirect("/register");
+  return dbUser;
+}
+
 export async function createOrganization(
   _prevState: { error: string } | null,
   formData: FormData,
 ): Promise<{ error: string } | null> {
-  const session = await auth();
-  if (!session?.user?.email) redirect("/register");
-
-  // Resolve the real DB user by email — more reliable than the JWT id which can go stale after re-seeding
-  const dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
-  if (!dbUser) redirect("/register");
+  const dbUser = await resolveUser();
   const userId = dbUser.id;
 
-  // Don't create a second org if user already has one
   const existingOrgId = await getOrgId(userId);
   if (existingOrgId) redirect("/");
 
@@ -26,7 +36,47 @@ export async function createOrganization(
 
   const org = await prisma.organization.create({ data: { name } });
 
-  // Check if user already has an OrgMember (without orgId)
+  await prisma.department.createMany({
+    data: DEFAULT_DEPARTMENTS.map((d) => ({ ...d, orgId: org.id })),
+  });
+
+  const existing = await prisma.orgMember.findUnique({ where: { userId } });
+  if (existing) {
+    await prisma.orgMember.update({
+      where: { id: existing.id },
+      data:  { orgId: org.id, orgRole: "PRESIDENT" },
+    });
+  } else {
+    await prisma.orgMember.create({
+      data: {
+        userId,
+        name:    dbUser.name ?? dbUser.email ?? "Member",
+        email:   dbUser.email,
+        orgRole: "PRESIDENT",
+        orgId:   org.id,
+      },
+    });
+  }
+
+  redirect("/");
+}
+
+export async function joinOrganization(
+  _prevState: { error: string } | null,
+  formData: FormData,
+): Promise<{ error: string } | null> {
+  const dbUser = await resolveUser();
+  const userId = dbUser.id;
+
+  const existingOrgId = await getOrgId(userId);
+  if (existingOrgId) redirect("/");
+
+  const token = (formData.get("token") as string)?.trim();
+  if (!token) return { error: "Organisation token is required." };
+
+  const org = await prisma.organization.findUnique({ where: { joinToken: token } });
+  if (!org) return { error: "Invalid organisation token. Please check with your administrator." };
+
   const existing = await prisma.orgMember.findUnique({ where: { userId } });
   if (existing) {
     await prisma.orgMember.update({
@@ -39,7 +89,7 @@ export async function createOrganization(
         userId,
         name:    dbUser.name ?? dbUser.email ?? "Member",
         email:   dbUser.email,
-        orgRole: "PRESIDENT",
+        orgRole: "ASSOCIATE",
         orgId:   org.id,
       },
     });

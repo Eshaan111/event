@@ -639,10 +639,11 @@ function MemberCard({ member, featured = false }: { member: MemberCardData; feat
 
 /* ── Main client component ───────────────────────────────────── */
 
-export default function MembersClient({ members }: { members: MemberCardData[] }) {
-  const [query,   setQuery]   = useState("");
-  const [page,    setPage]    = useState(1);
-  const [showAdd, setShowAdd] = useState(false);
+export default function MembersClient({ members, joinToken }: { members: MemberCardData[]; joinToken: string | null }) {
+  const [query,     setQuery]     = useState("");
+  const [page,      setPage]      = useState(1);
+  const [showAdd,   setShowAdd]   = useState(false);
+  const [tokenCopied, setTokenCopied] = useState(false);
   const PER_PAGE = 9;
 
   const filtered = useMemo(() => {
@@ -726,6 +727,38 @@ export default function MembersClient({ members }: { members: MemberCardData[] }
           </div>
         </div>
       </section>
+
+      {/* ── Organisation Join Token ── */}
+      {joinToken && (
+        <section
+          className="ghost-border rounded-xl p-5 flex flex-wrap gap-4 items-center justify-between"
+          style={{ backgroundColor: "rgba(194,235,220,0.18)" }}
+        >
+          <div className="flex flex-col gap-0.5">
+            <span className="font-label font-bold text-[10px] uppercase tracking-widest" style={{ color: "#40665a" }}>
+              Organisation Join Token
+            </span>
+            <span className="font-mono text-sm" style={{ color: "#2a3434" }}>{joinToken}</span>
+            <span className="font-body text-[11px]" style={{ color: "#576160" }}>
+              Share this token with staff members or students so they can join this organisation when signing in.
+            </span>
+          </div>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(joinToken);
+              setTokenCopied(true);
+              setTimeout(() => setTokenCopied(false), 2000);
+            }}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl font-label font-bold text-[11px] uppercase tracking-widest transition-all hover:opacity-90 active:scale-95"
+            style={{ backgroundColor: tokenCopied ? "#40665a" : "#2d5349", color: "#defff2" }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: "1rem" }}>
+              {tokenCopied ? "check" : "content_copy"}
+            </span>
+            {tokenCopied ? "Copied!" : "Copy Token"}
+          </button>
+        </section>
+      )}
 
       {/* ── Add member panel ── */}
       {showAdd && <AddMemberPanel onClose={() => setShowAdd(false)} />}

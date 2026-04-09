@@ -56,6 +56,7 @@ export type SerializedProposal = {
     userId: string | null;
   }[];
   tags: { id: string; label: string }[];
+  voteCount?: number;
 };
 
 export type SerializedChain = {
@@ -548,6 +549,8 @@ export default function ProposalDetailClient({
   versions,
   meetings,
   comments: initialComments,
+  isReadOnly = false,
+  backHref = "/proposals",
 }: {
   proposal: SerializedProposal;
   currentUserId: string | null;
@@ -558,6 +561,8 @@ export default function ProposalDetailClient({
   versions: SerializedVersion[];
   meetings: SerializedMeeting[];
   comments: SerializedComment[];
+  isReadOnly?: boolean;
+  backHref?: string;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -883,12 +888,12 @@ export default function ProposalDetailClient({
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link
-            href="/proposals"
+            href={backHref}
             className="flex items-center gap-2 font-label text-[10px] uppercase tracking-widest font-bold transition-opacity hover:opacity-60"
             style={{ color: "#576160" }}
           >
             <span className="material-symbols-outlined" style={{ fontSize: "1rem" }}>arrow_back</span>
-            All Proposals
+            {isReadOnly ? "My Proposals" : "All Proposals"}
           </Link>
           <span style={{ color: "rgba(169,180,179,0.5)" }}>·</span>
           <span className="font-label text-[10px] uppercase tracking-widest font-bold" style={{ color: "#40665a" }}>
@@ -973,20 +978,22 @@ export default function ProposalDetailClient({
               </p>
             </div>
           </div>
-          <button
-            onClick={() =>
-              startRestoreTransition(async () => {
-                await restoreVersion(proposal.id, viewingVersion.id);
-                setViewingVersion(null);
-              })
-            }
-            disabled={isRestoring}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg font-label font-bold text-[10px] uppercase tracking-widest transition-all hover:opacity-80 disabled:opacity-40"
-            style={{ backgroundColor: "#40665a", color: "#defff2" }}
-          >
-            <span className="material-symbols-outlined text-sm">restore</span>
-            {isRestoring ? "Restoring…" : "Restore this version"}
-          </button>
+          {!isReadOnly && (
+            <button
+              onClick={() =>
+                startRestoreTransition(async () => {
+                  await restoreVersion(proposal.id, viewingVersion.id);
+                  setViewingVersion(null);
+                })
+              }
+              disabled={isRestoring}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg font-label font-bold text-[10px] uppercase tracking-widest transition-all hover:opacity-80 disabled:opacity-40"
+              style={{ backgroundColor: "#40665a", color: "#defff2" }}
+            >
+              <span className="material-symbols-outlined text-sm">restore</span>
+              {isRestoring ? "Restoring…" : "Restore this version"}
+            </button>
+          )}
         </div>
       )}
 
@@ -1015,6 +1022,19 @@ export default function ProposalDetailClient({
           </span>
           <StatusBadge status={proposal.status} />
         </div>
+
+        {/* Right: vote count */}
+        {(proposal.voteCount ?? 0) > 0 && (
+          <div
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg flex-shrink-0"
+            style={{ backgroundColor: "rgba(45,83,73,0.08)", border: "1px solid rgba(45,83,73,0.12)" }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: "0.875rem", color: "#2d5349", fontVariationSettings: "'FILL' 1" }}>favorite</span>
+            <span className="font-label font-bold text-[10px] uppercase tracking-widest" style={{ color: "#2d5349" }}>
+              {proposal.voteCount} student support{proposal.voteCount === 1 ? "" : "s"}
+            </span>
+          </div>
+        )}
 
       </div>
 
@@ -1355,8 +1375,7 @@ export default function ProposalDetailClient({
                       Original PPTX
                     </a>
                   )}
-                  {/* Banner image upload — always visible, separate from the PDF slot */}
-                  {(() => {
+                  {!isReadOnly && (() => {
                     const hasBanner = !!(liveMeta?.bannerUrl as string | null);
                     return (
                       <button
@@ -1375,20 +1394,21 @@ export default function ProposalDetailClient({
                       </button>
                     );
                   })()}
-                  {/* PDF / PPTX upload */}
-                  <button
-                    onClick={() => uploadRef.current?.click()}
-                    disabled={isReplacing}
-                    className={ctrlBtn}
-                    style={ctrlStyle}
-                  >
-                    {isReplacing ? (
-                      <span className="w-3 h-3 rounded-full border-2 border-white/30 border-t-white animate-spin inline-block" />
-                    ) : (
-                      <span className="material-symbols-outlined text-sm">upload</span>
-                    )}
-                    {isReplacing ? "Uploading…" : hasAttachment ? "Replace" : "Upload"}
-                  </button>
+                  {!isReadOnly && (
+                    <button
+                      onClick={() => uploadRef.current?.click()}
+                      disabled={isReplacing}
+                      className={ctrlBtn}
+                      style={ctrlStyle}
+                    >
+                      {isReplacing ? (
+                        <span className="w-3 h-3 rounded-full border-2 border-white/30 border-t-white animate-spin inline-block" />
+                      ) : (
+                        <span className="material-symbols-outlined text-sm">upload</span>
+                      )}
+                      {isReplacing ? "Uploading…" : hasAttachment ? "Replace" : "Upload"}
+                    </button>
+                  )}
                 </div>
 
                 {/* Bottom-right navigation */}
@@ -1493,7 +1513,7 @@ export default function ProposalDetailClient({
                       ))}
                     </div>
                   )}
-                  {!viewingVersion && (
+                  {!viewingVersion && !isReadOnly && (
                     <button
                       onClick={() => {
                         setEditTitle(proposal.title);
@@ -1896,22 +1916,34 @@ export default function ProposalDetailClient({
             </div>
           </div>
 
-          {/* Actions */}
-          <div
-            className="p-6 rounded-2xl"
-            style={{ backgroundColor: "#ffffff", border: "1px solid rgba(169,180,179,0.2)", boxShadow: "0px 4px 16px rgba(42,52,52,0.04)" }}
-          >
-            <h4
-              className="font-label text-[10px] uppercase tracking-widest font-bold mb-4"
-              style={{ color: "#576160" }}
+          {/* Actions — hidden for read-only viewers (students) */}
+          {isReadOnly ? (
+            <div
+              className="p-5 rounded-2xl flex items-center gap-3"
+              style={{ backgroundColor: "rgba(64,102,90,0.04)", border: "1px solid rgba(64,102,90,0.12)" }}
             >
-              Actions
-              {isPending && (
-                <span className="ml-2 inline-block" style={{ color: "#40665a" }}>···</span>
-              )}
-            </h4>
-            <ActionButtons />
-          </div>
+              <span className="material-symbols-outlined" style={{ fontSize: "1.125rem", color: "#40665a" }}>info</span>
+              <p className="font-label text-[10px] uppercase tracking-widest font-bold" style={{ color: "#576160" }}>
+                View only — review actions are reserved for department members
+              </p>
+            </div>
+          ) : (
+            <div
+              className="p-6 rounded-2xl"
+              style={{ backgroundColor: "#ffffff", border: "1px solid rgba(169,180,179,0.2)", boxShadow: "0px 4px 16px rgba(42,52,52,0.04)" }}
+            >
+              <h4
+                className="font-label text-[10px] uppercase tracking-widest font-bold mb-4"
+                style={{ color: "#576160" }}
+              >
+                Actions
+                {isPending && (
+                  <span className="ml-2 inline-block" style={{ color: "#40665a" }}>···</span>
+                )}
+              </h4>
+              <ActionButtons />
+            </div>
+          )}
 
           {/* Last updated */}
           <div

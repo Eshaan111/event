@@ -215,6 +215,8 @@ export async function fetchEventReports(
       highlights:       r.highlights,
       challenges:       r.challenges,
       internalRating:   r.internalRating,
+      receipts:         [],
+      media:            [],
       reportedById:     r.reportedById,
       reportedByName:   r.reportedByName,
       createdAt:        r.createdAt.toISOString(),

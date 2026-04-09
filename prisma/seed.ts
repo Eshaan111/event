@@ -541,6 +541,7 @@ async function main() {
 
   await seedMembers();
   await seedDemo();
+  await seedDummy();
 }
 
 /* ── Members & Departments seed ─────────────────────────────── */
@@ -1015,6 +1016,450 @@ async function seedDemo() {
   });
 
   console.log(`DEMO org seeded: 4 departments, ${DEMO_DEFS.length} users, 8 proposals ✓`);
+}
+
+/* ── DUMMY Org Seed ──────────────────────────────────────────── */
+
+async function seedDummy() {
+  console.log("Seeding DUMMY org…");
+
+  // ── 1. Find or create org ────────────────────────────────────
+  let org = await prisma.organization.findFirst({ where: { name: "Dummy" } });
+  if (!org) {
+    org = await prisma.organization.create({ data: { name: "Dummy" } });
+  }
+  const orgId = org.id;
+
+  // ── 2. Clean existing data for this org ─────────────────────
+  // Approval chains first (FK on proposals)
+  const existingProposalIds = (
+    await prisma.proposal.findMany({ where: { orgId }, select: { id: true } })
+  ).map((p) => p.id);
+  if (existingProposalIds.length) {
+    await prisma.proposalApprovalChain.deleteMany({
+      where: { proposalId: { in: existingProposalIds } },
+    });
+  }
+  await prisma.proposal.deleteMany({ where: { orgId } });
+
+  // Students
+  const existingStudents = await prisma.student.findMany({
+    where: { orgId },
+    select: { id: true, userId: true },
+  });
+  for (const s of existingStudents) {
+    await prisma.student.delete({ where: { id: s.id } });
+    await prisma.user.delete({ where: { id: s.userId } });
+  }
+
+  // Dept members + depts
+  const existingDepts = await prisma.department.findMany({
+    where: { orgId },
+    select: { id: true },
+  });
+  const existingDeptIds = existingDepts.map((d) => d.id);
+  if (existingDeptIds.length) {
+    await prisma.departmentMember.deleteMany({
+      where: { departmentId: { in: existingDeptIds } },
+    });
+  }
+  await prisma.department.deleteMany({ where: { orgId } });
+
+  // Org members + users
+  const existingOrgMembers = await prisma.orgMember.findMany({
+    where:  { orgId, userId: { not: null } },
+    select: { userId: true },
+  });
+  const existingUserIds = existingOrgMembers.map((m) => m.userId!);
+  await prisma.orgMember.deleteMany({ where: { orgId } });
+  if (existingUserIds.length) {
+    await prisma.user.deleteMany({ where: { id: { in: existingUserIds }, email: { endsWith: "@dummy.seed" } } });
+  }
+
+  // ── 3. Create departments (5 default + 2 extra) ──────────────
+  const deptNames = [
+    { name: "Finance",           protocol: "STANDARD"   as const },
+    { name: "On-site Execution", protocol: "STANDARD"   as const },
+    { name: "Creative Design",   protocol: "STANDARD"   as const },
+    { name: "Marketing",         protocol: "STANDARD"   as const },
+    { name: "Council",           protocol: "RESTRICTED" as const },
+    { name: "Technology",        protocol: "STANDARD"   as const },
+    { name: "Media Relations",   protocol: "STANDARD"   as const },
+  ];
+  const depts: Record<string, string> = {};
+  for (const d of deptNames) {
+    const created = await prisma.department.create({ data: { ...d, orgId } });
+    depts[d.name] = created.id;
+  }
+
+  // ── 4. Create org members ────────────────────────────────────
+  type StaffDef = {
+    first: string; last: string;
+    orgRole: OrgRole;
+    depts: { name: string; role: MemberRole; clearance: Clearance }[];
+  };
+
+  const staffDefs: StaffDef[] = [
+    // President
+    { first: "Aryan",    last: "Kapoor",    orgRole: "PRESIDENT",
+      depts: [{ name: "Council",           role: "HEAD",   clearance: "OMEGA" }] },
+    // Dept heads
+    { first: "Meera",    last: "Iyer",      orgRole: "HEAD_FINANCE",
+      depts: [{ name: "Finance",           role: "HEAD",   clearance: "ALPHA" }] },
+    { first: "Dev",      last: "Sharma",    orgRole: "HEAD_LOGISTICS",
+      depts: [{ name: "On-site Execution", role: "HEAD",   clearance: "ALPHA" }] },
+    { first: "Pooja",    last: "Nair",      orgRole: "HEAD_CREATIVES",
+      depts: [{ name: "Creative Design",   role: "HEAD",   clearance: "ALPHA" }] },
+    { first: "Rahul",    last: "Gupta",     orgRole: "HEAD_MARKETING",
+      depts: [{ name: "Marketing",         role: "HEAD",   clearance: "ALPHA" }] },
+    { first: "Ananya",   last: "Singh",     orgRole: "PROJECT_LEAD",
+      depts: [{ name: "Technology",        role: "HEAD",   clearance: "ALPHA" }] },
+    { first: "Karan",    last: "Mehta",     orgRole: "PROJECT_LEAD",
+      depts: [{ name: "Media Relations",   role: "HEAD",   clearance: "ALPHA" }] },
+    // Leads
+    { first: "Tanya",    last: "Bose",      orgRole: "ASSOCIATE",
+      depts: [{ name: "Finance",           role: "LEAD",   clearance: "BETA"  }] },
+    { first: "Vivek",    last: "Rao",       orgRole: "ASSOCIATE",
+      depts: [{ name: "On-site Execution", role: "LEAD",   clearance: "BETA"  }] },
+    { first: "Isha",     last: "Patel",     orgRole: "ASSOCIATE",
+      depts: [{ name: "Creative Design",   role: "LEAD",   clearance: "BETA"  }] },
+    { first: "Nikhil",   last: "Verma",     orgRole: "ASSOCIATE",
+      depts: [{ name: "Marketing",         role: "LEAD",   clearance: "BETA"  }] },
+    // Members
+    { first: "Shreya",   last: "Das",       orgRole: "VOLUNTEER",
+      depts: [{ name: "Finance",           role: "MEMBER", clearance: "GAMMA" }] },
+    { first: "Akash",    last: "Kumar",     orgRole: "VOLUNTEER",
+      depts: [{ name: "On-site Execution", role: "MEMBER", clearance: "GAMMA" }] },
+    { first: "Divya",    last: "Reddy",     orgRole: "VOLUNTEER",
+      depts: [{ name: "Creative Design",   role: "MEMBER", clearance: "GAMMA" }] },
+    { first: "Rohan",    last: "Joshi",     orgRole: "VOLUNTEER",
+      depts: [{ name: "Marketing",         role: "MEMBER", clearance: "GAMMA" }] },
+    { first: "Sana",     last: "Khan",      orgRole: "VOLUNTEER",
+      depts: [{ name: "Council",           role: "MEMBER", clearance: "GAMMA" }] },
+  ];
+
+  // userId by first+last for later use
+  const userIds: Record<string, string> = {};
+
+  for (const def of staffDefs) {
+    const email       = `${def.first.toLowerCase()}.${def.last.toLowerCase()}@dummy.seed`;
+    const roleLabel   = orgRoleLabel(def.orgRole);
+    const displayName = `${roleLabel} - ${def.first} ${def.last}`;
+
+    const user = await prisma.user.create({ data: { name: displayName, email } });
+    userIds[`${def.first} ${def.last}`] = user.id;
+
+    await prisma.orgMember.create({
+      data: { userId: user.id, name: displayName, email, orgRole: def.orgRole, orgId },
+    });
+
+    for (const d of def.depts) {
+      await prisma.departmentMember.create({
+        data: {
+          departmentId: depts[d.name],
+          userId:       user.id,
+          name:         displayName,
+          email,
+          role:         d.role,
+          clearance:    d.clearance,
+        },
+      });
+    }
+  }
+
+  // ── 5. Create dummy students ─────────────────────────────────
+  const studentDefs = [
+    { first: "Aarav",   last: "Sharma",  number: "2023BCS001", branch: "Computer Science", year: "3rd Year" },
+    { first: "Priya",   last: "Patel",   number: "2022ECE042", branch: "Electronics",      year: "4th Year" },
+    { first: "Rohan",   last: "Verma",   number: "2024MBA010", branch: "Management",       year: "1st Year" },
+    { first: "Sneha",   last: "Gupta",   number: "2023MEC088", branch: "Mechanical Engg",  year: "3rd Year" },
+    { first: "Vikram",  last: "Nair",    number: "2022CIV019", branch: "Civil Engineering", year: "4th Year" },
+  ];
+
+  const studentIds: Record<string, string> = {}; // "first last" → student.id
+
+  for (const def of studentDefs) {
+    const email = `${def.first.toLowerCase()}.${def.last.toLowerCase()}@dummy.student`;
+    const user = await prisma.user.create({
+      data: { name: `${def.first} ${def.last}`, email, role: "STUDENT" },
+    });
+    const student = await prisma.student.create({
+      data: {
+        userId:       user.id,
+        name:         `${def.first} ${def.last}`,
+        email,
+        studentNumber: def.number,
+        branch:       def.branch,
+        year:         def.year,
+        orgId,
+      },
+    });
+    studentIds[`${def.first} ${def.last}`] = student.id;
+  }
+
+  // ── 6. Helper: build a student approval chain ────────────────
+  // STUDENT_DEPT_ORDER: Finance → On-site Execution → Creative Design → Marketing → Council
+  const STUDENT_DEPT_ORDER = [
+    "Finance", "On-site Execution", "Creative Design", "Marketing", "Council",
+  ];
+
+  type StepStatus = "PENDING" | "ACTIVE" | "APPROVED" | "REJECTED";
+
+  function buildSteps(deptId: string, memberRows: { userId: string | null; name: string; role: MemberRole }[]) {
+    const roleOrder: MemberRole[] = ["MEMBER", "LEAD", "HEAD"];
+    return roleOrder.map((role) => {
+      const members = memberRows
+        .filter((m) => m.role === role)
+        .map((m) => ({ userId: m.userId, name: m.name, initial: m.name.charAt(0).toUpperCase() }));
+      return {
+        role,
+        label: role === "HEAD" ? "Department Head" : role === "LEAD" ? "Lead Review" : "Member Review",
+        members,
+        approvals: [] as { userId: string; name: string; approvedAt: string }[],
+        status: "PENDING" as StepStatus,
+      };
+    }).filter((s) => s.members.length > 0);
+  }
+
+  async function getDeptMembers(deptName: string) {
+    return prisma.departmentMember.findMany({
+      where:  { departmentId: depts[deptName] },
+      select: { userId: true, name: true, role: true },
+    });
+  }
+
+  // Build full chain for a proposal, approving depts up to `approvedUpTo` (exclusive)
+  // and setting `activeIdx` dept as ACTIVE at step `activeStep`
+  async function createStudentChains(
+    proposalId: string,
+    approvedUpTo: number,  // number of leading depts that are fully APPROVED
+    activeDepth: number,   // how many steps are approved within the current (active) dept
+  ) {
+    for (let i = 0; i < STUDENT_DEPT_ORDER.length; i++) {
+      const deptName = STUDENT_DEPT_ORDER[i];
+      const deptId   = depts[deptName];
+      const members  = await getDeptMembers(deptName);
+      const steps    = buildSteps(deptId, members);
+      if (steps.length === 0) continue;
+
+      let chainStatus: "ACTIVE" | "APPROVED" | "REJECTED" = "ACTIVE";
+      let currentStep = 0;
+
+      if (i < approvedUpTo) {
+        // This dept is fully approved
+        chainStatus = "APPROVED";
+        currentStep = steps.length - 1;
+        for (const step of steps) {
+          step.status = "APPROVED";
+          step.approvals = step.members
+            .filter((m) => m.userId)
+            .slice(0, 1)
+            .map((m) => ({ userId: m.userId!, name: m.name, approvedAt: new Date().toISOString() }));
+        }
+      } else if (i === approvedUpTo) {
+        // This is the active dept
+        chainStatus = "ACTIVE";
+        currentStep = Math.min(activeDepth, steps.length - 1);
+        for (let s = 0; s < steps.length; s++) {
+          if (s < activeDepth) {
+            steps[s].status = "APPROVED";
+            steps[s].approvals = steps[s].members
+              .filter((m) => m.userId)
+              .slice(0, 1)
+              .map((m) => ({ userId: m.userId!, name: m.name, approvedAt: new Date().toISOString() }));
+          } else if (s === activeDepth) {
+            steps[s].status = "ACTIVE";
+          }
+        }
+      }
+      // depts beyond active stay PENDING with no changes
+
+      await prisma.proposalApprovalChain.create({
+        data: {
+          proposalId,
+          departmentId: deptId,
+          currentStep,
+          status: chainStatus,
+          steps,
+        },
+      });
+    }
+  }
+
+  // ── 7. Create org proposals ──────────────────────────────────
+
+  await prisma.proposal.create({
+    data: {
+      orgId,
+      type:          ProposalType.EVENT,
+      status:        ProposalStatus.APPROVED,
+      title:         "Dummy Annual Tech Fest",
+      description:   "A two-day technology festival celebrating innovation across AI, robotics, and software. Keynotes, hackathons, and a startup expo.",
+      imageGradient: "linear-gradient(135deg, #0d1b2a 0%, #1b3a5c 50%, #0a1520 100%)",
+      coverImageUrl: "https://picsum.photos/seed/dummytechfest/800/500",
+      dateEst:       "Aug 2026",
+      location:      "College Auditorium, Main Campus",
+      budget:        150000,
+      flowState: makeFlowState({
+        submitter: { name: "Aryan Kapoor", initial: "A", timestamp: "MAR 01, 09:00" },
+        reviewer:  { name: "Meera Iyer",   initial: "M", timestamp: "MAR 10, 11:00" },
+        approver:  { name: "Aryan Kapoor", initial: "A", timestamp: "MAR 15, 14:00" },
+        activeLabel: "Approved",
+      }),
+      metadata: { expectedAttendance: 500, riskLevel: "low", lastUpdatedBy: "Aryan Kapoor" },
+      authors: { create: [{ name: "Aryan Kapoor", role: "President", initial: "A", isPrimary: true, userId: userIds["Aryan Kapoor"] }] },
+      tags:    { create: [{ label: "Approved" }, { label: "Technology" }, { label: "Annual" }] },
+    },
+  });
+
+  await prisma.proposal.create({
+    data: {
+      orgId,
+      type:          ProposalType.EVENT,
+      status:        ProposalStatus.DRAFT,
+      title:         "Freshers Welcome Night",
+      description:   "An evening welcome event for incoming first-year students. DJ, food stalls, games, and a campus tour component.",
+      imageGradient: "linear-gradient(135deg, #1a0533 0%, #3d0f66 50%, #12031f 100%)",
+      dateEst:       "Jul 2026",
+      location:      "College Grounds",
+      budget:        40000,
+      flowState: makeFlowState({
+        submitter: { name: "Rahul Gupta", initial: "R", timestamp: "APR 01, 10:00" },
+        reviewer:  { name: "Not Assigned", initial: "—", timestamp: "PENDING" },
+        approver:  { name: "Not Assigned", initial: "—", timestamp: "PENDING" },
+        activeLabel: "Draft Stage",
+      }),
+      metadata: { expectedAttendance: 300, riskLevel: "low", lastUpdatedBy: "Rahul Gupta" },
+      authors: { create: [{ name: "Rahul Gupta", role: "Marketing Head", initial: "R", isPrimary: true, userId: userIds["Rahul Gupta"] }] },
+      tags:    { create: [{ label: "Draft" }, { label: "Freshers" }] },
+    },
+  });
+
+  await prisma.proposal.create({
+    data: {
+      orgId,
+      type:          ProposalType.INTERNAL,
+      status:        ProposalStatus.ACTIVE,
+      title:         "Campus Media Rebranding",
+      description:   "Rebranding the college media presence — new logo, social media templates, and a launch video series.",
+      imageGradient: "linear-gradient(135deg, #1f1a0a 0%, #3d3010 50%, #0f0d05 100%)",
+      dateEst:       "Jun 2026",
+      location:      "Media Lab",
+      budget:        25000,
+      flowState: makeFlowState({
+        submitter: { name: "Karan Mehta", initial: "K", timestamp: "FEB 20, 09:00" },
+        reviewer:  { name: "Pooja Nair",  initial: "P", timestamp: "MAR 05, 13:00" },
+        approver:  { name: "Aryan Kapoor", initial: "A", timestamp: "MAR 12, 11:00" },
+        activeLabel: "In Production",
+      }),
+      metadata: { internalOnly: true, riskLevel: "low", lastUpdatedBy: "Karan Mehta" },
+      authors: { create: [
+        { name: "Karan Mehta", role: "Media Relations Head", initial: "K", isPrimary: true,  userId: userIds["Karan Mehta"] },
+        { name: "Pooja Nair",  role: "Creative Lead",        initial: "P", isPrimary: false, userId: userIds["Pooja Nair"] },
+      ]},
+      tags: { create: [{ label: "Active" }, { label: "Internal" }, { label: "Media" }] },
+    },
+  });
+
+  // ── 8. Create student proposals with approval chains ─────────
+
+  // Student proposal 1: just submitted → Finance chain active at step 0 (MEMBER review)
+  const sp1 = await prisma.proposal.create({
+    data: {
+      orgId,
+      studentId:     studentIds["Aarav Sharma"],
+      type:          ProposalType.EVENT,
+      status:        ProposalStatus.DRAFT,
+      title:         "Inter-College Coding Hackathon",
+      description:   "A 24-hour hackathon open to all engineering colleges in the city. Participants compete in teams of 4 to build solutions around a surprise theme. Prizes worth ₹50,000.",
+      imageGradient: "linear-gradient(135deg, #0a1628 0%, #1a3a5c 50%, #061020 100%)",
+      dateEst:       "Sep 2026",
+      location:      "Computer Science Block, Lab 3",
+      budget:        55000,
+      metadata: {
+        targetAudience: "Engineering students",
+        expectedAttendance: 120,
+        potentialSponsors: "TechCorp India, HackerEarth",
+        riskLevel: "low",
+        lastUpdatedBy: "Aarav Sharma",
+      },
+      flowState: makeFlowState({
+        submitter: { name: "Aarav Sharma", initial: "A", timestamp: "APR 05, 10:00" },
+        reviewer:  { name: "Not Assigned", initial: "—", timestamp: "PENDING" },
+        approver:  { name: "Not Assigned", initial: "—", timestamp: "PENDING" },
+        activeLabel: "Under Review",
+      }),
+      authors: { create: [{ name: "Aarav Sharma", role: "Student Organiser", initial: "A", isPrimary: true }] },
+      tags:    { create: [{ label: "Student" }, { label: "Hackathon" }, { label: "Tech" }] },
+    },
+  });
+  await createStudentChains(sp1.id, 0, 0); // Finance active at MEMBER step
+
+  // Student proposal 2: Finance approved, On-site Execution active at LEAD step
+  const sp2 = await prisma.proposal.create({
+    data: {
+      orgId,
+      studentId:     studentIds["Priya Patel"],
+      type:          ProposalType.EVENT,
+      status:        ProposalStatus.DRAFT,
+      title:         "Women in Tech Symposium",
+      description:   "A half-day symposium featuring panel discussions, networking, and workshops focused on encouraging women into technology careers. Guest speakers from industry and academia.",
+      imageGradient: "linear-gradient(135deg, #2d0a3e 0%, #5c1a6e 50%, #1a0525 100%)",
+      dateEst:       "Oct 2026",
+      location:      "Seminar Hall B",
+      budget:        30000,
+      metadata: {
+        targetAudience: "Students & Faculty",
+        expectedAttendance: 80,
+        potentialSponsors: "Google India, WiE IEEE",
+        riskLevel: "low",
+        lastUpdatedBy: "Priya Patel",
+      },
+      flowState: makeFlowState({
+        submitter: { name: "Priya Patel",  initial: "P", timestamp: "MAR 20, 14:00" },
+        reviewer:  { name: "Meera Iyer",   initial: "M", timestamp: "APR 01, 11:00" },
+        approver:  { name: "Not Assigned", initial: "—", timestamp: "PENDING" },
+        activeLabel: "Under Review",
+      }),
+      authors: { create: [{ name: "Priya Patel", role: "Student Organiser", initial: "P", isPrimary: true }] },
+      tags:    { create: [{ label: "Student" }, { label: "Symposium" }, { label: "Women in Tech" }] },
+    },
+  });
+  await createStudentChains(sp2.id, 1, 1); // Finance approved; On-site active at LEAD step
+
+  // Student proposal 3: Council approved (all approved)
+  const sp3 = await prisma.proposal.create({
+    data: {
+      orgId,
+      studentId:     studentIds["Rohan Verma"],
+      type:          ProposalType.EVENT,
+      status:        ProposalStatus.APPROVED,
+      title:         "Annual Business Plan Competition",
+      description:   "A two-round business plan competition open to all MBA and BBA students. Round 1 is written submissions; Round 2 is live pitches to a panel of industry judges.",
+      imageGradient: "linear-gradient(135deg, #0f2a1a 0%, #1e4a30 50%, #0a1f12 100%)",
+      dateEst:       "Nov 2026",
+      location:      "Management Block, Seminar Hall",
+      budget:        45000,
+      metadata: {
+        targetAudience: "MBA & BBA students",
+        expectedAttendance: 60,
+        potentialSponsors: "KPMG, Deloitte India",
+        riskLevel: "low",
+        lastUpdatedBy: "Rohan Verma",
+      },
+      flowState: makeFlowState({
+        submitter: { name: "Rohan Verma",  initial: "R", timestamp: "FEB 10, 09:00" },
+        reviewer:  { name: "Meera Iyer",   initial: "M", timestamp: "FEB 20, 14:00" },
+        approver:  { name: "Aryan Kapoor", initial: "A", timestamp: "MAR 01, 10:00" },
+        activeLabel: "Approved",
+      }),
+      authors: { create: [{ name: "Rohan Verma", role: "Student Organiser", initial: "R", isPrimary: true }] },
+      tags:    { create: [{ label: "Student" }, { label: "Competition" }, { label: "Business" }] },
+    },
+  });
+  await createStudentChains(sp3.id, STUDENT_DEPT_ORDER.length, 0); // all depts approved
+
+  console.log(`DUMMY org seeded: 7 departments, ${staffDefs.length} staff, ${studentDefs.length} students, 3 org + 3 student proposals ✓`);
 }
 
 main()

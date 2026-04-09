@@ -7,10 +7,11 @@ import type { Proposal, ProposalAuthor, ProposalTag } from "@prisma/client";
 import { format } from "date-fns";
 
 export type ProposalWithRelations = Omit<Proposal, "createdAt" | "updatedAt"> & {
-  createdAt: string;
-  updatedAt: string;
-  authors: ProposalAuthor[];
-  tags: ProposalTag[];
+  createdAt:  string;
+  updatedAt:  string;
+  authors:    ProposalAuthor[];
+  tags:       ProposalTag[];
+  voteCount?: number;
 };
 
 /* ── Helpers ────────────────────────────────────────────────── */
@@ -305,9 +306,15 @@ function ImageCard({ p, onOpen }: { p: ProposalWithRelations; onOpen: () => void
         )}
 
         <div className="flex items-center justify-between pt-6" style={{ borderTop: "1px solid rgba(155,168,167,0.2)" }}>
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-1">
             <span className="font-label font-black text-[9px] uppercase tracking-[0.15em]" style={{ color: "#707977" }}>Date Est.</span>
             <span className="text-xs font-bold" style={{ color: "#1a1f1f" }}>{p.dateEst ?? "TBD"}</span>
+            {(p.voteCount ?? 0) > 0 && (
+              <span className="flex items-center gap-1 font-label text-[9px] uppercase tracking-widest mt-0.5" style={{ color: "#2d5349" }}>
+                <span className="material-symbols-outlined" style={{ fontSize: "0.75rem", fontVariationSettings: "'FILL' 1" }}>favorite</span>
+                {p.voteCount} student support{p.voteCount === 1 ? "" : "s"}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <Link
@@ -350,9 +357,15 @@ function TextCard({ p, onOpen }: { p: ProposalWithRelations; onOpen: () => void 
         <h3 className="font-headline text-xl font-bold mb-4 leading-tight" style={{ color: "#1a1f1f" }}>{p.title}</h3>
         <p className="text-sm font-body font-medium leading-relaxed mb-10" style={{ color: "rgba(64,73,72,0.8)" }}>{p.description}</p>
         <div className="flex items-center justify-between pt-6" style={{ borderTop: "1px solid rgba(155,168,167,0.2)" }}>
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-1">
             <span className="font-label font-black text-[9px] uppercase tracking-[0.15em]" style={{ color: "#707977" }}>Proposer</span>
             <span className="text-xs font-bold" style={{ color: "#1a1f1f" }}>{primaryAuthor?.name ?? "—"}</span>
+            {(p.voteCount ?? 0) > 0 && (
+              <span className="flex items-center gap-1 font-label text-[9px] uppercase tracking-widest mt-0.5" style={{ color: "#2d5349" }}>
+                <span className="material-symbols-outlined" style={{ fontSize: "0.75rem", fontVariationSettings: "'FILL' 1" }}>favorite</span>
+                {p.voteCount} student support{p.voteCount === 1 ? "" : "s"}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <Link

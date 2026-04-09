@@ -14,7 +14,7 @@ export default async function ProposalsPage() {
   const [proposals] = await Promise.all([
     prisma.proposal.findMany({
       where:   { orgId: orgId ?? "__none__" },
-      include: { authors: true, tags: true },
+      include: { authors: true, tags: true, _count: { select: { votes: true } } },
       orderBy: { createdAt: "desc" },
     }),
   ]);
@@ -45,8 +45,9 @@ export default async function ProposalsPage() {
 
   const serialized: ProposalWithRelations[] = proposals.map((p) => ({
     ...p,
-    createdAt: p.createdAt.toISOString(),
-    updatedAt: p.updatedAt.toISOString(),
+    createdAt:  p.createdAt.toISOString(),
+    updatedAt:  p.updatedAt.toISOString(),
+    voteCount:  p._count.votes,
   }));
 
   return (

@@ -8,6 +8,7 @@ import {
   saveBannerImage,
 } from "@/lib/proposal-attachments";
 import { revalidatePath } from "next/cache";
+import { getNextStudentDept } from "@/lib/student-flow";
 
 /* ── Flow state shape ─────────────────────────────────────────── */
 
@@ -393,7 +394,29 @@ export async function approveChainStep(proposalId: string, chainId: string) {
   });
 
   if (newChainStatus === "APPROVED") {
-    // If no other chain is still active, approve the proposal
+    // For student proposals: activate the next department in sequence
+    const proposal = await prisma.proposal.findUnique({
+      where:  { id: proposalId },
+      select: { studentId: true, orgId: true },
+    });
+
+    if (proposal?.studentId && proposal.orgId) {
+      const nextChain = await getNextStudentDept(proposal.orgId, chain.department.name);
+      if (nextChain) {
+        await prisma.proposalApprovalChain.create({
+          data: {
+            proposalId,
+            departmentId: nextChain.dept.id,
+            currentStep:  0,
+            status:       "ACTIVE",
+            steps:        nextChain.steps as never,
+          },
+        });
+      }
+    }
+
+    // Mark proposal APPROVED only once no active chains remain
+    // (for student flow this naturally happens after Council approves)
     const activeCount = await prisma.proposalApprovalChain.count({
       where: { proposalId, status: "ACTIVE" },
     });

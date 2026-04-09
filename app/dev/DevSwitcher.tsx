@@ -4,12 +4,13 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { useState } from "react";
 
 export type SeedUser = {
-  id:       string;
-  name:     string;
-  email:    string;
-  orgRole:  string;
+  id:        string;
+  name:      string;
+  email:     string;
+  orgRole:   string;
   deptName?: string;
   deptRole?: string;
+  isStudent?: boolean;
 };
 
 export type OrgSection = {
@@ -73,9 +74,9 @@ export default function DevSwitcher({
   const { status } = useSession();
   const [loading, setLoading] = useState<string | null>(null);
 
-  async function handleSignIn(email: string, userId: string) {
+  async function handleSignIn(email: string, userId: string, isStudent?: boolean) {
     setLoading(userId);
-    await signIn("dev-seed", { email, callbackUrl: "/" });
+    await signIn("dev-seed", { email, callbackUrl: isStudent ? "/student" : "/" });
     setLoading(null);
   }
 
@@ -86,19 +87,44 @@ export default function DevSwitcher({
 
   const totalUsers = orgs.reduce((s, o) => s + o.groups.reduce((gs, g) => gs + g.users.length, 0), 0);
   const isDemoOrg  = (orgName: string) => orgName === "DEMO";
+  const isDummyOrg = (orgName: string) => orgName === "Dummy";
+
+  const DUMMY_GROUP_HEADER: Record<string, { bg: string; text: string }> = {
+    "Finance":           { bg: "#14532d", text: "#ffffff" },
+    "On-site Execution": { bg: "#1e3a5f", text: "#ffffff" },
+    "Creative Design":   { bg: "#4c1d95", text: "#ffffff" },
+    "Marketing":         { bg: "#7c2d12", text: "#ffffff" },
+    "Council":           { bg: "#1c1917", text: "#ffffff" },
+    "Technology":        { bg: "#0c4a6e", text: "#ffffff" },
+    "Media Relations":   { bg: "#831843", text: "#ffffff" },
+    "Students":          { bg: "#064e3b", text: "#ffffff" },
+  };
+  const DUMMY_GROUP_LIGHT: Record<string, { bg: string; text: string }> = {
+    "Finance":           { bg: "#dcfce7", text: "#14532d" },
+    "On-site Execution": { bg: "#dbeafe", text: "#1e3a5f" },
+    "Creative Design":   { bg: "#ede9fe", text: "#4c1d95" },
+    "Marketing":         { bg: "#ffedd5", text: "#7c2d12" },
+    "Council":           { bg: "#e7e5e4", text: "#1c1917" },
+    "Technology":        { bg: "#e0f2fe", text: "#0c4a6e" },
+    "Media Relations":   { bg: "#fce7f3", text: "#831843" },
+    "Students":          { bg: "#d1fae5", text: "#064e3b" },
+  };
 
   function groupColor(orgName: string, groupName: string): { bg: string; text: string } {
-    if (isDemoOrg(orgName)) return DEMO_DEPT_LIGHT[groupName] ?? { bg: "#f0f0f0", text: "#333" };
+    if (isDemoOrg(orgName))  return DEMO_DEPT_LIGHT[groupName]  ?? { bg: "#f0f0f0", text: "#333" };
+    if (isDummyOrg(orgName)) return DUMMY_GROUP_LIGHT[groupName] ?? { bg: "#f0f0f0", text: "#333" };
     return SEED_GROUP_COLOR[groupName] ?? SEED_GROUP_COLOR.General;
   }
 
   function groupHeaderColor(orgName: string, groupName: string): { bg: string; text: string } {
-    if (isDemoOrg(orgName)) return DEMO_DEPT_COLOR[groupName] ?? { bg: "#333", text: "#fff" };
+    if (isDemoOrg(orgName))  return DEMO_DEPT_COLOR[groupName]   ?? { bg: "#333", text: "#fff" };
+    if (isDummyOrg(orgName)) return DUMMY_GROUP_HEADER[groupName] ?? { bg: "#333", text: "#fff" };
     return { bg: "transparent", text: "#40665a" };
   }
 
   function userSubLabel(user: SeedUser, orgName: string): string {
-    if (isDemoOrg(orgName) && user.deptRole) {
+    if (user.isStudent) return user.orgRole; // orgRole holds extra info for students
+    if ((isDemoOrg(orgName) || isDummyOrg(orgName)) && user.deptRole) {
       return DEPT_ROLE_LABEL[user.deptRole] ?? user.deptRole;
     }
     return ORG_ROLE_LABEL[user.orgRole] ?? user.orgRole;
@@ -157,7 +183,7 @@ export default function DevSwitcher({
 
               {/* Org header */}
               <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.5rem" }}>
-                <div style={{ width: 10, height: 10, borderRadius: "50%", backgroundColor: isDemoOrg(org.orgName) ? "#9c59d1" : "#40665a" }} />
+                <div style={{ width: 10, height: 10, borderRadius: "50%", backgroundColor: isDemoOrg(org.orgName) ? "#9c59d1" : isDummyOrg(org.orgName) ? "#d97706" : "#40665a" }} />
                 <h2 style={{ fontSize: "0.85rem", letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 700, color: "#2a3434", margin: 0 }}>
                   {org.orgName}
                 </h2>
@@ -190,15 +216,15 @@ export default function DevSwitcher({
                       {/* Members grid */}
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "0.625rem" }}>
                         {users.map((user) => {
-                          const isActive  = user.id === currentUserId;
-                          const isLoading = loading === user.id;
+                          const isActive    = user.id === currentUserId;
+                          const isLoading   = loading === user.id;
                           const displayName = user.name.split(" - ").pop() ?? user.name;
                           const subLabel    = userSubLabel(user, org.orgName);
 
                           return (
                             <button
                               key={user.id}
-                              onClick={() => handleSignIn(user.email, user.id)}
+                              onClick={() => handleSignIn(user.email, user.id, user.isStudent)}
                               disabled={!!loading || isActive}
                               style={{
                                 display: "flex", alignItems: "center", gap: "0.75rem",
@@ -228,8 +254,8 @@ export default function DevSwitcher({
                               {/* Avatar */}
                               <div style={{
                                 width: 36, height: 36, borderRadius: "50%", flexShrink: 0,
-                                backgroundColor: isActive ? cardClr.bg : (isDemo ? DEMO_DEPT_COLOR[groupName]?.bg ?? "#333" : SEED_GROUP_COLOR[groupName]?.bg ?? "#576160"),
-                                color: isActive ? cardClr.text : (isDemo ? DEMO_DEPT_COLOR[groupName]?.text ?? "#fff" : SEED_GROUP_COLOR[groupName]?.text ?? "#fff"),
+                                backgroundColor: isActive ? cardClr.bg : (isDemo ? DEMO_DEPT_COLOR[groupName]?.bg : isDummyOrg(org.orgName) ? DUMMY_GROUP_HEADER[groupName]?.bg : SEED_GROUP_COLOR[groupName]?.bg) ?? "#576160",
+                                color: isActive ? cardClr.text : (isDemo ? DEMO_DEPT_COLOR[groupName]?.text : isDummyOrg(org.orgName) ? DUMMY_GROUP_HEADER[groupName]?.text : SEED_GROUP_COLOR[groupName]?.text) ?? "#fff",
                                 display: "flex", alignItems: "center", justifyContent: "center",
                                 fontSize: "0.75rem", fontWeight: 700,
                                 border: `2px solid ${isActive ? cardClr.bg : "rgba(169,180,179,0.25)"}`,

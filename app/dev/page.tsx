@@ -101,9 +101,64 @@ export default async function DevPage() {
       })),
   };
 
+  /* ── DUMMY Org — grouped by department + students ────────── */
+  const dummyDeptOrder = [
+    "Finance", "On-site Execution", "Creative Design",
+    "Marketing", "Council", "Technology", "Media Relations",
+  ];
+
+  const dummyStaffMembers = await prisma.departmentMember.findMany({
+    where: { user: { email: { endsWith: "@dummy.seed" } } },
+    include: {
+      user:       { select: { id: true, name: true, email: true } },
+      department: { select: { name: true } },
+    },
+    orderBy: [{ department: { name: "asc" } }, { role: "asc" }],
+  });
+
+  const dummyGroupMap = new Map<string, SeedUser[]>();
+  for (const m of dummyStaffMembers) {
+    if (!m.user) continue;
+    const deptName = m.department.name;
+    if (!dummyGroupMap.has(deptName)) dummyGroupMap.set(deptName, []);
+    dummyGroupMap.get(deptName)!.push({
+      id:       m.user.id,
+      name:     m.user.name ?? "",
+      email:    m.user.email ?? "",
+      orgRole:  "",
+      deptName: deptName,
+      deptRole: m.role,
+    });
+  }
+
+  // Students
+  const dummyStudents = await prisma.student.findMany({
+    where:   { org: { name: "Dummy" } },
+    include: { user: { select: { id: true } } },
+  });
+  if (dummyStudents.length > 0) {
+    dummyGroupMap.set("Students", dummyStudents.map((s) => ({
+      id:        s.user.id,
+      name:      s.name,
+      email:     s.email,
+      orgRole:   s.branch ?? "Student",
+      isStudent: true,
+    })));
+  }
+
+  const dummyOrg: OrgSection = {
+    orgName: "Dummy",
+    groups: [...dummyDeptOrder, "Students"]
+      .filter((d) => dummyGroupMap.has(d))
+      .map((groupName) => ({
+        groupName,
+        users: dummyGroupMap.get(groupName)!,
+      })),
+  };
+
   return (
     <DevSwitcher
-      orgs={[seedOrg, demoOrg]}
+      orgs={[seedOrg, demoOrg, dummyOrg]}
       currentUserId={session?.user?.id ?? null}
       currentUserName={session?.user?.name ?? null}
     />

@@ -37,6 +37,8 @@ export const authConfig: NextAuthConfig = {
         token.image = user.image;
         token.name  = user.name;
         token.email = user.email;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        token.role  = (user as any).role ?? "STAFF";
       }
       return token;
     },
@@ -47,6 +49,8 @@ export const authConfig: NextAuthConfig = {
         session.user.image = (token.image as string) ?? session.user.image;
         session.user.name  = (token.name  as string) ?? session.user.name;
         if (typeof token.email === "string") session.user.email = token.email;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (session.user as any).role = (token.role as string) ?? "STAFF";
       }
       return session;
     },

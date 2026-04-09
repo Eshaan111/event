@@ -9,6 +9,11 @@ datasource db {
   provider = "postgresql"
 }
 
+enum UserRole {
+  STAFF
+  STUDENT
+}
+
 enum ProposalType {
   EVENT
   SUMMIT
@@ -30,11 +35,13 @@ enum ProposalStatus {
 model Organization {
   id        String   @id @default(cuid())
   name      String
+  joinToken String?  @unique
   createdAt DateTime @default(now())
 
   members     OrgMember[]
   departments Department[]
   proposals   Proposal[]
+  students    Student[]
 }
 
 model Proposal {
@@ -59,6 +66,10 @@ model Proposal {
   orgId          String?
   org            Organization?   @relation(fields: [orgId], references: [id])
 
+  // Set when proposal is submitted by a student (not a dept member)
+  studentId      String?
+  student        Student?        @relation(fields: [studentId], references: [id], onDelete: SetNull)
+
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
@@ -69,6 +80,7 @@ model Proposal {
   meetings       Meeting[]
   comments       ProposalComment[]
   eventReport    EventReport?
+  votes          ProposalVote[]
 }
 
 model ProposalVersion {
@@ -135,6 +147,9 @@ model User {
   emailVerified DateTime?
   image         String?
 
+  // STAFF = org member / dept member; STUDENT = student portal user
+  role          UserRole  @default(STAFF)
+
   // Profile fields editable by the user
   bio           String?
   specialty     String?   // e.g. "Spatial Logic", "Atmosphere Engineering"
@@ -147,6 +162,7 @@ model User {
   proposalComments  ProposalComment[]
   orgMembership     OrgMember?
   eventReports      EventReport[]
+  student           Student?
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -394,4 +410,48 @@ model DepartmentInvite {
   usedAt       DateTime?
 
   createdAt    DateTime   @default(now())
+}
+
+// ── Students ────────────────────────────────────────────────────
+// Students are external to org departments — they submit proposals
+// that flow through the org's default approval hierarchy.
+
+model Student {
+  id            String        @id @default(cuid())
+
+  userId        String        @unique
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name          String
+  email         String
+
+  studentNumber String?       // college-issued student ID
+  branch        String?       // academic department/branch (e.g. "Computer Science")
+  year          String?       // e.g. "2nd Year", "Final Year"
+
+  orgId         String?
+  org           Organization? @relation(fields: [orgId], references: [id])
+
+  proposals     Proposal[]
+  votes         ProposalVote[]
+
+  createdAt     DateTime      @default(now())
+}
+
+// ── Student Votes ───────────────────────────────────────────────
+// One vote per student per proposal. Students "like" proposals to
+// signal interest; the aggregate count is surfaced to dept reviewers.
+
+model ProposalVote {
+  id         String   @id @default(cuid())
+
+  proposalId String
+  proposal   Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  studentId  String
+  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime @default(now())
+
+  @@unique([proposalId, studentId])
 }

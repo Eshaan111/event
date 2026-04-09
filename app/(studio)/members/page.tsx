@@ -13,6 +13,8 @@ export default async function MembersPage() {
   const session = await auth();
   const orgId   = await getOrgId(session?.user?.id);
 
+  const org = orgId ? await prisma.organization.findUnique({ where: { id: orgId }, select: { joinToken: true } }) : null;
+
   const [users, manualOrgMembers] = await Promise.all([
     // Only fetch users who belong to this org (via OrgMember or a dept in this org)
     prisma.user.findMany({
@@ -83,5 +85,5 @@ export default async function MembersPage() {
     })),
   ];
 
-  return <MembersClient members={members} />;
+  return <MembersClient members={members} joinToken={org?.joinToken ?? null} />;
 }

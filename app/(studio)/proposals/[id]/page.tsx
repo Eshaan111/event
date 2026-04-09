@@ -22,7 +22,7 @@ export default async function ProposalDetailPage({ params }: Props) {
   const session = await auth();
   const orgId   = await getOrgId(session?.user?.id);
 
-  const [proposal, rawChains, departments, rawVersions, rawMeetings, rawComments] = await Promise.all([
+  const [proposal, rawChains, departments, rawVersions, rawMeetings, rawComments, voteCount] = await Promise.all([
     prisma.proposal.findUnique({
       where:   { id },
       include: { authors: { orderBy: { isPrimary: "desc" } }, tags: true },
@@ -53,6 +53,7 @@ export default async function ProposalDetailPage({ params }: Props) {
       where:   { proposalId: id },
       orderBy: { createdAt: "asc" },
     }),
+    prisma.proposalVote.count({ where: { proposalId: id } }),
   ]);
 
   // Guard: proposal must exist and belong to the current user's org
@@ -96,7 +97,8 @@ export default async function ProposalDetailPage({ params }: Props) {
       isPrimary: a.isPrimary,
       userId:    a.userId,
     })),
-    tags: proposal.tags.map((t) => ({ id: t.id, label: t.label })),
+    tags:      proposal.tags.map((t) => ({ id: t.id, label: t.label })),
+    voteCount,
   };
 
   const chains: SerializedChain[] = rawChains.map((c) => ({
